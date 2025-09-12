@@ -76,7 +76,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
     btn_agregar = tk.Button(frame_input_btns, text="Agregar", command=agregar_producto_wrapper)
     btn_agregar.pack(side="left", padx=10)
 
-    btn_cancelar = tk.Button(frame_input_btns, text="Cancelar", command=lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio), bg="red", fg="white")
+    btn_cancelar = tk.Button(frame_input_btns, text="Cancelar", command=lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio), fg="black")
     btn_cancelar.pack(side="left", padx=10)
 
     # Treeview para mostrar productos con columnas
@@ -113,14 +113,14 @@ def crear_pantalla_principal(conn, cursor, menubar):
     btn_eliminar = tk.Button(root, text="Eliminar seleccionado", command=lambda: utils.eliminar_seleccionado(tree))
     btn_eliminar.grid(row=5, column=0, padx=10, pady=5, sticky="e")
 
-    btn_limpiar = tk.Button(root, text="Limpiar todo", command=lambda: utils.limpiar_todo(tree), bg="red", fg="white")
+    btn_limpiar = tk.Button(root, text="Limpiar todo", command=lambda: utils.limpiar_todo(tree), fg="black")
     btn_limpiar.grid(row=5, column=1, padx=10, pady=5, sticky="w")
 
     btn_modificar = tk.Button(root, text="Modificar seleccionado", command=lambda: utils.modificar_seleccionado(tree, entry_descripcion, entry_precio))
     btn_modificar.grid(row=5, column=1, padx=10, pady=5, sticky="e")
 
     # Botón Finalizar venta (centrado arriba de imprimir)
-    btn_finalizar = tk.Button(root, text="Finalizar venta", command=finalizar_venta_wrapper, bg="green", fg="white", width=20)
+    btn_finalizar = tk.Button(root, text="Finalizar venta", command=finalizar_venta_wrapper, fg="black", width=20)
     btn_finalizar.grid(row=6, column=1, padx=10, pady=(20, 5), sticky="n")
 
     # Botón Imprimir debajo de todos los demás, alineado a la derecha
@@ -128,8 +128,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
         root,
         text="Imprimir",
         command=lambda: utils.imprimir(cursor, lambda: utils.mostrar_popup_sin_productos(root)),
-        bg="blue",
-        fg="white"
+        bg="#357ab8", fg="white"
     )
     btn_imprimir.grid(row=7, column=1, padx=10, pady=20, sticky="e")
 

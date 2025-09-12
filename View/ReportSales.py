@@ -18,10 +18,11 @@ def mostrar_reporte_ventas(parent=None):
     frame_filtros.pack(fill="x", padx=10, pady=10)
 
     tk.Label(frame_filtros, text="Fecha inicio:").pack(side="left")
-    entry_inicio = DateEntry(frame_filtros, width=12, date_pattern="yyyy-mm-dd")
+    from datetime import date
+    entry_inicio = DateEntry(frame_filtros, width=12, date_pattern="yyyy-mm-dd", mindate=date(1900, 1, 1))
     entry_inicio.pack(side="left", padx=5)
     tk.Label(frame_filtros, text="Fecha fin:").pack(side="left")
-    entry_fin = DateEntry(frame_filtros, width=12, date_pattern="yyyy-mm-dd")
+    entry_fin = DateEntry(frame_filtros, width=12, date_pattern="yyyy-mm-dd", mindate=date(1900, 1, 1))
     entry_fin.pack(side="left", padx=5)
 
     def filtrar():
