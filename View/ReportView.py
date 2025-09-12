@@ -66,6 +66,13 @@ def mostrar_historial_ventas(parent=None):
     tk.Label(frame_filtros, text="Fecha fin:").pack(side="left")
     entry_fin = DateEntry(frame_filtros, width=12, date_pattern="yyyy-mm-dd")
     entry_fin.pack(side="left", padx=5)
+
+    # Botón Descargar PDF en la parte superior derecha
+    def descargar_pdf():
+        from tkinter import messagebox
+        messagebox.showinfo("Descargar PDF", "Función de descarga de PDF (por implementar)")
+    btn_pdf = tk.Button(frame_filtros, text="Descargar PDF", command=descargar_pdf, bg="#357ab8", fg="white")
+    btn_pdf.pack(side="right", padx=10)
     def filtrar_ventas():
         from tkinter import messagebox
         lista_ventas.delete(0, tk.END)
