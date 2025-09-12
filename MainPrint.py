@@ -12,7 +12,7 @@ crear_conexion_y_tablas("config/sqliteDB.db")
 conn = sqlite3.connect("config/sqliteDB.db")
 cursor = conn.cursor()
 
-crear_pantalla_principal(conn, cursor, menubar)
+crear_pantalla_principal(conn, cursor, menubar) 
 conn.close()
 #test
 #te
