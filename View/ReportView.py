@@ -67,11 +67,12 @@ def mostrar_historial_ventas(parent=None):
     entry_fin = DateEntry(frame_filtros, width=12, date_pattern="yyyy-mm-dd")
     entry_fin.pack(side="left", padx=5)
 
-    # Botón Descargar PDF en la parte superior derecha
+    # Estilo personalizado para botones azules
+    style.configure("Blue.TButton", background="#357ab8", foreground="white")
     def descargar_pdf():
         from tkinter import messagebox
         messagebox.showinfo("Descargar PDF", "Función de descarga de PDF (por implementar)")
-    btn_pdf = tk.Button(frame_filtros, text="Descargar PDF", command=descargar_pdf, bg="#357ab8", fg="white")
+    btn_pdf = ttk.Button(frame_filtros, text="Descargar PDF", command=descargar_pdf, style="Blue.TButton")
     btn_pdf.pack(side="right", padx=10)
     def filtrar_ventas():
         from tkinter import messagebox
@@ -123,7 +124,7 @@ def mostrar_historial_ventas(parent=None):
         from tkinter import messagebox
         messagebox.showinfo("Imprimir", "Función de impresión de reporte")
 
-    btn_imprimir = tk.Button(frame_der, text="Imprimir", command=imprimir_reporte, bg="#357ab8", fg="white")
+    btn_imprimir = ttk.Button(frame_der, text="Imprimir", command=imprimir_reporte, style="Blue.TButton")
     btn_imprimir.pack(anchor="ne", padx=5, pady=5)
 
     label_resumen = tk.Label(frame_der, text="Resumen de la venta seleccionada:")
