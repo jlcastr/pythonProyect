@@ -123,12 +123,13 @@ def crear_pantalla_principal(conn, cursor, menubar):
     btn_finalizar = tk.Button(root, text="Finalizar venta", command=finalizar_venta_wrapper, fg="black", width=20)
     btn_finalizar.grid(row=6, column=1, padx=10, pady=(20, 5), sticky="n")
 
-    # Botón Imprimir debajo de todos los demás, alineado a la derecha
-    btn_imprimir = tk.Button(
+    # Botón Imprimir debajo de todos los demás, alineado a la derecha (usando ttk para color personalizado en macOS)
+    style.configure("Blue.TButton", background="#357ab8", foreground="white")
+    btn_imprimir = ttk.Button(
         root,
         text="Imprimir",
         command=lambda: utils.imprimir(cursor, lambda: utils.mostrar_popup_sin_productos(root)),
-        bg="#357ab8", fg="white"
+        style="Blue.TButton"
     )
     btn_imprimir.grid(row=7, column=1, padx=10, pady=20, sticky="e")
 
