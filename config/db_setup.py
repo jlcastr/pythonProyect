@@ -1,8 +1,19 @@
 import sqlite3
 
 def crear_conexion_y_tablas(db_path="sqliteDB.db"):
+
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+    # Crear tabla Emails
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Emails (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            pass TEXT NOT NULL,
+            createon TEXT NOT NULL,
+            updateon TEXT
+        )
+    """)
 
     # Crear tabla VentaMaster
     cursor.execute("""

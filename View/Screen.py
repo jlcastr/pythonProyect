@@ -6,6 +6,10 @@ import Controller.db_operations as db_operations
 def crear_pantalla_principal(conn, cursor, menubar):
     import tkinter as tk
     root = tk.Tk()
+    try:
+        root.iconbitmap('Img/SM2.ico')
+    except Exception:
+        pass
     # Estilo personalizado para Treeview de productos (igual que el reporte)
     from tkinter import ttk
     style = ttk.Style()
@@ -32,7 +36,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
 
     venta_actual_id = [None]
     folio_actual = [None]
-    root.after(0, lambda: root.title("Agregar Producto"))
+    root.after(0, lambda: root.title("S&M - Sistema de Manejo de Ventas"))
     root.geometry("900x570")
     root.resizable(False, False)
     from View.menu import menubar as menu_fn
@@ -68,10 +72,14 @@ def crear_pantalla_principal(conn, cursor, menubar):
 
     def finalizar_venta_wrapper():
         venta_actual_id[0], folio_actual[0] = utils.finalizar_venta(
-                tree, entry_folio, conn, cursor,
-                lambda: utils.mostrar_popup_finalizar_venta(root, lambda: utils.imprimir(cursor, lambda: utils.mostrar_popup_sin_productos(root))),
-                venta_actual_id[0], folio_actual[0]
-            )
+            tree, entry_folio, conn, cursor,
+            lambda: utils.mostrar_popup_finalizar_venta(
+                root,
+                lambda: utils.imprimir(cursor, lambda: utils.mostrar_popup_sin_productos(root)),
+                cursor
+            ),
+            venta_actual_id[0], folio_actual[0]
+        )
 
     btn_agregar = tk.Button(frame_input_btns, text="Agregar", command=agregar_producto_wrapper)
     btn_agregar.pack(side="left", padx=10)
@@ -125,12 +133,24 @@ def crear_pantalla_principal(conn, cursor, menubar):
 
     # Botón Imprimir debajo de todos los demás, alineado a la derecha (usando ttk para color personalizado en macOS)
     style.configure("Blue.TButton", background="#357ab8", foreground="white")
+
     btn_imprimir = ttk.Button(
         root,
         text="Imprimir",
         command=lambda: utils.imprimir(cursor, lambda: utils.mostrar_popup_sin_productos(root)),
         style="Blue.TButton"
     )
-    btn_imprimir.grid(row=7, column=1, padx=10, pady=20, sticky="e")
+    btn_imprimir.grid(row=7, column=1, padx=(10, 120), pady=20, sticky="e")
+
+    # Botón Enviar por correo al lado de Imprimir
+    style.configure("Blue.TButton", background="#357ab8", foreground="white")
+
+    btn_email = ttk.Button(
+        root,
+        text="Enviar por correo",
+        command=lambda: utils.enviar_por_correo(cursor, lambda: utils.mostrar_popup_sin_productos(root)),
+        style="Blue.TButton"
+    )
+    btn_email.grid(row=7, column=1, padx=(110, 10), pady=20, sticky="e")
 
     root.mainloop()

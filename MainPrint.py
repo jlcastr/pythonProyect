@@ -14,5 +14,3 @@ cursor = conn.cursor()
 
 crear_pantalla_principal(conn, cursor, menubar) 
 conn.close()
-#test
-#teP
