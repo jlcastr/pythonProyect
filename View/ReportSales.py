@@ -55,34 +55,13 @@ def mostrar_reporte_ventas(parent=None):
         query += " ORDER BY fecha_venta DESC"
         for row in cursor.execute(query, params):
             tree.insert("", tk.END, values=row)
+        actualizar_total_general()
 
     btn_filtrar = tk.Button(frame_filtros, text="Filtrar", command=filtrar)
     btn_filtrar.pack(side="left", padx=10)
 
-    # Tabla de resultados
-    style = ttk.Style()
-    style.theme_use("default")
-    style.configure("minimal.Treeview",
-                    background="#fafafa",
-                    foreground="#222",
-                    rowheight=24,
-                    fieldbackground="#fafafa",
-                    font=("Segoe UI", 10),
-                    borderwidth=0)
-    style.configure("minimal.Treeview.Heading",
-                    font=("Segoe UI", 10, "bold"),
-                    background="#eaeaea",
-                    foreground="#222",
-                    borderwidth=0)
-    style.layout("minimal.Treeview", [
-        ('Treeview.treearea', {'sticky': 'nswe'})
-    ])
-    style.map("minimal.Treeview",
-              background=[('selected', '#e0e0e0')])
-    style.map("minimal.Treeview.Heading",
-              background=[('active', '#cccccc')])
-
-    tree = ttk.Treeview(root, columns=("descripcion", "precio", "fecha_venta", "venta_master_id"), show="headings", height=18, style="minimal.Treeview")
+    # Treeview principal de productos
+    tree = ttk.Treeview(root, columns=("descripcion", "precio", "fecha_venta", "venta_master_id"), show="headings", height=18)
     tree.heading("descripcion", text="Descripción")
     tree.heading("precio", text="Precio")
     tree.heading("fecha_venta", text="Fecha de venta")
@@ -91,7 +70,23 @@ def mostrar_reporte_ventas(parent=None):
     tree.column("precio", width=80, anchor="center")
     tree.column("fecha_venta", width=150, anchor="center")
     tree.column("venta_master_id", width=80, anchor="center")
-    tree.pack(fill="both", expand=True, padx=10, pady=10)
+    tree.pack(fill="both", expand=True, padx=10, pady=(0,0))
+
+    # Label para mostrar el total general debajo del Treeview principal
+    total_general_var = tk.StringVar(value="Total: $0.00")
+    label_total_general = tk.Label(root, textvariable=total_general_var, font=("Segoe UI", 12, "bold"), anchor="e", pady=8)
+    label_total_general.pack(fill="x", padx=10, pady=(0,10))
+
+    def actualizar_total_general():
+        total = 0.0
+        for row_id in tree.get_children():
+            values = tree.item(row_id, "values")
+            if len(values) > 1:
+                try:
+                    total += float(values[1])
+                except Exception:
+                    pass
+        total_general_var.set(f"Total: ${total:,.2f}")
 
     filtrar()  # Mostrar todos al abrir
 

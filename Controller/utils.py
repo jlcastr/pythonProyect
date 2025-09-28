@@ -150,7 +150,7 @@ def mostrar_popup_finalizar_venta(root, popup_imprimir_nota, cursor):
     import tkinter as tk
     popup = tk.Toplevel(root)
     popup.title("Finalizar venta")
-    popup.geometry("350x150")
+    popup.geometry("540x180")  # Más ancho para 3 botones grandes
     popup.resizable(False, False)
     label = tk.Label(popup, text="¿Qué deseas hacer?", pady=20)
     label.pack()
@@ -160,22 +160,23 @@ def mostrar_popup_finalizar_venta(root, popup_imprimir_nota, cursor):
     from tkinter import ttk
     style = ttk.Style()
     style.configure("Blue.TButton", background="#357ab8", foreground="white")
-    btn_imprimir = ttk.Button(frame, text="Imprimir", width=12, style="Blue.TButton", command=lambda: [popup.destroy(), popup_imprimir_nota()])
-    btn_imprimir.pack(side="left", padx=10)
+    style.configure("Red.TButton", background="#c0392b", foreground="white")
+    btn_imprimir = ttk.Button(frame, text="Imprimir", width=13, style="Blue.TButton", command=lambda: [popup.destroy(), popup_imprimir_nota()])
+    btn_imprimir.pack(side="left", padx=8)
 
     # Botón Enviar por correo (igual funcionalidad que el principal)
     import Controller.utils as utils_mod
     btn_enviar_correo = ttk.Button(
         frame,
         text="Enviar por correo",
-        width=16,
+        width=17,
         style="Blue.TButton",
         command=lambda: [popup.destroy(), utils_mod.enviar_por_correo(cursor, lambda: utils_mod.mostrar_popup_sin_productos(root))]
     )
-    btn_enviar_correo.pack(side="left", padx=10)
+    btn_enviar_correo.pack(side="left", padx=8)
 
-    btn_no = tk.Button(frame, text="Cerrar", width=12, command=popup.destroy)
-    btn_no.pack(side="left", padx=10)
+    btn_no = ttk.Button(frame, text="Cerrar", width=10, style="Red.TButton", command=popup.destroy)
+    btn_no.pack(side="left", padx=8, pady=5)
     popup.transient(root)
     popup.grab_set()
     root.wait_window(popup)
