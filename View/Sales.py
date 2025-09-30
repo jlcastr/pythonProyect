@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import Controller.utils as utils
 import Controller.db_operations as db_operations
+from Controller.styles import configurar_estilos_aplicacion, Colores, Fuentes, EstilosVentas, EstilosTreeview
 
 def crear_pantalla_principal(conn, cursor, menubar):
     import tkinter as tk
@@ -12,30 +13,12 @@ def crear_pantalla_principal(conn, cursor, menubar):
         pass
     
     # Configuración profesional de la ventana
-    root.configure(bg='#f8f9fa')
-    # Estilo personalizado para Treeview de productos (igual que el reporte)
-    from tkinter import ttk
-    style = ttk.Style()
-    style.theme_use("default")
-    style.configure("minimal.Treeview",
-                    background="#fafafa",
-                    foreground="#222",
-                    rowheight=24,
-                    fieldbackground="#fafafa",
-                    font=("Segoe UI", 10),
-                    borderwidth=0)
-    style.configure("minimal.Treeview.Heading",
-                    font=("Segoe UI", 10, "bold"),
-                    background="#eaeaea",
-                    foreground="#222",
-                    borderwidth=0)
-    style.layout("minimal.Treeview", [
-        ('Treeview.treearea', {'sticky': 'nswe'})
-    ])
-    style.map("minimal.Treeview",
-              background=[('selected', '#e0e0e0')])
-    style.map("minimal.Treeview.Heading",
-              background=[('active', '#cccccc')])
+    root.configure(bg=Colores.FONDO_VENTAS)
+    
+    # Configurar estilos centralizados
+    style = configurar_estilos_aplicacion()
+    
+    # Los estilos de Treeview ya están configurados centralizadamente
 
     venta_actual_id = [None]
     folio_actual = [None]
@@ -46,51 +29,42 @@ def crear_pantalla_principal(conn, cursor, menubar):
     root.config(menu=menu_fn(root))
     
     # Frame principal con estilo profesional
-    main_container = tk.Frame(root, bg='#f8f9fa', padx=20, pady=20)
+    main_container = EstilosVentas.crear_frame(root)
+    main_container.configure(padx=20, pady=20)
     main_container.pack(fill='both', expand=True)
     
     # Título principal
-    titulo_principal = tk.Label(main_container, text="📊 MÓDULO DE VENTAS", 
-                               font=("Arial", 18, "bold"), bg='#f8f9fa', fg='#2c3e50')
+    titulo_principal = EstilosVentas.crear_label_titulo(main_container, "📊 MÓDULO DE VENTAS")
     titulo_principal.grid(row=0, column=0, columnspan=3, pady=(0, 20))
     
     # Sección de información de venta
-    info_frame = tk.LabelFrame(main_container, text="📋 Información de Venta", 
-                              font=("Arial", 11, "bold"), bg='#f8f9fa', fg='#34495e', 
-                              relief='groove', bd=2)
+    info_frame = EstilosVentas.crear_labelframe(main_container, "📋 Información de Venta")
     info_frame.grid(row=1, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
     info_frame.columnconfigure(1, weight=1)
 
     # Etiqueta y campo para folio (readonly) con mejor estilo
-    label_folio = tk.Label(info_frame, text="Folio de venta:", 
-                          font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
+    label_folio = EstilosVentas.crear_label_campo(info_frame, "Folio de venta:")
     label_folio.grid(row=0, column=0, padx=15, pady=10, sticky="e")
-    entry_folio = tk.Entry(info_frame, width=35, state="readonly", 
-                          font=("Arial", 10), relief='solid', bd=1)
+    entry_folio = EstilosVentas.crear_entry_campo(info_frame, readonly=True)
     entry_folio.grid(row=0, column=1, padx=15, pady=10, sticky='w')
 
     # Sección de entrada de productos
-    producto_frame = tk.LabelFrame(main_container, text="🗺️ Agregar Producto", 
-                                  font=("Arial", 11, "bold"), bg='#f8f9fa', fg='#34495e', 
-                                  relief='groove', bd=2)
+    producto_frame = EstilosVentas.crear_labelframe(main_container, "🗺️ Agregar Producto")
     producto_frame.grid(row=2, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
     producto_frame.columnconfigure(1, weight=1)
 
     # Etiqueta y campo para descripción con mejor estilo
-    label_descripcion = tk.Label(producto_frame, text="Descripción del producto:", 
-                                font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
+    label_descripcion = EstilosVentas.crear_label_campo(producto_frame, "Descripción del producto:")
     label_descripcion.grid(row=0, column=0, padx=15, pady=8, sticky="e")
-    entry_descripcion = tk.Entry(producto_frame, width=35, font=("Arial", 10), 
-                               relief='solid', bd=1)
+    entry_descripcion = EstilosVentas.crear_entry_campo(producto_frame)
     entry_descripcion.grid(row=0, column=1, padx=15, pady=8, sticky='w')
 
     # Etiqueta y campo para precio con mejor estilo
-    label_precio = tk.Label(producto_frame, text="Precio ($):", 
-                           font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
+    label_precio = EstilosVentas.crear_label_campo(producto_frame, "Precio ($):")
     label_precio.grid(row=1, column=0, padx=15, pady=8, sticky="e")
     vcmd = (root.register(lambda texto: utils.validar_decimal(texto)), '%P')
-    entry_precio = tk.Entry(producto_frame, width=35, validate="key", validatecommand=vcmd, 
-                          font=("Arial", 10), relief='solid', bd=1)
+    entry_precio = EstilosVentas.crear_entry_campo(producto_frame)
+    entry_precio.configure(validate="key", validatecommand=vcmd)
     entry_precio.grid(row=1, column=1, padx=15, pady=8, sticky='w')
 
     # Frame para los botones con estilo profesional
@@ -125,16 +99,13 @@ def crear_pantalla_principal(conn, cursor, menubar):
     btn_cancelar.pack(side="left", padx=15)
 
     # Sección de lista de productos
-    lista_frame = tk.LabelFrame(main_container, text="📋 Productos en la Venta", 
-                               font=("Arial", 11, "bold"), bg='#f8f9fa', fg='#34495e', 
-                               relief='groove', bd=2)
+    lista_frame = EstilosVentas.crear_labelframe(main_container, "📋 Productos en la Venta")
     lista_frame.grid(row=3, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
     lista_frame.columnconfigure(0, weight=1)
 
     tree = ttk.Treeview(lista_frame, columns=("descripcion", "precio", "fecha_venta", "folio"), 
                        show="headings", height=8, style="product.Treeview")
-    tree.tag_configure('oddrow', background='#e6f2ff')
-    tree.tag_configure('evenrow', background='#ffffff')
+    EstilosVentas.configurar_filas_alternadas(tree)
     tree.heading("descripcion", text="Descripción")
     tree.heading("precio", text="Precio")
     tree.heading("fecha_venta", text="Fecha de venta")
@@ -164,13 +135,13 @@ def crear_pantalla_principal(conn, cursor, menubar):
     
     btn_eliminar = tk.Button(acciones_frame, text="🗑️ Eliminar", 
                             command=lambda: utils.eliminar_seleccionado(tree),
-                            bg='#e67e22', fg='white', font=("Arial", 9, "bold"),
+                            bg='#e74c3c', fg='white', font=("Arial", 9, "bold"),
                             relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_eliminar.pack(side="left", padx=10)
 
     btn_modificar = tk.Button(acciones_frame, text="✏️ Modificar", 
                              command=lambda: utils.modificar_seleccionado(tree, entry_descripcion, entry_precio),
-                             bg='#3498db', fg='white', font=("Arial", 9, "bold"),
+                             bg='#2980b9', fg='white', font=("Arial", 9, "bold"),
                              relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_modificar.pack(side="left", padx=10)
     
@@ -187,7 +158,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
     # Botón Finalizar venta con estilo destacado
     btn_finalizar = tk.Button(finalizacion_frame, text="✅ Finalizar Venta", 
                              command=finalizar_venta_wrapper,
-                             bg='#8e44ad', fg='white', font=("Arial", 12, "bold"),
+                             bg='#27ae60', fg='white', font=("Arial", 12, "bold"),
                              relief='raised', bd=3, padx=30, pady=8, cursor='hand2')
     btn_finalizar.pack(pady=(0, 15))
 
@@ -224,32 +195,11 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
         widget.destroy()
     
     # Crear un frame interno completamente centrado
-    frame_centrado = tk.Frame(parent_frame, bg='#f8f9fa', padx=30, pady=20)
+    frame_centrado = EstilosVentas.crear_frame(parent_frame)
+    frame_centrado.configure(padx=30, pady=20)
     frame_centrado.place(relx=0.5, rely=0.5, anchor='center')
     
-    # Estilo personalizado para Treeview
-    from tkinter import ttk
-    style = ttk.Style()
-    style.theme_use("default")
-    style.configure("minimal.Treeview",
-                    background="#fafafa",
-                    foreground="#222",
-                    rowheight=24,
-                    fieldbackground="#fafafa",
-                    font=("Segoe UI", 10),
-                    borderwidth=0)
-    style.configure("minimal.Treeview.Heading",
-                    font=("Segoe UI", 10, "bold"),
-                    background="#eaeaea",
-                    foreground="#222",
-                    borderwidth=0)
-    style.layout("minimal.Treeview", [
-        ('Treeview.treearea', {'sticky': 'nswe'})
-    ])
-    style.map("minimal.Treeview",
-              background=[('selected', '#e0e0e0')])
-    style.map("minimal.Treeview.Heading",
-              background=[('active', '#cccccc')])
+    # Los estilos de Treeview ya están configurados centralizadamente
 
     venta_actual_id = [None]
     folio_actual = [None]
@@ -259,17 +209,17 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
     header_frame.grid(row=0, column=0, columnspan=3, sticky='ew', pady=(0, 15))
     header_frame.columnconfigure(1, weight=1)
     
-    # Botón para volver al menú con mejor estilo
-    btn_volver = tk.Button(header_frame, text="← Volver al Menú", 
-                          command=callback_volver, 
-                          bg="#34495e", fg="white", 
-                          font=("Arial", 10, "bold"), relief='raised', bd=2,
-                          padx=15, pady=5, cursor='hand2')
+    # Configurar estilos centralizados
+    style = configurar_estilos_aplicacion()
+    
+    # Botón para volver al menú con estilo centralizado
+    btn_volver = ttk.Button(header_frame, text="← Volver al Menú", 
+                           command=callback_volver, 
+                           style="VolverButton.TButton")
     btn_volver.pack(side='left')
 
     # Título centrado con mejor estilo
-    titulo_ventas = tk.Label(header_frame, text="📊 MÓDULO DE VENTAS", 
-                            font=("Arial", 18, "bold"), bg='#f8f9fa', fg='#2c3e50')
+    titulo_ventas = EstilosVentas.crear_label_titulo(header_frame, "📊 MÓDULO DE VENTAS")
     titulo_ventas.pack(side='right')
 
     # Sección de información de venta
@@ -352,8 +302,7 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
 
     tree = ttk.Treeview(lista_frame, columns=("descripcion", "precio", "fecha_venta", "folio"), 
                        show="headings", height=8, style="minimal.Treeview")
-    tree.tag_configure('oddrow', background='#e6f2ff')
-    tree.tag_configure('evenrow', background='#ffffff')
+    EstilosVentas.configurar_filas_alternadas(tree)
     tree.heading("descripcion", text="Descripción")
     tree.heading("precio", text="Precio")
     tree.heading("fecha_venta", text="Fecha de venta")
@@ -383,13 +332,13 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
     
     btn_eliminar = tk.Button(acciones_frame, text="🗑️ Eliminar", 
                             command=lambda: utils.eliminar_seleccionado(tree),
-                            bg='#e67e22', fg='white', font=("Arial", 9, "bold"),
+                            bg='#e74c3c', fg='white', font=("Arial", 9, "bold"),
                             relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_eliminar.pack(side="left", padx=10)
 
     btn_modificar = tk.Button(acciones_frame, text="✏️ Modificar", 
                              command=lambda: utils.modificar_seleccionado(tree, entry_descripcion, entry_precio),
-                             bg='#3498db', fg='white', font=("Arial", 9, "bold"),
+                             bg='#2980b9', fg='white', font=("Arial", 9, "bold"),
                              relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_modificar.pack(side="left", padx=10)
     
@@ -406,7 +355,7 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
     # Botón Finalizar venta con estilo destacado
     btn_finalizar = tk.Button(finalizacion_frame, text="✅ Finalizar Venta", 
                              command=finalizar_venta_wrapper,
-                             bg='#8e44ad', fg='white', font=("Arial", 12, "bold"),
+                             bg='#27ae60', fg='white', font=("Arial", 12, "bold"),
                              relief='raised', bd=3, padx=30, pady=8, cursor='hand2')
     btn_finalizar.pack(pady=(0, 15))
 

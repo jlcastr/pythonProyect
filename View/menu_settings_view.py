@@ -1,6 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
+import sys
+import os
 from View.email_view import abrir_config_email, mostrar_config_email_en_frame
+
+# Agregar el directorio padre al path para importar estilos
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from Controller.styles import configurar_estilos_aplicacion
 
 def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     """
@@ -20,6 +27,9 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
         img_configuracion = img_configuracion.subsample(4, 4)  # Medida 4 (aún más pequeña)
     except Exception:
         img_configuracion = None
+    
+    # Usar estilos centralizados
+    style = configurar_estilos_aplicacion()
     
     # Frame principal para las configuraciones
     main_frame = tk.Frame(parent_frame)
@@ -66,19 +76,7 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     grid_frame = tk.Frame(botones_frame, bg="#ecf0f1")
     grid_frame.pack(expand=True)
     
-    # Estilo común para botones (ajustado para coincidir con Report_menu.py)
-    button_style = {
-        "bg": "#3498db",  # Color azul
-        "fg": "white",
-        "font": ("Arial", 10, "bold"),
-        "relief": "raised",
-        "bd": 2,
-        "padx": 10,
-        "pady": 8,
-        "width": 170,
-        "height": 110,
-        "cursor": "hand2"
-    }
+    # Los botones ahora usarán ttk.Button con estilo consistente
     
     # Cargar imágenes para los botones (más pequeñas para mantener tamaño original)
     try:
@@ -137,47 +135,55 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     
     # Botón Email (fila 0, columna 0) con imagen
     if img_email:
-        btn_email = tk.Button(grid_frame, text="Email", 
-                             image=img_email, compound=tk.TOP,
-                             command=abrir_email, **button_style)
+        btn_email = ttk.Button(grid_frame, text="Email", 
+                              image=img_email, compound=tk.TOP,
+                              command=abrir_email, style='Config.TButton',
+                              cursor="hand2")
         btn_email.image = img_email  # Mantener referencia de la imagen
     else:
-        btn_email = tk.Button(grid_frame, text="Email", 
-                             command=abrir_email, **button_style)
-    btn_email.grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
+        btn_email = ttk.Button(grid_frame, text="Email", 
+                              command=abrir_email, style='Config.TButton',
+                              cursor="hand2")
+    btn_email.grid(row=0, column=0, padx=15, pady=15, sticky="nsew", ipadx=30, ipady=25)
     
     # Botón Logo (fila 0, columna 1) con imagen
     if img_logo:
-        btn_logo = tk.Button(grid_frame, text="Logo", 
-                            image=img_logo, compound=tk.TOP,
-                            command=abrir_logo, **button_style)
+        btn_logo = ttk.Button(grid_frame, text="Logo", 
+                             image=img_logo, compound=tk.TOP,
+                             command=abrir_logo, style='Config.TButton',
+                             cursor="hand2")
         btn_logo.image = img_logo  # Mantener referencia de la imagen
     else:
-        btn_logo = tk.Button(grid_frame, text="Logo", 
-                            command=abrir_logo, **button_style)
-    btn_logo.grid(row=0, column=1, padx=15, pady=15, sticky="nsew")
+        btn_logo = ttk.Button(grid_frame, text="Logo", 
+                             command=abrir_logo, style='Config.TButton',
+                             cursor="hand2")
+    btn_logo.grid(row=0, column=1, padx=15, pady=15, sticky="nsew", ipadx=30, ipady=25)
     
     # Botón Apariencia (fila 1, columna 0) con imagen
     if img_apariencia:
-        btn_apariencia = tk.Button(grid_frame, text="Apariencia", 
-                                  image=img_apariencia, compound=tk.TOP,
-                                  command=abrir_apariencia, **button_style)
+        btn_apariencia = ttk.Button(grid_frame, text="Apariencia", 
+                                   image=img_apariencia, compound=tk.TOP,
+                                   command=abrir_apariencia, style='Config.TButton',
+                                   cursor="hand2")
         btn_apariencia.image = img_apariencia  # Mantener referencia de la imagen
     else:
-        btn_apariencia = tk.Button(grid_frame, text="Apariencia", 
-                                  command=abrir_apariencia, **button_style)
-    btn_apariencia.grid(row=1, column=0, padx=15, pady=15, sticky="nsew")
+        btn_apariencia = ttk.Button(grid_frame, text="Apariencia", 
+                                   command=abrir_apariencia, style='Config.TButton',
+                                   cursor="hand2")
+    btn_apariencia.grid(row=1, column=0, padx=15, pady=15, sticky="nsew", ipadx=30, ipady=25)
     
     # Botón Teléfono (fila 1, columna 1) con imagen
     if img_telefono:
-        btn_telefono = tk.Button(grid_frame, text="Teléfono", 
-                                image=img_telefono, compound=tk.TOP,
-                                command=abrir_telefono, **button_style)
+        btn_telefono = ttk.Button(grid_frame, text="Teléfono", 
+                                 image=img_telefono, compound=tk.TOP,
+                                 command=abrir_telefono, style='Config.TButton',
+                                 cursor="hand2")
         btn_telefono.image = img_telefono  # Mantener referencia de la imagen
     else:
-        btn_telefono = tk.Button(grid_frame, text="Teléfono", 
-                                command=abrir_telefono, **button_style)
-    btn_telefono.grid(row=1, column=1, padx=15, pady=15, sticky="nsew")
+        btn_telefono = ttk.Button(grid_frame, text="Teléfono", 
+                                 command=abrir_telefono, style='Config.TButton',
+                                 cursor="hand2")
+    btn_telefono.grid(row=1, column=1, padx=15, pady=15, sticky="nsew", ipadx=30, ipady=25)
     
     # Configurar peso de las celdas del grid para que se expandan uniformemente
     grid_frame.grid_rowconfigure(0, weight=1)
@@ -185,19 +191,7 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     grid_frame.grid_columnconfigure(0, weight=1)
     grid_frame.grid_columnconfigure(1, weight=1)
     
-    # Efectos hover para los botones
-    def on_enter(event, button, hover_color="#2980b9"):
-        """Efecto hover al entrar"""
-        button.config(bg=hover_color)
-    
-    def on_leave(event, button, normal_color="#3498db"):
-        """Efecto hover al salir"""
-        button.config(bg=normal_color)
-    
-    # Aplicar efectos hover a todos los botones
-    for btn in [btn_email, btn_logo, btn_apariencia, btn_telefono]:
-        btn.bind("<Enter>", lambda e, b=btn: on_enter(e, b))
-        btn.bind("<Leave>", lambda e, b=btn: on_leave(e, b))
+    # Los efectos hover ahora se manejan automáticamente por ttk.Style
     
     # Información adicional
     info_frame = tk.Frame(botones_frame, bg="#ecf0f1")
@@ -232,6 +226,9 @@ def mostrar_configuraciones(parent=None):
         img_configuracion_popup = img_configuracion_popup.subsample(4, 4)  # Medida 4 (aún más pequeña)
     except Exception:
         img_configuracion_popup = None
+    
+    # Usar estilos centralizados
+    style = configurar_estilos_aplicacion()
     
     # Frame principal
     main_frame = tk.Frame(root, bg="#f8f9fa")
@@ -287,19 +284,7 @@ def mostrar_configuraciones(parent=None):
     except Exception:
         img_telefono_popup = None
     
-    # Estilo de botones (ajustado para coincidir con Report_menu.py)
-    button_style = {
-        "bg": "#3498db",
-        "fg": "white",
-        "font": ("Arial", 10, "bold"),
-        "relief": "raised",
-        "bd": 2,
-        "padx": 10,
-        "pady": 8,
-        "width": 170,
-        "height": 110,
-        "cursor": "hand2"
-    }
+    # Los botones usarán ttk.Button con estilo consistente
     
     # Funciones para botones en ventana separada
     def abrir_email_popup():
@@ -326,57 +311,56 @@ def mostrar_configuraciones(parent=None):
                            "Esta funcionalidad estará disponible próximamente.", 
                            parent=root)
     
-    # Crear botones con imagen para Email
+    # Crear botones con ttk.Button para consistencia multiplataforma
     if img_email_popup:
-        btn_email = tk.Button(grid_frame, text="Email", 
-                             image=img_email_popup, compound=tk.TOP,
-                             command=abrir_email_popup, **button_style)
+        btn_email = ttk.Button(grid_frame, text="Email", 
+                              image=img_email_popup, compound=tk.TOP,
+                              command=abrir_email_popup, style='ConfigPopup.TButton',
+                              cursor="hand2")
         btn_email.image = img_email_popup  # Mantener referencia de la imagen
     else:
-        btn_email = tk.Button(grid_frame, text="Email", 
-                             command=abrir_email_popup, **button_style)
-    btn_email.grid(row=0, column=0, padx=20, pady=20)
+        btn_email = ttk.Button(grid_frame, text="Email", 
+                              command=abrir_email_popup, style='ConfigPopup.TButton',
+                              cursor="hand2")
+    btn_email.grid(row=0, column=0, padx=20, pady=20, ipadx=30, ipady=25)
     
     if img_logo_popup:
-        btn_logo = tk.Button(grid_frame, text="Logo", 
-                            image=img_logo_popup, compound=tk.TOP,
-                            command=abrir_logo_popup, **button_style)
+        btn_logo = ttk.Button(grid_frame, text="Logo", 
+                             image=img_logo_popup, compound=tk.TOP,
+                             command=abrir_logo_popup, style='ConfigPopup.TButton',
+                             cursor="hand2")
         btn_logo.image = img_logo_popup  # Mantener referencia de la imagen
     else:
-        btn_logo = tk.Button(grid_frame, text="Logo", 
-                            command=abrir_logo_popup, **button_style)
-    btn_logo.grid(row=0, column=1, padx=20, pady=20)
+        btn_logo = ttk.Button(grid_frame, text="Logo", 
+                             command=abrir_logo_popup, style='ConfigPopup.TButton',
+                             cursor="hand2")
+    btn_logo.grid(row=0, column=1, padx=20, pady=20, ipadx=30, ipady=25)
     
     if img_apariencia_popup:
-        btn_apariencia = tk.Button(grid_frame, text="Apariencia", 
-                                  image=img_apariencia_popup, compound=tk.TOP,
-                                  command=abrir_apariencia_popup, **button_style)
+        btn_apariencia = ttk.Button(grid_frame, text="Apariencia", 
+                                   image=img_apariencia_popup, compound=tk.TOP,
+                                   command=abrir_apariencia_popup, style='ConfigPopup.TButton',
+                                   cursor="hand2")
         btn_apariencia.image = img_apariencia_popup  # Mantener referencia de la imagen
     else:
-        btn_apariencia = tk.Button(grid_frame, text="Apariencia", 
-                                  command=abrir_apariencia_popup, **button_style)
-    btn_apariencia.grid(row=1, column=0, padx=20, pady=20)
+        btn_apariencia = ttk.Button(grid_frame, text="Apariencia", 
+                                   command=abrir_apariencia_popup, style='ConfigPopup.TButton',
+                                   cursor="hand2")
+    btn_apariencia.grid(row=1, column=0, padx=20, pady=20, ipadx=30, ipady=25)
     
     if img_telefono_popup:
-        btn_telefono = tk.Button(grid_frame, text="Teléfono", 
-                                image=img_telefono_popup, compound=tk.TOP,
-                                command=abrir_telefono_popup, **button_style)
+        btn_telefono = ttk.Button(grid_frame, text="Teléfono", 
+                                 image=img_telefono_popup, compound=tk.TOP,
+                                 command=abrir_telefono_popup, style='ConfigPopup.TButton',
+                                 cursor="hand2")
         btn_telefono.image = img_telefono_popup  # Mantener referencia de la imagen
     else:
-        btn_telefono = tk.Button(grid_frame, text="Teléfono", 
-                                command=abrir_telefono_popup, **button_style)
-    btn_telefono.grid(row=1, column=1, padx=20, pady=20)
+        btn_telefono = ttk.Button(grid_frame, text="Teléfono", 
+                                 command=abrir_telefono_popup, style='ConfigPopup.TButton',
+                                 cursor="hand2")
+    btn_telefono.grid(row=1, column=1, padx=20, pady=20, ipadx=30, ipady=25)
     
-    # Efectos hover
-    def on_enter_popup(event, button):
-        button.config(bg="#2980b9")
-    
-    def on_leave_popup(event, button):
-        button.config(bg="#3498db")
-    
-    for btn in [btn_email, btn_logo, btn_apariencia, btn_telefono]:
-        btn.bind("<Enter>", lambda e, b=btn: on_enter_popup(e, b))
-        btn.bind("<Leave>", lambda e, b=btn: on_leave_popup(e, b))
+    # Los efectos hover se manejan automáticamente por ttk.Style
     
     # Información
     info_label = tk.Label(botones_frame, 

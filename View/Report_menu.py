@@ -1,9 +1,19 @@
 import tkinter as tk
 from tkinter import ttk
 import sqlite3
+import sys
+import os
+
+# Agregar el directorio padre al path para importar estilos
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from Controller.styles import configurar_estilos_aplicacion
 
 def crear_menu_reportes(parent_frame, callback_volver):
     """Crear el menú de reportes con botones en cuadrícula"""
+    
+    # Usar estilos centralizados con color #2c5aa0
+    style = configurar_estilos_aplicacion()
     
     # Crear un frame centrado para los botones
     frame_centrado = tk.Frame(parent_frame)
@@ -29,10 +39,9 @@ def crear_menu_reportes(parent_frame, callback_volver):
         img_inventario = None
     
     # Botón para volver al menú principal
-    btn_volver = tk.Button(frame_centrado, text="← Volver al Menú", 
-                          command=callback_volver, 
-                          bg="#357ab8", fg="white", 
-                          font=("Arial", 10, "bold"))
+    btn_volver = ttk.Button(frame_centrado, text="← Volver al Menú", 
+                           command=callback_volver,
+                           style='VolverButton.TButton')
     btn_volver.grid(row=0, column=0, padx=10, pady=5, sticky="w")
     
     # Título del menú de reportes
@@ -58,68 +67,41 @@ def crear_menu_reportes(parent_frame, callback_volver):
     # Crear botones en cuadrícula (2x2, con el tercero en una segunda fila)
     # Fila 1
     if img_reporte_ventas:
-        btn_reporte_ventas = tk.Button(frame_centrado, text="REPORTE DE\nVENTAS", 
-                                      image=img_reporte_ventas, compound=tk.TOP,
-                                      command=abrir_reporte_ventas,
-                                      font=("Arial", 10, "bold"),
-                                      width=170, height=110,
-                                      bg="#357ab8", fg="white", relief="raised",
-                                      bd=2, padx=10, pady=8)
-    else:
-        btn_reporte_ventas = tk.Button(frame_centrado, text="REPORTE DE\nVENTAS", 
-                                      command=abrir_reporte_ventas,
-                                      font=("Arial", 12, "bold"),
-                                      width=18, height=6,
-                                      bg="#357ab8", fg="white", relief="raised",
-                                      bd=2, padx=5, pady=5)
-    btn_reporte_ventas.grid(row=1, column=0, padx=20, pady=20)
-    
-    # Mantener referencia de la imagen
-    if img_reporte_ventas:
+        btn_reporte_ventas = ttk.Button(frame_centrado, text="REPORTE DE\nVENTAS", 
+                                       image=img_reporte_ventas, compound=tk.TOP,
+                                       command=abrir_reporte_ventas,
+                                       style='ReportButton.TButton')
         btn_reporte_ventas.image = img_reporte_ventas
-    
-    if img_historial:
-        btn_historial_ventas = tk.Button(frame_centrado, text="HISTORIAL DE\nNOTAS DE VENTA", 
-                                        image=img_historial, compound=tk.TOP,
-                                        command=abrir_historial_ventas,
-                                        font=("Arial", 10, "bold"),
-                                        width=170, height=110,
-                                        bg="#357ab8", fg="white", relief="raised",
-                                        bd=2, padx=10, pady=8)
     else:
-        btn_historial_ventas = tk.Button(frame_centrado, text="HISTORIAL DE\nNOTAS DE VENTA", 
-                                        command=abrir_historial_ventas,
-                                        font=("Arial", 12, "bold"),
-                                        width=18, height=6,
-                                        bg="#357ab8", fg="white", relief="raised",
-                                        bd=2, padx=5, pady=5)
-    btn_historial_ventas.grid(row=1, column=1, padx=20, pady=20)
+        btn_reporte_ventas = ttk.Button(frame_centrado, text="📊 REPORTE DE\nVENTAS", 
+                                       command=abrir_reporte_ventas,
+                                       style='ReportButton.TButton')
+    btn_reporte_ventas.grid(row=1, column=0, padx=20, pady=20, ipadx=50, ipady=30)
     
-    # Mantener referencia de la imagen
     if img_historial:
+        btn_historial_ventas = ttk.Button(frame_centrado, text="HISTORIAL DE\nNOTAS DE VENTA", 
+                                         image=img_historial, compound=tk.TOP,
+                                         command=abrir_historial_ventas,
+                                         style='ReportButton.TButton')
         btn_historial_ventas.image = img_historial
+    else:
+        btn_historial_ventas = ttk.Button(frame_centrado, text="📋 HISTORIAL DE\nNOTAS DE VENTA", 
+                                         command=abrir_historial_ventas,
+                                         style='ReportButton.TButton')
+    btn_historial_ventas.grid(row=1, column=1, padx=20, pady=20, ipadx=50, ipady=30)
     
     # Fila 2 - Centrar el botón de inventario
     if img_inventario:
-        btn_reporte_inventario = tk.Button(frame_centrado, text="REPORTE DE\nINVENTARIO", 
-                                          image=img_inventario, compound=tk.TOP,
-                                          command=abrir_reporte_inventario,
-                                          font=("Arial", 10, "bold"),
-                                          width=170, height=110,
-                                          bg="#357ab8", fg="white", relief="raised",
-                                          bd=2, padx=10, pady=8)
-    else:
-        btn_reporte_inventario = tk.Button(frame_centrado, text="REPORTE DE\nINVENTARIO", 
-                                          command=abrir_reporte_inventario,
-                                          font=("Arial", 12, "bold"),
-                                          width=18, height=6,
-                                          bg="#357ab8", fg="white", relief="raised",
-                                          bd=2, padx=5, pady=5)
-    btn_reporte_inventario.grid(row=2, column=0, columnspan=2, padx=20, pady=20)
-    
-    # Mantener referencia de la imagen
-    if img_inventario:
+        btn_reporte_inventario = ttk.Button(frame_centrado, text="REPORTE DE\nINVENTARIO", 
+                                           image=img_inventario, compound=tk.TOP,
+                                           command=abrir_reporte_inventario,
+                                           style='ReportButton.TButton')
         btn_reporte_inventario.image = img_inventario
+    else:
+        btn_reporte_inventario = ttk.Button(frame_centrado, text="📦 REPORTE DE\nINVENTARIO", 
+                                           command=abrir_reporte_inventario,
+                                           style='ReportButton.TButton')
+    btn_reporte_inventario.grid(row=2, column=0, columnspan=2, padx=20, pady=20, ipadx=50, ipady=30)
     
     # Centrar las columnas
     frame_centrado.grid_columnconfigure(0, weight=1)

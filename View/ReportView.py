@@ -23,8 +23,8 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
     
     btn_volver = tk.Button(header_frame, text="← Volver al Menú de Reportes", 
                           command=lambda: [conn.close(), callback_volver()], 
-                          bg="#357ab8", fg="white", 
-                          font=("Arial", 10, "bold"))
+                          bg="#2980b9", fg="white", 
+                          font=("Arial", 10, "bold"), relief="raised", bd=2, cursor="hand2")
     btn_volver.pack(side="left")
     
     titulo = tk.Label(header_frame, text="HISTORIAL DE NOTAS DE VENTA", 
@@ -224,7 +224,9 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
     tree_ventas_master.bind("<<TreeviewSelect>>", on_venta_select)
     tree_ventas_master.bind("<Button-1>", on_tree_click)
 
-    btn_filtrar = tk.Button(frame_filtros, text="Filtrar", command=filtrar_ventas)
+    btn_filtrar = tk.Button(frame_filtros, text="🔍 Filtrar", command=filtrar_ventas,
+                           bg="#2980b9", fg="white", font=("Arial", 10, "bold"),
+                           relief="raised", bd=2, padx=15, pady=5, cursor="hand2")
     btn_filtrar.pack(side="left", padx=10)
 
     # Llenar el listado al crear la interfaz
@@ -409,7 +411,9 @@ def mostrar_historial_ventas(parent=None):
     tree_ventas_master.bind("<<TreeviewSelect>>", on_venta_select)
     tree_ventas_master.bind("<Button-1>", on_tree_click_separada)
 
-    btn_filtrar = tk.Button(frame_filtros, text="Filtrar", command=filtrar_ventas)
+    btn_filtrar = tk.Button(frame_filtros, text="🔍 Filtrar", command=filtrar_ventas,
+                           bg="#2980b9", fg="white", font=("Arial", 10, "bold"),
+                           relief="raised", bd=2, padx=15, pady=5, cursor="hand2")
     btn_filtrar.pack(side="left", padx=10)
 
     # Llenar el listado al abrir la ventana

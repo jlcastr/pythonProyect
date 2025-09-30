@@ -23,8 +23,8 @@ def mostrar_reporte_ventas_en_frame(parent_frame, callback_volver):
     
     btn_volver = tk.Button(header_frame, text="← Volver al Menú de Reportes", 
                           command=lambda: [conn.close(), callback_volver()], 
-                          bg="#357ab8", fg="white", 
-                          font=("Arial", 10, "bold"))
+                          bg="#2980b9", fg="white", 
+                          font=("Arial", 10, "bold"), relief="raised", bd=2, cursor="hand2")
     btn_volver.pack(side="left")
     
     titulo = tk.Label(header_frame, text="📊 REPORTE DE VENTAS", 
@@ -123,8 +123,8 @@ def mostrar_reporte_ventas_en_frame(parent_frame, callback_volver):
         actualizar_total_general()
 
     btn_filtrar = tk.Button(frame_filtros, text="🔍 Filtrar", command=filtrar,
-                           bg="#3498db", fg="white", font=("Arial", 10, "bold"),
-                           relief="flat", padx=15, pady=5)
+                           bg="#2980b9", fg="white", font=("Arial", 10, "bold"),
+                           relief="raised", bd=2, padx=15, pady=5, cursor="hand2")
     btn_filtrar.pack(side="left", padx=(20, 10))
 
     # Cargar datos al crear la interfaz
@@ -185,8 +185,8 @@ def mostrar_reporte_ventas(parent=None):
         actualizar_total_general()
 
     btn_filtrar = tk.Button(frame_filtros, text="🔍 Filtrar", command=filtrar,
-                           bg="#3498db", fg="white", font=("Arial", 10, "bold"),
-                           relief="flat", padx=15, pady=5)
+                           bg="#2980b9", fg="white", font=("Arial", 10, "bold"),
+                           relief="raised", bd=2, padx=15, pady=5, cursor="hand2")
     btn_filtrar.pack(side="left", padx=(20, 10))
 
     # Frame contenedor para el TreeView con scrollbar
