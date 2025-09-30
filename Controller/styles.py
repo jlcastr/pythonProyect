@@ -34,19 +34,31 @@ def configurar_estilos_aplicacion():
     style.configure('Ventas.TButton', 
                    background='#3498db',
                    foreground='white',
-                   font=('Arial', 18, 'bold'))
+                   font=('Arial', 14, 'bold'),
+                   borderwidth=2,
+                   relief='raised',
+                   padding=(10, 10))
     style.configure('Reportes.TButton', 
                    background='#e74c3c',
                    foreground='white',
-                   font=('Arial', 18, 'bold'))
+                   font=('Arial', 14, 'bold'),
+                   borderwidth=2,
+                   relief='raised',
+                   padding=(10, 10))
     style.configure('Ajustes.TButton', 
                    background='#f39c12',
                    foreground='white',
-                   font=('Arial', 18, 'bold'))
+                   font=('Arial', 14, 'bold'),
+                   borderwidth=2,
+                   relief='raised',
+                   padding=(10, 10))
     style.configure('Salir.TButton', 
                    background='#95a5a6',
                    foreground='white',
-                   font=('Arial', 18, 'bold'))
+                   font=('Arial', 14, 'bold'),
+                   borderwidth=2,
+                   relief='raised',
+                   padding=(10, 10))
     
     # Efectos hover para botones principales
     style.map('Ventas.TButton', 

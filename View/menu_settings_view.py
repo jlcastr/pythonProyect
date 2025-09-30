@@ -2,12 +2,57 @@ import tkinter as tk
 from tkinter import ttk
 import sys
 import os
+import platform
 from View.email_view import abrir_config_email, mostrar_config_email_en_frame
 
 # Agregar el directorio padre al path para importar estilos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from Controller.styles import configurar_estilos_aplicacion
+from Controller.styles_mac import configurar_estilos_macos, crear_boton_config_macos, crear_boton_volver_config_macos, es_macos
+
+def crear_boton_config_optimizado(parent, text, command, image=None, is_popup=False):
+    """
+    Crear botón optimizado para configuraciones en la plataforma actual
+    """
+    is_macos = platform.system() == 'Darwin'
+    
+    if is_macos:
+        # En macOS usar los estilos optimizados sin bordes
+        if image:
+            boton = crear_boton_config_macos(parent, text, command, is_popup, image=image, compound=tk.TOP)
+            boton.image = image  # Mantener referencia de la imagen
+        else:
+            boton = crear_boton_config_macos(parent, text, command, is_popup)
+        return boton
+    else:
+        # En Windows/Linux usar tk.Button normal
+        if image:
+            boton = tk.Button(parent, text=text, command=command,
+                             bg='#3498db', fg='white', font=("Arial", 12, "bold"),
+                             relief='raised', bd=2, cursor='hand2',
+                             image=image, compound=tk.TOP)
+            boton.image = image  # Mantener referencia de la imagen
+        else:
+            boton = tk.Button(parent, text=text, command=command,
+                             bg='#3498db', fg='white', font=("Arial", 12, "bold"),
+                             relief='raised', bd=2, cursor='hand2')
+        return boton
+
+def crear_boton_volver_optimizado(parent, text, command):
+    """
+    Crear botón de volver optimizado para la plataforma actual
+    """
+    is_macos = platform.system() == 'Darwin'
+    
+    if is_macos:
+        # En macOS usar los estilos optimizados sin bordes
+        return crear_boton_volver_config_macos(parent, text, command)
+    else:
+        # En Windows/Linux usar tk.Button normal
+        return tk.Button(parent, text=text, command=command,
+                        bg='#357ab8', fg='white', font=("Arial", 10, "bold"),
+                        relief='raised', bd=2, cursor='hand2')
 
 def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     """
@@ -28,33 +73,35 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     except Exception:
         img_configuracion = None
     
-    # Usar estilos centralizados
+    # Configurar estilos centralizados
     style = configurar_estilos_aplicacion()
     
-    # Frame principal para las configuraciones
-    main_frame = tk.Frame(parent_frame)
+    # Configurar estilos específicos para macOS si es necesario
+    if es_macos():
+        configurar_estilos_macos()
+    
+    # Frame principal para las configuraciones con fondo personalizado
+    main_frame = tk.Frame(parent_frame, bg='#f8f9fa')
     main_frame.pack(fill="both", expand=True, padx=20, pady=20)
     
     # Título y botón volver
-    header_frame = tk.Frame(main_frame)
+    header_frame = tk.Frame(main_frame, bg='#f8f9fa')
     header_frame.pack(fill="x", pady=(0, 30))
     
-    btn_volver = tk.Button(header_frame, text="← Volver al Menú Principal", 
-                          command=callback_volver, 
-                          bg="#357ab8", fg="white", 
-                          font=("Arial", 10, "bold"))
+    # Botón volver optimizado
+    btn_volver = crear_boton_volver_optimizado(header_frame, "← Volver al Menú Principal", callback_volver)
     btn_volver.pack(side="left")
     
-    # Título con imagen de configuración
+    # Título con imagen de configuración y fondo consistente
     if img_configuracion:
         titulo = tk.Label(header_frame, text=" CONFIGURACIONES", 
-                         font=("Arial", 16, "bold"), fg="#2c3e50",
+                         font=("Arial", 16, "bold"), fg="#2c3e50", bg='#f8f9fa',
                          compound=tk.LEFT, image=img_configuracion)
         titulo.image = img_configuracion
         titulo.pack(side="right")
     else:
         titulo = tk.Label(header_frame, text="⚙️ CONFIGURACIONES", 
-                         font=("Arial", 16, "bold"), fg="#2c3e50")
+                         font=("Arial", 16, "bold"), fg="#2c3e50", bg='#f8f9fa')
         titulo.pack(side="right")
     
     # Frame contenedor para los botones con estilo
@@ -133,56 +180,20 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
                            "Esta funcionalidad estará disponible próximamente.\n"
                            "Permitirá configurar números de contacto para reportes y facturas.")
     
-    # Botón Email (fila 0, columna 0) con imagen
-    if img_email:
-        btn_email = ttk.Button(grid_frame, text="Email", 
-                              image=img_email, compound=tk.TOP,
-                              command=abrir_email, style='Config.TButton',
-                              cursor="hand2")
-        btn_email.image = img_email  # Mantener referencia de la imagen
-    else:
-        btn_email = ttk.Button(grid_frame, text="Email", 
-                              command=abrir_email, style='Config.TButton',
-                              cursor="hand2")
+    # Botón Email (fila 0, columna 0) con imagen optimizado
+    btn_email = crear_boton_config_optimizado(grid_frame, "Email", abrir_email, img_email, is_popup=False)
     btn_email.grid(row=0, column=0, padx=15, pady=15, sticky="nsew", ipadx=30, ipady=25)
     
-    # Botón Logo (fila 0, columna 1) con imagen
-    if img_logo:
-        btn_logo = ttk.Button(grid_frame, text="Logo", 
-                             image=img_logo, compound=tk.TOP,
-                             command=abrir_logo, style='Config.TButton',
-                             cursor="hand2")
-        btn_logo.image = img_logo  # Mantener referencia de la imagen
-    else:
-        btn_logo = ttk.Button(grid_frame, text="Logo", 
-                             command=abrir_logo, style='Config.TButton',
-                             cursor="hand2")
+    # Botón Logo (fila 0, columna 1) con imagen optimizado
+    btn_logo = crear_boton_config_optimizado(grid_frame, "Logo", abrir_logo, img_logo, is_popup=False)
     btn_logo.grid(row=0, column=1, padx=15, pady=15, sticky="nsew", ipadx=30, ipady=25)
     
-    # Botón Apariencia (fila 1, columna 0) con imagen
-    if img_apariencia:
-        btn_apariencia = ttk.Button(grid_frame, text="Apariencia", 
-                                   image=img_apariencia, compound=tk.TOP,
-                                   command=abrir_apariencia, style='Config.TButton',
-                                   cursor="hand2")
-        btn_apariencia.image = img_apariencia  # Mantener referencia de la imagen
-    else:
-        btn_apariencia = ttk.Button(grid_frame, text="Apariencia", 
-                                   command=abrir_apariencia, style='Config.TButton',
-                                   cursor="hand2")
+    # Botón Apariencia (fila 1, columna 0) con imagen optimizado
+    btn_apariencia = crear_boton_config_optimizado(grid_frame, "Apariencia", abrir_apariencia, img_apariencia, is_popup=False)
     btn_apariencia.grid(row=1, column=0, padx=15, pady=15, sticky="nsew", ipadx=30, ipady=25)
     
-    # Botón Teléfono (fila 1, columna 1) con imagen
-    if img_telefono:
-        btn_telefono = ttk.Button(grid_frame, text="Teléfono", 
-                                 image=img_telefono, compound=tk.TOP,
-                                 command=abrir_telefono, style='Config.TButton',
-                                 cursor="hand2")
-        btn_telefono.image = img_telefono  # Mantener referencia de la imagen
-    else:
-        btn_telefono = ttk.Button(grid_frame, text="Teléfono", 
-                                 command=abrir_telefono, style='Config.TButton',
-                                 cursor="hand2")
+    # Botón Teléfono (fila 1, columna 1) con imagen optimizado
+    btn_telefono = crear_boton_config_optimizado(grid_frame, "Teléfono", abrir_telefono, img_telefono, is_popup=False)
     btn_telefono.grid(row=1, column=1, padx=15, pady=15, sticky="nsew", ipadx=30, ipady=25)
     
     # Configurar peso de las celdas del grid para que se expandan uniformemente
@@ -227,8 +238,12 @@ def mostrar_configuraciones(parent=None):
     except Exception:
         img_configuracion_popup = None
     
-    # Usar estilos centralizados
+    # Configurar estilos centralizados
     style = configurar_estilos_aplicacion()
+    
+    # Configurar estilos específicos para macOS si es necesario
+    if es_macos():
+        configurar_estilos_macos()
     
     # Frame principal
     main_frame = tk.Frame(root, bg="#f8f9fa")
@@ -311,53 +326,17 @@ def mostrar_configuraciones(parent=None):
                            "Esta funcionalidad estará disponible próximamente.", 
                            parent=root)
     
-    # Crear botones con ttk.Button para consistencia multiplataforma
-    if img_email_popup:
-        btn_email = ttk.Button(grid_frame, text="Email", 
-                              image=img_email_popup, compound=tk.TOP,
-                              command=abrir_email_popup, style='ConfigPopup.TButton',
-                              cursor="hand2")
-        btn_email.image = img_email_popup  # Mantener referencia de la imagen
-    else:
-        btn_email = ttk.Button(grid_frame, text="Email", 
-                              command=abrir_email_popup, style='ConfigPopup.TButton',
-                              cursor="hand2")
+    # Crear botones optimizados para popup
+    btn_email = crear_boton_config_optimizado(grid_frame, "Email", abrir_email_popup, img_email_popup, is_popup=True)
     btn_email.grid(row=0, column=0, padx=20, pady=20, ipadx=30, ipady=25)
     
-    if img_logo_popup:
-        btn_logo = ttk.Button(grid_frame, text="Logo", 
-                             image=img_logo_popup, compound=tk.TOP,
-                             command=abrir_logo_popup, style='ConfigPopup.TButton',
-                             cursor="hand2")
-        btn_logo.image = img_logo_popup  # Mantener referencia de la imagen
-    else:
-        btn_logo = ttk.Button(grid_frame, text="Logo", 
-                             command=abrir_logo_popup, style='ConfigPopup.TButton',
-                             cursor="hand2")
+    btn_logo = crear_boton_config_optimizado(grid_frame, "Logo", abrir_logo_popup, img_logo_popup, is_popup=True)
     btn_logo.grid(row=0, column=1, padx=20, pady=20, ipadx=30, ipady=25)
     
-    if img_apariencia_popup:
-        btn_apariencia = ttk.Button(grid_frame, text="Apariencia", 
-                                   image=img_apariencia_popup, compound=tk.TOP,
-                                   command=abrir_apariencia_popup, style='ConfigPopup.TButton',
-                                   cursor="hand2")
-        btn_apariencia.image = img_apariencia_popup  # Mantener referencia de la imagen
-    else:
-        btn_apariencia = ttk.Button(grid_frame, text="Apariencia", 
-                                   command=abrir_apariencia_popup, style='ConfigPopup.TButton',
-                                   cursor="hand2")
+    btn_apariencia = crear_boton_config_optimizado(grid_frame, "Apariencia", abrir_apariencia_popup, img_apariencia_popup, is_popup=True)
     btn_apariencia.grid(row=1, column=0, padx=20, pady=20, ipadx=30, ipady=25)
     
-    if img_telefono_popup:
-        btn_telefono = ttk.Button(grid_frame, text="Teléfono", 
-                                 image=img_telefono_popup, compound=tk.TOP,
-                                 command=abrir_telefono_popup, style='ConfigPopup.TButton',
-                                 cursor="hand2")
-        btn_telefono.image = img_telefono_popup  # Mantener referencia de la imagen
-    else:
-        btn_telefono = ttk.Button(grid_frame, text="Teléfono", 
-                                 command=abrir_telefono_popup, style='ConfigPopup.TButton',
-                                 cursor="hand2")
+    btn_telefono = crear_boton_config_optimizado(grid_frame, "Teléfono", abrir_telefono_popup, img_telefono_popup, is_popup=True)
     btn_telefono.grid(row=1, column=1, padx=20, pady=20, ipadx=30, ipady=25)
     
     # Los efectos hover se manejan automáticamente por ttk.Style

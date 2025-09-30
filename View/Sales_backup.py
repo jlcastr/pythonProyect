@@ -1,36 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-import platform
 import Controller.utils as utils
 import Controller.db_operations as db_operations
 from Controller.styles import configurar_estilos_aplicacion, Colores, Fuentes, EstilosVentas, EstilosTreeview
-from Controller.styles_mac import configurar_estilos_macos, crear_boton_macos, es_macos
-
-def crear_boton_optimizado(parent, text, command, tipo_boton):
-    """
-    Crear botón optimizado para la plataforma actual
-    """
-    is_macos = platform.system() == 'Darwin'
-    
-    if is_macos:
-        # En macOS usar los estilos optimizados sin bordes
-        from Controller.styles_mac import crear_boton_sales_macos
-        return crear_boton_sales_macos(parent, text, command, tipo_boton)
-    else:
-        # En Windows/Linux usar tk.Button normal
-        colores = {
-            "agregar": ('#27ae60', 'white'),
-            "cancelar": ('#e74c3c', 'white'),
-            "eliminar": ('#e74c3c', 'white'),
-            "modificar": ('#2980b9', 'white'),
-            "limpiar": ('#95a5a6', 'white'),
-            "finalizar": ('#27ae60', 'white')
-        }
-        color_bg, color_fg = colores.get(tipo_boton, ('#27ae60', 'white'))
-        
-        return tk.Button(parent, text=text, command=command,
-                        bg=color_bg, fg=color_fg, font=("Arial", 10, "bold"),
-                        relief='raised', bd=2, cursor='hand2')
 
 def crear_pantalla_principal(conn, cursor, menubar):
     import tkinter as tk
@@ -45,12 +17,6 @@ def crear_pantalla_principal(conn, cursor, menubar):
     
     # Configurar estilos centralizados
     style = configurar_estilos_aplicacion()
-    
-    # Configurar estilos específicos para macOS si es necesario
-    if es_macos():
-        configurar_estilos_macos()
-    
-    # Los estilos de botones ahora se manejan centralizadamente desde styles_mac.py
     
     # Los estilos de Treeview ya están configurados centralizadamente
 
@@ -124,18 +90,16 @@ def crear_pantalla_principal(conn, cursor, menubar):
             venta_actual_id[0], folio_actual[0]
         )
 
-    # Botones optimizados sin bordes problemáticos
-    btn_agregar = crear_boton_optimizado(
-        frame_input_btns, "➕ Agregar", agregar_producto_wrapper, "agregar"
-    )
-    btn_agregar.pack(side="left", padx=15, pady=8)
+    btn_agregar = tk.Button(frame_input_btns, text="➕ Agregar", command=agregar_producto_wrapper,
+                           bg='#27ae60', fg='white', font=("Arial", 10, "bold"),
+                           relief='raised', bd=2, padx=20, pady=5, cursor='hand2')
+    btn_agregar.pack(side="left", padx=15)
 
-    btn_cancelar = crear_boton_optimizado(
-        frame_input_btns, "❌ Cancelar", 
-        lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio),
-        "cancelar"
-    )
-    btn_cancelar.pack(side="left", padx=15, pady=8)
+    btn_cancelar = tk.Button(frame_input_btns, text="❌ Cancelar", 
+                            command=lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio),
+                            bg='#e74c3c', fg='white', font=("Arial", 10, "bold"),
+                            relief='raised', bd=2, padx=20, pady=5, cursor='hand2')
+    btn_cancelar.pack(side="left", padx=15)
 
     # Sección de lista de productos
     lista_frame = EstilosVentas.crear_labelframe(main_container, "📋 Productos en la Venta")
@@ -172,26 +136,33 @@ def crear_pantalla_principal(conn, cursor, menubar):
     acciones_frame = tk.Frame(lista_frame, bg='#f8f9fa')
     acciones_frame.grid(row=1, column=0, columnspan=2, pady=10)
     
-    # Botones de acción optimizados sin bordes problemáticos
-    btn_eliminar = crear_boton_optimizado(acciones_frame, "🗑️ Eliminar", 
-                                         lambda: utils.eliminar_seleccionado(tree), "eliminar")
+    btn_eliminar = tk.Button(acciones_frame, text="🗑️ Eliminar", 
+                            command=lambda: utils.eliminar_seleccionado(tree),
+                            bg='#e74c3c', fg='white', font=("Arial", 9, "bold"),
+                            relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_eliminar.pack(side="left", padx=10)
 
-    btn_modificar = crear_boton_optimizado(acciones_frame, "✏️ Modificar", 
-                                          lambda: utils.modificar_seleccionado(tree, entry_descripcion, entry_precio), "modificar")
+    btn_modificar = tk.Button(acciones_frame, text="✏️ Modificar", 
+                             command=lambda: utils.modificar_seleccionado(tree, entry_descripcion, entry_precio),
+                             bg='#2980b9', fg='white', font=("Arial", 9, "bold"),
+                             relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_modificar.pack(side="left", padx=10)
     
-    btn_limpiar = crear_boton_optimizado(acciones_frame, "🧹 Limpiar Todo", 
-                                        lambda: utils.limpiar_todo(tree), "limpiar")
+    btn_limpiar = tk.Button(acciones_frame, text="🧹 Limpiar Todo", 
+                           command=lambda: utils.limpiar_todo(tree),
+                           bg='#95a5a6', fg='white', font=("Arial", 9, "bold"),
+                           relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_limpiar.pack(side="left", padx=10)
 
     # Sección de finalización
     finalizacion_frame = tk.Frame(main_container, bg='#f8f9fa')
     finalizacion_frame.grid(row=4, column=0, columnspan=3, pady=20)
     
-    # Botón Finalizar venta con estilo destacado y sin bordes problemáticos
-    btn_finalizar = crear_boton_optimizado(finalizacion_frame, "✅ Finalizar Venta", 
-                                          finalizar_venta_wrapper, "finalizar")
+    # Botón Finalizar venta con estilo destacado
+    btn_finalizar = tk.Button(finalizacion_frame, text="✅ Finalizar Venta", 
+                             command=finalizar_venta_wrapper,
+                             bg='#27ae60', fg='white', font=("Arial", 12, "bold"),
+                             relief='raised', bd=3, padx=30, pady=8, cursor='hand2')
     btn_finalizar.pack(pady=(0, 15))
 
     # Frame para botones de impresión y correo
@@ -243,10 +214,6 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
     
     # Configurar estilos centralizados
     style = configurar_estilos_aplicacion()
-    
-    # Configurar estilos específicos para macOS si es necesario
-    if es_macos():
-        configurar_estilos_macos()
     
     # Botón para volver al menú con estilo centralizado
     btn_volver = ttk.Button(header_frame, text="← Volver al Menú", 
@@ -319,13 +286,15 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
             venta_actual_id[0], folio_actual[0]
         )
 
-    # Botones optimizados sin bordes problemáticos
-    btn_agregar = crear_boton_optimizado(frame_input_btns, "➕ Agregar", 
-                                        agregar_producto_wrapper, "agregar")
+    btn_agregar = tk.Button(frame_input_btns, text="➕ Agregar", command=agregar_producto_wrapper,
+                           bg='#27ae60', fg='white', font=("Arial", 10, "bold"),
+                           relief='raised', bd=2, padx=20, pady=5, cursor='hand2')
     btn_agregar.pack(side="left", padx=15)
 
-    btn_cancelar = crear_boton_optimizado(frame_input_btns, "❌ Cancelar", 
-                                         lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio), "cancelar")
+    btn_cancelar = tk.Button(frame_input_btns, text="❌ Cancelar", 
+                            command=lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio),
+                            bg='#e74c3c', fg='white', font=("Arial", 10, "bold"),
+                            relief='raised', bd=2, padx=20, pady=5, cursor='hand2')
     btn_cancelar.pack(side="left", padx=15)
 
     # Sección de lista de productos
@@ -365,26 +334,33 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
     acciones_frame = tk.Frame(lista_frame, bg='#f8f9fa')
     acciones_frame.grid(row=1, column=0, columnspan=2, pady=10)
     
-    # Botones de acción optimizados sin bordes problemáticos
-    btn_eliminar = crear_boton_optimizado(acciones_frame, "🗑️ Eliminar", 
-                                         lambda: utils.eliminar_seleccionado(tree), "eliminar")
+    btn_eliminar = tk.Button(acciones_frame, text="🗑️ Eliminar", 
+                            command=lambda: utils.eliminar_seleccionado(tree),
+                            bg='#e74c3c', fg='white', font=("Arial", 9, "bold"),
+                            relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_eliminar.pack(side="left", padx=10)
 
-    btn_modificar = crear_boton_optimizado(acciones_frame, "✏️ Modificar", 
-                                          lambda: utils.modificar_seleccionado(tree, entry_descripcion, entry_precio), "modificar")
+    btn_modificar = tk.Button(acciones_frame, text="✏️ Modificar", 
+                             command=lambda: utils.modificar_seleccionado(tree, entry_descripcion, entry_precio),
+                             bg='#2980b9', fg='white', font=("Arial", 9, "bold"),
+                             relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_modificar.pack(side="left", padx=10)
     
-    btn_limpiar = crear_boton_optimizado(acciones_frame, "🧹 Limpiar Todo", 
-                                        lambda: utils.limpiar_todo(tree), "limpiar")
+    btn_limpiar = tk.Button(acciones_frame, text="🧹 Limpiar Todo", 
+                           command=lambda: utils.limpiar_todo(tree),
+                           bg='#95a5a6', fg='white', font=("Arial", 9, "bold"),
+                           relief='raised', bd=2, padx=15, pady=3, cursor='hand2')
     btn_limpiar.pack(side="left", padx=10)
 
     # Sección de finalización centrada
     finalizacion_frame = tk.Frame(frame_centrado, bg='#f8f9fa')
     finalizacion_frame.grid(row=4, column=0, columnspan=3, pady=15)
     
-    # Botón Finalizar venta con estilo destacado y sin bordes problemáticos
-    btn_finalizar = crear_boton_optimizado(finalizacion_frame, "✅ Finalizar Venta", 
-                                          finalizar_venta_wrapper, "finalizar")
+    # Botón Finalizar venta con estilo destacado
+    btn_finalizar = tk.Button(finalizacion_frame, text="✅ Finalizar Venta", 
+                             command=finalizar_venta_wrapper,
+                             bg='#27ae60', fg='white', font=("Arial", 12, "bold"),
+                             relief='raised', bd=3, padx=30, pady=8, cursor='hand2')
     btn_finalizar.pack(pady=(0, 15))
 
     # Frame para botones de impresión y correo

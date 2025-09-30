@@ -3,20 +3,64 @@ from tkinter import ttk
 import sqlite3
 import sys
 import os
+import platform
 
 # Agregar el directorio padre al path para importar estilos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from Controller.styles import configurar_estilos_aplicacion
+from Controller.styles_mac import configurar_estilos_macos, crear_boton_report_macos, crear_boton_volver_report_macos, es_macos
+
+def crear_boton_report_optimizado(parent, text, command, image=None):
+    """
+    Crear botón optimizado para reportes en la plataforma actual
+    """
+    is_macos = platform.system() == 'Darwin'
+    
+    if is_macos:
+        # En macOS usar los estilos optimizados sin bordes
+        return crear_boton_report_macos(parent, text, command, image)
+    else:
+        # En Windows/Linux usar tk.Button normal
+        if image:
+            boton = tk.Button(parent, text=text, command=command,
+                             bg='#3498db', fg='white', font=("Arial", 12, "bold"),
+                             relief='raised', bd=2, cursor='hand2',
+                             image=image, compound=tk.TOP)
+            boton.image = image  # Mantener referencia de la imagen
+        else:
+            boton = tk.Button(parent, text=text, command=command,
+                             bg='#3498db', fg='white', font=("Arial", 12, "bold"),
+                             relief='raised', bd=2, cursor='hand2')
+        return boton
+
+def crear_boton_volver_report_optimizado(parent, text, command):
+    """
+    Crear botón de volver optimizado para reportes en la plataforma actual
+    """
+    is_macos = platform.system() == 'Darwin'
+    
+    if is_macos:
+        # En macOS usar los estilos optimizados sin bordes
+        return crear_boton_volver_report_macos(parent, text, command)
+    else:
+        # En Windows/Linux usar tk.Button normal
+        return tk.Button(parent, text=text, command=command,
+                        bg='#357ab8', fg='white', font=("Arial", 10, "bold"),
+                        relief='raised', bd=2, cursor='hand2')
 
 def crear_menu_reportes(parent_frame, callback_volver):
     """Crear el menú de reportes con botones en cuadrícula"""
     
-    # Usar estilos centralizados con color #2c5aa0
+    # Configurar estilos centralizados
     style = configurar_estilos_aplicacion()
     
-    # Crear un frame centrado para los botones
-    frame_centrado = tk.Frame(parent_frame)
+    # Configurar estilos específicos para macOS si es necesario
+    if es_macos():
+        configurar_estilos_macos()
+    
+    # Crear un frame centrado para los botones con fondo personalizado
+    frame_centrado = tk.Frame(parent_frame, bg='#f8f9fa')
     frame_centrado.pack(expand=True)
     
     # Cargar imágenes para los botones de reportes
@@ -38,15 +82,13 @@ def crear_menu_reportes(parent_frame, callback_volver):
     except Exception:
         img_inventario = None
     
-    # Botón para volver al menú principal
-    btn_volver = ttk.Button(frame_centrado, text="← Volver al Menú", 
-                           command=callback_volver,
-                           style='VolverButton.TButton')
+    # Botón para volver al menú principal optimizado
+    btn_volver = crear_boton_volver_report_optimizado(frame_centrado, "← Volver al Menú", callback_volver)
     btn_volver.grid(row=0, column=0, padx=10, pady=5, sticky="w")
     
-    # Título del menú de reportes
-    titulo_reportes = tk.Label(frame_centrado, text="MENÚ DE REPORTES", 
-                              font=("Arial", 16, "bold"))
+    # Título del menú de reportes con fondo consistente
+    titulo_reportes = tk.Label(frame_centrado, text="📊 MENÚ DE REPORTES", 
+                              font=("Arial", 16, "bold"), fg="#2c3e50", bg='#f8f9fa')
     titulo_reportes.grid(row=0, column=1, pady=10, columnspan=2)
     
     def abrir_reporte_ventas():
@@ -64,43 +106,19 @@ def crear_menu_reportes(parent_frame, callback_volver):
         from tkinter import messagebox
         messagebox.showinfo("Reporte de Inventario", "Módulo de reporte de inventario en desarrollo")
     
-    # Crear botones en cuadrícula (2x2, con el tercero en una segunda fila)
+    # Crear botones en cuadrícula optimizados (2x2, con el tercero en una segunda fila)
     # Fila 1
-    if img_reporte_ventas:
-        btn_reporte_ventas = ttk.Button(frame_centrado, text="REPORTE DE\nVENTAS", 
-                                       image=img_reporte_ventas, compound=tk.TOP,
-                                       command=abrir_reporte_ventas,
-                                       style='ReportButton.TButton')
-        btn_reporte_ventas.image = img_reporte_ventas
-    else:
-        btn_reporte_ventas = ttk.Button(frame_centrado, text="📊 REPORTE DE\nVENTAS", 
-                                       command=abrir_reporte_ventas,
-                                       style='ReportButton.TButton')
+    btn_reporte_ventas = crear_boton_report_optimizado(frame_centrado, "REPORTE DE\nVENTAS", 
+                                                      abrir_reporte_ventas, img_reporte_ventas)
     btn_reporte_ventas.grid(row=1, column=0, padx=20, pady=20, ipadx=50, ipady=30)
     
-    if img_historial:
-        btn_historial_ventas = ttk.Button(frame_centrado, text="HISTORIAL DE\nNOTAS DE VENTA", 
-                                         image=img_historial, compound=tk.TOP,
-                                         command=abrir_historial_ventas,
-                                         style='ReportButton.TButton')
-        btn_historial_ventas.image = img_historial
-    else:
-        btn_historial_ventas = ttk.Button(frame_centrado, text="📋 HISTORIAL DE\nNOTAS DE VENTA", 
-                                         command=abrir_historial_ventas,
-                                         style='ReportButton.TButton')
+    btn_historial_ventas = crear_boton_report_optimizado(frame_centrado, "HISTORIAL DE\nNOTAS DE VENTA", 
+                                                        abrir_historial_ventas, img_historial)
     btn_historial_ventas.grid(row=1, column=1, padx=20, pady=20, ipadx=50, ipady=30)
     
-    # Fila 2 - Centrar el botón de inventario
-    if img_inventario:
-        btn_reporte_inventario = ttk.Button(frame_centrado, text="REPORTE DE\nINVENTARIO", 
-                                           image=img_inventario, compound=tk.TOP,
-                                           command=abrir_reporte_inventario,
-                                           style='ReportButton.TButton')
-        btn_reporte_inventario.image = img_inventario
-    else:
-        btn_reporte_inventario = ttk.Button(frame_centrado, text="📦 REPORTE DE\nINVENTARIO", 
-                                           command=abrir_reporte_inventario,
-                                           style='ReportButton.TButton')
+    # Fila 2 - Centrar el botón de inventario optimizado
+    btn_reporte_inventario = crear_boton_report_optimizado(frame_centrado, "REPORTE DE\nINVENTARIO", 
+                                                          abrir_reporte_inventario, img_inventario)
     btn_reporte_inventario.grid(row=2, column=0, columnspan=2, padx=20, pady=20, ipadx=50, ipady=30)
     
     # Centrar las columnas
