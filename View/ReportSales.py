@@ -139,6 +139,7 @@ def mostrar_reporte_ventas(parent=None):
     root = tk.Toplevel(parent) if parent else tk.Toplevel()
     root.title("📊 Reporte de Ventas")
     root.geometry("1000x600")
+    root.configure(bg='#ecf0f1')
 
     # Filtro de fechas con estilo profesional
     frame_filtros = tk.Frame(root, bg="#ecf0f1", relief="solid", bd=1)

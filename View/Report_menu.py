@@ -98,7 +98,7 @@ def crear_menu_reportes(parent_frame, callback_volver):
     
     def abrir_historial_ventas():
         """Abrir el historial de notas de venta en el mismo frame"""
-        from View.ReportView import mostrar_historial_ventas_en_frame
+        from View.ReportHistorySales import mostrar_historial_ventas_en_frame
         mostrar_historial_ventas_en_frame(parent_frame, callback_volver)
     
     def abrir_reporte_inventario():

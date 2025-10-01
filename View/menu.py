@@ -2,7 +2,7 @@
 
 def menubar(root):
     import tkinter as tk
-    from View.ReportView import mostrar_historial_ventas
+    from View.ReportHistorySales import mostrar_historial_ventas
     from View.ReportSales import mostrar_reporte_ventas
     menubar = tk.Menu(root)
     # Menú principal

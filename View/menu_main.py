@@ -17,7 +17,7 @@ def crear_menu_principal():
     root.title('S&M - Sistema de Manejo de Ventas')
     root.state('zoomed')
     root.resizable(True, True)
-    root.configure(bg=Colores.FONDO_PRINCIPAL)
+    root.configure(bg='#ecf0f1')
     
     # Intentar aplicar el icono
     try:
@@ -40,7 +40,7 @@ def crear_menu_principal():
     titulo.pack()
     
     # Crear frame contenedor con recuadro negro
-    frame_contenedor = tk.Frame(root, bg=Colores.FONDO_PRINCIPAL, pady=20)
+    frame_contenedor = tk.Frame(root, bg='#ecf0f1', pady=20)
     frame_contenedor.pack(expand=True, fill="both", padx=50, pady=20)
     
     # Frame con borde negro (recuadro)
@@ -63,7 +63,7 @@ def crear_menu_principal():
         conn = sqlite3.connect("config/sqliteDB.db")
         cursor = conn.cursor()
         
-        frame_ventas = tk.Frame(root, bg=Colores.FONDO_VENTAS)
+        frame_ventas = tk.Frame(root, bg='#ecf0f1')
         
         # Ocultar elementos del menú
         titulo.pack_forget()
@@ -97,7 +97,7 @@ def crear_menu_principal():
     def abrir_reportes():
         """Abrir el módulo de reportes con transición suave"""
         # Crear el frame de reportes ANTES de ocultar el menú
-        frame_reportes = tk.Frame(root, bg=Colores.FONDO_PRINCIPAL)
+        frame_reportes = tk.Frame(root, bg='#ecf0f1')
         
         # Ocultar elementos del menú
         titulo.pack_forget()
@@ -128,7 +128,7 @@ def crear_menu_principal():
     def abrir_configuraciones():
         """Abrir el módulo de configuraciones con transición suave"""
         # Crear el frame de configuraciones ANTES de ocultar el menú
-        frame_configuraciones = tk.Frame(root, bg=Colores.FONDO_PRINCIPAL)
+        frame_configuraciones = tk.Frame(root, bg='#ecf0f1')
         
         # Ocultar elementos del menú
         titulo.pack_forget()

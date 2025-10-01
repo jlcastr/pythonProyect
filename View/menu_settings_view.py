@@ -81,11 +81,11 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
         configurar_estilos_macos()
     
     # Frame principal para las configuraciones con fondo personalizado
-    main_frame = tk.Frame(parent_frame, bg='#f8f9fa')
+    main_frame = tk.Frame(parent_frame, bg='#ecf0f1')
     main_frame.pack(fill="both", expand=True, padx=20, pady=20)
     
     # Título y botón volver
-    header_frame = tk.Frame(main_frame, bg='#f8f9fa')
+    header_frame = tk.Frame(main_frame, bg='#ecf0f1')
     header_frame.pack(fill="x", pady=(0, 30))
     
     # Botón volver optimizado
@@ -95,22 +95,22 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     # Título con imagen de configuración y fondo consistente
     if img_configuracion:
         titulo = tk.Label(header_frame, text=" CONFIGURACIONES", 
-                         font=("Arial", 16, "bold"), fg="#2c3e50", bg='#f8f9fa',
+                         font=("Arial", 16, "bold"), fg="#2c3e50", bg='#ecf0f1',
                          compound=tk.LEFT, image=img_configuracion)
         titulo.image = img_configuracion
         titulo.pack(side="right")
     else:
         titulo = tk.Label(header_frame, text="⚙️ CONFIGURACIONES", 
-                         font=("Arial", 16, "bold"), fg="#2c3e50", bg='#f8f9fa')
+                         font=("Arial", 16, "bold"), fg="#2c3e50", bg='#ecf0f1')
         titulo.pack(side="right")
     
     # Frame contenedor para los botones con estilo
-    botones_frame = tk.Frame(main_frame, bg="#ecf0f1", relief="solid", bd=2)
+    botones_frame = tk.Frame(main_frame, bg="#f8f9fa", relief="solid", bd=2)
     botones_frame.pack(fill="both", expand=True, padx=10, pady=10)
     
     # Título de la sección
     titulo_seccion = tk.Label(botones_frame, text="🔧 Selecciona una Configuración:", 
-                             font=("Arial", 14, "bold"), bg="#ecf0f1", fg="#2c3e50")
+                             font=("Arial", 14, "bold"), bg="#f8f9fa", fg="#2c3e50")
     titulo_seccion.pack(pady=(20, 30))
     
     # Configurar grid para centrar botones
@@ -120,7 +120,7 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     botones_frame.grid_columnconfigure(1, weight=1)
     
     # Frame interno para organizar botones en grid
-    grid_frame = tk.Frame(botones_frame, bg="#ecf0f1")
+    grid_frame = tk.Frame(botones_frame, bg="#f8f9fa")
     grid_frame.pack(expand=True)
     
     # Los botones ahora usarán ttk.Button con estilo consistente
@@ -205,12 +205,12 @@ def mostrar_configuraciones_en_frame(parent_frame, callback_volver):
     # Los efectos hover ahora se manejan automáticamente por ttk.Style
     
     # Información adicional
-    info_frame = tk.Frame(botones_frame, bg="#ecf0f1")
+    info_frame = tk.Frame(botones_frame, bg="#f8f9fa")
     info_frame.pack(side="bottom", pady=(20, 15))
     
     info_label = tk.Label(info_frame, 
                          text="💡 Configura los diferentes aspectos de tu aplicación",
-                         font=("Arial", 10), bg="#ecf0f1", fg="#7f8c8d")
+                         font=("Arial", 10), bg="#f8f9fa", fg="#7f8c8d")
     info_label.pack()
 
 def mostrar_configuraciones(parent=None):
@@ -224,6 +224,7 @@ def mostrar_configuraciones(parent=None):
     root.title("⚙️ Configuraciones")
     root.geometry("600x500")
     root.resizable(True, True)
+    root.configure(bg='#ecf0f1')
     
     # Configurar ícono
     try:
@@ -246,32 +247,32 @@ def mostrar_configuraciones(parent=None):
         configurar_estilos_macos()
     
     # Frame principal
-    main_frame = tk.Frame(root, bg="#f8f9fa")
+    main_frame = tk.Frame(root, bg="#ecf0f1")
     main_frame.pack(fill="both", expand=True, padx=10, pady=10)
     
     # Título con imagen de configuración
     if img_configuracion_popup:
         titulo = tk.Label(main_frame, text=" CONFIGURACIONES", 
-                         font=("Arial", 18, "bold"), bg="#f8f9fa", fg="#2c3e50",
+                         font=("Arial", 18, "bold"), bg="#ecf0f1", fg="#2c3e50",
                          compound=tk.LEFT, image=img_configuracion_popup)
         titulo.image = img_configuracion_popup
         titulo.pack(pady=(10, 30))
     else:
         titulo = tk.Label(main_frame, text="⚙️ CONFIGURACIONES", 
-                         font=("Arial", 18, "bold"), bg="#f8f9fa", fg="#2c3e50")
+                         font=("Arial", 18, "bold"), bg="#ecf0f1", fg="#2c3e50")
         titulo.pack(pady=(10, 30))
     
     # Frame para botones
-    botones_frame = tk.Frame(main_frame, bg="#ecf0f1", relief="solid", bd=2)
+    botones_frame = tk.Frame(main_frame, bg="#f8f9fa", relief="solid", bd=2)
     botones_frame.pack(fill="both", expand=True, padx=20, pady=10)
     
     # Título de sección
     titulo_seccion = tk.Label(botones_frame, text="🔧 Selecciona una Configuración:", 
-                             font=("Arial", 14, "bold"), bg="#ecf0f1", fg="#2c3e50")
+                             font=("Arial", 14, "bold"), bg="#f8f9fa", fg="#2c3e50")
     titulo_seccion.pack(pady=(20, 30))
     
     # Grid frame
-    grid_frame = tk.Frame(botones_frame, bg="#ecf0f1")
+    grid_frame = tk.Frame(botones_frame, bg="#f8f9fa")
     grid_frame.pack(expand=True)
     
     # Cargar imágenes para los botones en ventana separada (más pequeñas)
@@ -344,7 +345,7 @@ def mostrar_configuraciones(parent=None):
     # Información
     info_label = tk.Label(botones_frame, 
                          text="💡 Configura los diferentes aspectos de tu aplicación",
-                         font=("Arial", 10), bg="#ecf0f1", fg="#7f8c8d")
+                         font=("Arial", 10), bg="#f8f9fa", fg="#7f8c8d")
     info_label.pack(side="bottom", pady=15)
     
     # Manejar cierre de ventana

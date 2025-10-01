@@ -45,8 +45,8 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
     contenedor_horizontal = tk.Frame(main_frame)
     contenedor_horizontal.pack(fill="both", expand=True, pady=(0, 10))
 
-    # Frame izquierdo para VentaMaster (40% del ancho)
-    frame_izquierdo = tk.Frame(contenedor_horizontal, width=380, relief="solid", bd=1, bg="#f8f9fa")
+    # Frame izquierdo para VentaMaster (50% del ancho)
+    frame_izquierdo = tk.Frame(contenedor_horizontal, width=480, relief="solid", bd=1, bg="#f8f9fa")
     frame_izquierdo.pack(side="left", fill="y", padx=(0, 15))
     frame_izquierdo.pack_propagate(False)
 
@@ -56,13 +56,15 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
     label_ventas.pack(anchor="w", pady=(8, 5), padx=5)
 
     # Treeview principal de VentaMaster (ventas maestras) - Diseño compacto
-    tree_ventas_master = ttk.Treeview(frame_izquierdo, columns=("folio", "fecha_venta", "total"), show="headings", height=20)
+    tree_ventas_master = ttk.Treeview(frame_izquierdo, columns=("folio", "cliente", "fecha_venta", "total"), show="headings", height=20)
     tree_ventas_master.heading("folio", text="Folio")
+    tree_ventas_master.heading("cliente", text="Cliente")
     tree_ventas_master.heading("fecha_venta", text="Fecha")
     tree_ventas_master.heading("total", text="Total")
-    tree_ventas_master.column("folio", width=50, anchor="center")
+    tree_ventas_master.column("folio", width=65, anchor="center")
+    tree_ventas_master.column("cliente", width=150, anchor="w")
     tree_ventas_master.column("fecha_venta", width=130, anchor="center")
-    tree_ventas_master.column("total", width=85, anchor="center")
+    tree_ventas_master.column("total", width=100, anchor="center")
     tree_ventas_master.pack(fill="both", expand=True, pady=(0, 8), padx=5)
     
     # Scrollbar para VentaMaster
@@ -108,8 +110,8 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
             values = tree_ventas_master.item(row_id, "values")
             if len(values) > 2:
                 try:
-                    # El total está en la tercera columna (índice 2)
-                    total_str = values[2].replace("$", "").replace(",", "")
+                    # El total está en la cuarta columna (índice 3)
+                    total_str = values[3].replace("$", "").replace(",", "")
                     total += float(total_str)
                 except Exception:
                     pass
@@ -124,17 +126,18 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
         
         # Consultar VentaMaster con total calculado
         cursor.execute("""
-            SELECT vm.folio, vm.fecha_venta, vm.id,
+            SELECT vm.folio, vm.cliente, vm.fecha_venta, vm.id,
                    COALESCE(SUM(vi.precio), 0) as total
             FROM VentaMaster vm
             LEFT JOIN ventas_items vi ON vm.id = vi.venta_master_id
-            GROUP BY vm.id, vm.folio, vm.fecha_venta
+            GROUP BY vm.id, vm.folio, vm.cliente, vm.fecha_venta
             ORDER BY vm.fecha_venta DESC
         """)
         ventas = cursor.fetchall()
         for venta in ventas:
-            folio, fecha, venta_id, total = venta
-            tree_ventas_master.insert("", tk.END, values=(folio, fecha, f"${total:,.2f}"), tags=(venta_id,))
+            folio, cliente, fecha, venta_id, total = venta
+            cliente_display = cliente if cliente else "Sin cliente"
+            tree_ventas_master.insert("", tk.END, values=(folio, cliente_display, fecha, f"${total:,.2f}"), tags=(venta_id,))
         
         actualizar_total_general()
 
@@ -149,7 +152,7 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
         fecha_fin = entry_fin.get().strip()
         
         query = """
-            SELECT vm.folio, vm.fecha_venta, vm.id,
+            SELECT vm.folio, vm.cliente, vm.fecha_venta, vm.id,
                    COALESCE(SUM(vi.precio), 0) as total
             FROM VentaMaster vm
             LEFT JOIN ventas_items vi ON vm.id = vi.venta_master_id
@@ -165,12 +168,13 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
             query += " WHERE date(vm.fecha_venta) <= ?"
             params = [fecha_fin]
         
-        query += " GROUP BY vm.id, vm.folio, vm.fecha_venta ORDER BY vm.fecha_venta DESC"
+        query += " GROUP BY vm.id, vm.folio, vm.cliente, vm.fecha_venta ORDER BY vm.fecha_venta DESC"
         
         ventas = list(cursor.execute(query, params))
         for venta in ventas:
-            folio, fecha, venta_id, total = venta
-            tree_ventas_master.insert("", tk.END, values=(folio, fecha, f"${total:,.2f}"), tags=(venta_id,))
+            folio, cliente, fecha, venta_id, total = venta
+            cliente_display = cliente if cliente else "Sin cliente"
+            tree_ventas_master.insert("", tk.END, values=(folio, cliente_display, fecha, f"${total:,.2f}"), tags=(venta_id,))
         
         actualizar_total_general()
 
@@ -190,7 +194,7 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
         item = selection[0]
         venta_id = tree_ventas_master.item(item, "tags")[0]
         valores_venta = tree_ventas_master.item(item, "values")
-        total_venta = valores_venta[2] if len(valores_venta) > 2 else "$0.00"
+        total_venta = valores_venta[3] if len(valores_venta) > 3 else "$0.00"
         
         # Actualizar el total con el valor de la venta seleccionada
         total_general_var.set(f"💰 Total de Venta Seleccionada: {total_venta}")
@@ -241,6 +245,7 @@ def mostrar_historial_ventas(parent=None):
     root = tk.Toplevel(parent) if parent else tk.Toplevel()
     root.title("Historial de notas de venta")
     root.geometry("1200x700")  # Aumentar ancho para diseño horizontal
+    root.configure(bg='#ecf0f1')
 
     # Filtro de fechas
     frame_filtros = tk.Frame(root)
@@ -256,8 +261,8 @@ def mostrar_historial_ventas(parent=None):
     contenedor_horizontal = tk.Frame(root)
     contenedor_horizontal.pack(fill="both", expand=True, padx=10, pady=(10, 0))
 
-    # Frame izquierdo para VentaMaster (40% del ancho)
-    frame_izquierdo = tk.Frame(contenedor_horizontal, width=480, relief="solid", bd=1, bg="#f8f9fa")
+    # Frame izquierdo para VentaMaster (50% del ancho)
+    frame_izquierdo = tk.Frame(contenedor_horizontal, width=600, relief="solid", bd=1, bg="#f8f9fa")
     frame_izquierdo.pack(side="left", fill="y", padx=(0, 15))
     frame_izquierdo.pack_propagate(False)
 
@@ -267,13 +272,15 @@ def mostrar_historial_ventas(parent=None):
     label_ventas.pack(anchor="w", pady=(8, 5), padx=5)
 
     # Treeview principal de VentaMaster
-    tree_ventas_master = ttk.Treeview(frame_izquierdo, columns=("folio", "fecha_venta", "total"), show="headings", height=15)
+    tree_ventas_master = ttk.Treeview(frame_izquierdo, columns=("folio", "cliente", "fecha_venta", "total"), show="headings", height=15)
     tree_ventas_master.heading("folio", text="Folio")
+    tree_ventas_master.heading("cliente", text="Cliente")
     tree_ventas_master.heading("fecha_venta", text="Fecha y Hora")  
     tree_ventas_master.heading("total", text="Total")
     tree_ventas_master.column("folio", width=80, anchor="center")
+    tree_ventas_master.column("cliente", width=180, anchor="w")
     tree_ventas_master.column("fecha_venta", width=150, anchor="center")
-    tree_ventas_master.column("total", width=100, anchor="center")
+    tree_ventas_master.column("total", width=120, anchor="center")
     tree_ventas_master.pack(fill="both", expand=True, pady=(0, 10))
 
     # Frame derecho para items
@@ -304,7 +311,7 @@ def mostrar_historial_ventas(parent=None):
             values = tree_ventas_master.item(row_id, "values")
             if len(values) > 2:
                 try:
-                    total_str = values[2].replace("$", "").replace(",", "")
+                    total_str = values[3].replace("$", "").replace(",", "")
                     total += float(total_str)
                 except Exception:
                     pass
@@ -317,17 +324,18 @@ def mostrar_historial_ventas(parent=None):
             tree_items.delete(row)
         
         cursor.execute("""
-            SELECT vm.folio, vm.fecha_venta, vm.id,
+            SELECT vm.folio, vm.cliente, vm.fecha_venta, vm.id,
                    COALESCE(SUM(vi.precio), 0) as total
             FROM VentaMaster vm
             LEFT JOIN ventas_items vi ON vm.id = vi.venta_master_id
-            GROUP BY vm.id, vm.folio, vm.fecha_venta
+            GROUP BY vm.id, vm.folio, vm.cliente, vm.fecha_venta
             ORDER BY vm.fecha_venta DESC
         """)
         ventas = cursor.fetchall()
         for venta in ventas:
-            folio, fecha, venta_id, total = venta
-            tree_ventas_master.insert("", tk.END, values=(folio, fecha, f"${total:,.2f}"), tags=(venta_id,))
+            folio, cliente, fecha, venta_id, total = venta
+            cliente_display = cliente if cliente else "Sin cliente"
+            tree_ventas_master.insert("", tk.END, values=(folio, cliente_display, fecha, f"${total:,.2f}"), tags=(venta_id,))
         
         actualizar_total_general()
 
@@ -341,7 +349,7 @@ def mostrar_historial_ventas(parent=None):
         fecha_fin = entry_fin.get().strip()
         
         query = """
-            SELECT vm.folio, vm.fecha_venta, vm.id,
+            SELECT vm.folio, vm.cliente, vm.fecha_venta, vm.id,
                    COALESCE(SUM(vi.precio), 0) as total
             FROM VentaMaster vm
             LEFT JOIN ventas_items vi ON vm.id = vi.venta_master_id
@@ -357,12 +365,13 @@ def mostrar_historial_ventas(parent=None):
             query += " WHERE date(vm.fecha_venta) <= ?"
             params = [fecha_fin]
         
-        query += " GROUP BY vm.id, vm.folio, vm.fecha_venta ORDER BY vm.fecha_venta DESC"
+        query += " GROUP BY vm.id, vm.folio, vm.cliente, vm.fecha_venta ORDER BY vm.fecha_venta DESC"
         
         ventas = list(cursor.execute(query, params))
         for venta in ventas:
-            folio, fecha, venta_id, total = venta
-            tree_ventas_master.insert("", tk.END, values=(folio, fecha, f"${total:,.2f}"), tags=(venta_id,))
+            folio, cliente, fecha, venta_id, total = venta
+            cliente_display = cliente if cliente else "Sin cliente"
+            tree_ventas_master.insert("", tk.END, values=(folio, cliente_display, fecha, f"${total:,.2f}"), tags=(venta_id,))
         
         actualizar_total_general()
 
@@ -379,7 +388,7 @@ def mostrar_historial_ventas(parent=None):
         item = selection[0]
         venta_id = tree_ventas_master.item(item, "tags")[0]
         valores_venta = tree_ventas_master.item(item, "values")
-        total_venta = valores_venta[2] if len(valores_venta) > 2 else "$0.00"
+        total_venta = valores_venta[3] if len(valores_venta) > 3 else "$0.00"
         
         # Actualizar el total con el valor de la venta seleccionada
         total_general_var.set(f"💰 Total de Venta Seleccionada: {total_venta}")

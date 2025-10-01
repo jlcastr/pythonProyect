@@ -20,7 +20,8 @@ def crear_conexion_y_tablas(db_path="sqliteDB.db"):
         CREATE TABLE IF NOT EXISTS VentaMaster (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             folio INTEGER NOT NULL UNIQUE,
-            fecha_venta TEXT NOT NULL
+            fecha_venta TEXT NOT NULL,
+            cliente TEXT
         )
     """)
 
@@ -35,6 +36,18 @@ def crear_conexion_y_tablas(db_path="sqliteDB.db"):
             FOREIGN KEY (venta_master_id) REFERENCES VentaMaster(id)
         )
     """)
+
+    # Migración: Agregar campo cliente a VentaMaster si no existe
+    try:
+        # Verificar si la columna cliente ya existe
+        cursor.execute("PRAGMA table_info(VentaMaster)")
+        columns = [column[1] for column in cursor.fetchall()]
+        
+        if 'cliente' not in columns:
+            cursor.execute("ALTER TABLE VentaMaster ADD COLUMN cliente TEXT")
+            print("Campo 'cliente' agregado a la tabla VentaMaster")
+    except sqlite3.Error as e:
+        print(f"Error al agregar campo cliente: {e}")
 
     conn.commit()
     conn.close()

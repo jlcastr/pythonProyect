@@ -41,7 +41,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
         pass
     
     # Configuración profesional de la ventana
-    root.configure(bg=Colores.FONDO_VENTAS)
+    root.configure(bg='#ecf0f1')
     
     # Configurar estilos centralizados
     style = configurar_estilos_aplicacion()
@@ -74,30 +74,43 @@ def crear_pantalla_principal(conn, cursor, menubar):
     # Sección de información de venta
     info_frame = EstilosVentas.crear_labelframe(main_container, "📋 Información de Venta")
     info_frame.grid(row=1, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
+    info_frame.columnconfigure(0, minsize=180)
     info_frame.columnconfigure(1, weight=1)
 
     # Etiqueta y campo para folio (readonly) con mejor estilo
-    label_folio = EstilosVentas.crear_label_campo(info_frame, "Folio de venta:")
+    label_folio = tk.Label(info_frame, text="Folio de venta:", width=20, anchor="e",
+                          font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
     label_folio.grid(row=0, column=0, padx=15, pady=10, sticky="e")
     entry_folio = tk.Entry(info_frame, width=35, state="readonly", 
                           font=("Arial", 10), relief='solid', bd=1,
                           bg='#ffffff', fg='#000000', readonlybackground='#f0f0f0')
     entry_folio.grid(row=0, column=1, padx=15, pady=10, sticky='w')
 
+    # Etiqueta y campo para nombre del cliente
+    label_cliente = tk.Label(info_frame, text="Nombre del cliente:", width=20, anchor="e",
+                            font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
+    label_cliente.grid(row=1, column=0, padx=15, pady=10, sticky="e")
+    entry_cliente = tk.Entry(info_frame, width=35, font=("Arial", 10), 
+                            relief='solid', bd=1, bg='#ffffff', fg='#000000')
+    entry_cliente.grid(row=1, column=1, padx=15, pady=10, sticky='w')
+
     # Sección de entrada de productos
     producto_frame = EstilosVentas.crear_labelframe(main_container, "🗺️ Agregar Producto")
     producto_frame.grid(row=2, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
+    producto_frame.columnconfigure(0, minsize=180)
     producto_frame.columnconfigure(1, weight=1)
 
     # Etiqueta y campo para descripción con mejor estilo
-    label_descripcion = EstilosVentas.crear_label_campo(producto_frame, "Descripción del producto:")
+    label_descripcion = tk.Label(producto_frame, text="Descripción del producto:", width=20, anchor="e",
+                                font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
     label_descripcion.grid(row=0, column=0, padx=15, pady=8, sticky="e")
     entry_descripcion = tk.Entry(producto_frame, width=35, font=("Arial", 10), 
                                relief='solid', bd=1, bg='#ffffff', fg='#000000')
     entry_descripcion.grid(row=0, column=1, padx=15, pady=8, sticky='w')
 
     # Etiqueta y campo para precio con mejor estilo
-    label_precio = EstilosVentas.crear_label_campo(producto_frame, "Precio ($):")
+    label_precio = tk.Label(producto_frame, text="Precio ($):", width=20, anchor="e",
+                           font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
     label_precio.grid(row=1, column=0, padx=15, pady=8, sticky="e")
     vcmd = (root.register(lambda texto: utils.validar_decimal(texto)), '%P')
     entry_precio = tk.Entry(producto_frame, width=35, validate="key", validatecommand=vcmd, 
@@ -263,10 +276,11 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
                               font=("Arial", 11, "bold"), bg='#f8f9fa', fg='#34495e', 
                               relief='groove', bd=2)
     info_frame.grid(row=1, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
+    info_frame.columnconfigure(0, minsize=180)
     info_frame.columnconfigure(1, weight=1)
 
     # Etiqueta y campo para folio con mejor estilo
-    label_folio = tk.Label(info_frame, text="Folio de venta:", 
+    label_folio = tk.Label(info_frame, text="Folio de venta:", width=20, anchor="e",
                           font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
     label_folio.grid(row=0, column=0, padx=15, pady=10, sticky="e")
     entry_folio = tk.Entry(info_frame, width=35, state="readonly", 
@@ -274,15 +288,24 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
                           bg='#ffffff', fg='#000000', readonlybackground='#f0f0f0')
     entry_folio.grid(row=0, column=1, padx=15, pady=10, sticky='w')
     
+    # Etiqueta y campo para nombre del cliente
+    label_cliente = tk.Label(info_frame, text="Nombre del cliente:", width=20, anchor="e",
+                            font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
+    label_cliente.grid(row=1, column=0, padx=15, pady=10, sticky="e")
+    entry_cliente = tk.Entry(info_frame, width=35, font=("Arial", 10), 
+                            relief='solid', bd=1, bg='#ffffff', fg='#000000')
+    entry_cliente.grid(row=1, column=1, padx=15, pady=10, sticky='w')
+    
     # Sección de entrada de productos
     producto_frame = tk.LabelFrame(frame_centrado, text="🗺️ Agregar Producto", 
                                   font=("Arial", 11, "bold"), bg='#f8f9fa', fg='#34495e', 
                                   relief='groove', bd=2)
     producto_frame.grid(row=2, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
+    producto_frame.columnconfigure(0, minsize=180)
     producto_frame.columnconfigure(1, weight=1)
 
     # Etiqueta y campo para descripción con mejor estilo
-    label_descripcion = tk.Label(producto_frame, text="Descripción del producto:", 
+    label_descripcion = tk.Label(producto_frame, text="Descripción del producto:", width=20, anchor="e",
                                 font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
     label_descripcion.grid(row=0, column=0, padx=15, pady=8, sticky="e")
     entry_descripcion = tk.Entry(producto_frame, width=35, font=("Arial", 10), 
@@ -290,7 +313,7 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
     entry_descripcion.grid(row=0, column=1, padx=15, pady=8, sticky='w')
 
     # Etiqueta y campo para precio con mejor estilo
-    label_precio = tk.Label(producto_frame, text="Precio ($):", 
+    label_precio = tk.Label(producto_frame, text="Precio ($):", width=20, anchor="e",
                            font=("Arial", 10, "bold"), bg='#f8f9fa', fg='#2c3e50')
     label_precio.grid(row=1, column=0, padx=15, pady=8, sticky="e")
     root = parent_frame.winfo_toplevel()
