@@ -60,7 +60,7 @@ def crear_menu_principal():
     def abrir_ventas():
         """Abrir el módulo de ventas con transición suave"""
         # Crear el frame de ventas ANTES de ocultar el menú
-        conn = sqlite3.connect("config/sqliteDB.db")
+        conn = sqlite3.connect("config/sales_system.db")
         cursor = conn.cursor()
         
         frame_ventas = tk.Frame(root, bg='#ecf0f1')
@@ -197,7 +197,7 @@ def crear_menu_principal():
                                style=ventas_style,
                                cursor="hand2")
     
-    btn_ventas.grid(row=0, column=0, padx=40, pady=30, sticky="nsew", ipadx=30, ipady=60)
+    btn_ventas.grid(row=0, column=0, padx=30, pady=20, sticky="nsew", ipadx=20, ipady=40)
     
     # Botón REPORTES
     reportes_style = 'MacReportes.TButton' if es_macos() else 'Reportes.TButton'
@@ -214,7 +214,7 @@ def crear_menu_principal():
                                  style=reportes_style,
                                  cursor="hand2")
     
-    btn_reportes.grid(row=0, column=1, padx=40, pady=30, sticky="nsew", ipadx=30, ipady=60)
+    btn_reportes.grid(row=0, column=1, padx=30, pady=20, sticky="nsew", ipadx=20, ipady=40)
     
     # Botón AJUSTES
     ajustes_style = 'MacAjustes.TButton' if es_macos() else 'Ajustes.TButton'
@@ -231,7 +231,7 @@ def crear_menu_principal():
                                          style=ajustes_style,
                                          cursor="hand2")
     
-    btn_configuraciones.grid(row=1, column=0, padx=40, pady=30, sticky="nsew", ipadx=30, ipady=60)
+    btn_configuraciones.grid(row=1, column=0, padx=30, pady=20, sticky="nsew", ipadx=20, ipady=40)
     
     # Botón SALIR
     salir_style = 'MacSalir.TButton' if es_macos() else 'Salir.TButton'
@@ -248,7 +248,7 @@ def crear_menu_principal():
                               style=salir_style,
                               cursor="hand2")
     
-    btn_salir.grid(row=1, column=1, padx=40, pady=30, sticky="nsew", ipadx=30, ipady=60)
+    btn_salir.grid(row=1, column=1, padx=30, pady=20, sticky="nsew", ipadx=20, ipady=40)
     
     # Configurar el grid para distribución uniforme
     frame_botones.grid_columnconfigure(0, weight=1)
@@ -265,5 +265,5 @@ def crear_menu_principal():
     root.mainloop()
 
 if __name__ == '__main__':
-    crear_conexion_y_tablas('config/sqliteDB.db')
+    crear_conexion_y_tablas('config/sales_system.db')
     crear_menu_principal()

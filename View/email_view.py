@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-from Controller.db_operations import consultar_email_config, obtener_email_config, guardar_email_config
+from Controller.SQL.db_operations import consultar_email_config, obtener_email_config, guardar_email_config
 from Controller.styles_mac import (es_macos, configurar_estilos_macos, crear_boton_email_macos,
                                  FuentesMac, ColoresMac)
 

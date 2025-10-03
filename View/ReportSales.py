@@ -6,7 +6,7 @@ from tkcalendar import DateEntry
 
 def mostrar_reporte_ventas_en_frame(parent_frame, callback_volver):
     """Mostrar reporte de ventas dentro de un frame existente"""
-    conn = sqlite3.connect("config/sqliteDB.db")
+    conn = sqlite3.connect("config/sales_system.db")
     cursor = conn.cursor()
     
     # Limpiar el frame padre
@@ -133,7 +133,7 @@ def mostrar_reporte_ventas_en_frame(parent_frame, callback_volver):
 
 def mostrar_reporte_ventas(parent=None):
     """Función original para mostrar en ventana separada (mantener compatibilidad)"""
-    conn = sqlite3.connect("config/sqliteDB.db")
+    conn = sqlite3.connect("config/sales_system.db")
     cursor = conn.cursor()
 
     root = tk.Toplevel(parent) if parent else tk.Toplevel()

@@ -2,8 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 import platform
 import Controller.utils as utils
-import Controller.db_operations as db_operations
-from Controller.styles import configurar_estilos_aplicacion, Colores, Fuentes, EstilosVentas, EstilosTreeview
+import Controller.SQL.db_operations as db_operations
+from Controller.SQL.sqlite_utils import db_optimizer, guardar_venta_optimizada
+from Controller.styles import configurar_estilos_aplicacion, Colores, Fuentes, EstilosVentas, EstilosTreeview, crear_menu_estandarizado, crear_recuadro_estandarizado
 from Controller.styles_mac import configurar_estilos_macos, crear_boton_macos, es_macos
 
 def crear_boton_optimizado(parent, text, command, tipo_boton):
@@ -69,7 +70,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
     
     # Título principal
     titulo_principal = EstilosVentas.crear_label_titulo(main_container, "📊 MÓDULO DE VENTAS")
-    titulo_principal.grid(row=0, column=0, columnspan=3, pady=(0, 20))
+    titulo_principal.grid(row=0, column=1, pady=(0, 20))
     
     # Sección de información de venta
     info_frame = EstilosVentas.crear_labelframe(main_container, "📋 Información de Venta")
@@ -127,6 +128,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
         )
 
     def finalizar_venta_wrapper():
+        cliente_nombre = entry_cliente.get().strip() or "Consumidor Final"
         venta_actual_id[0], folio_actual[0] = utils.finalizar_venta(
             tree, entry_folio, conn, cursor,
             lambda: utils.mostrar_popup_finalizar_venta(
@@ -134,7 +136,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
                 lambda: utils.imprimir(cursor, lambda: utils.mostrar_popup_sin_productos(root)),
                 cursor
             ),
-            venta_actual_id[0], folio_actual[0]
+            venta_actual_id[0], folio_actual[0], cliente_nombre
         )
 
     # Botones optimizados sin bordes problemáticos
@@ -145,7 +147,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
 
     btn_cancelar = crear_boton_optimizado(
         frame_input_btns, "❌ Cancelar", 
-        lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio),
+        lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio, entry_cliente),
         "cancelar"
     )
     btn_cancelar.pack(side="left", padx=15, pady=8)
@@ -200,7 +202,7 @@ def crear_pantalla_principal(conn, cursor, menubar):
 
     # Sección de finalización
     finalizacion_frame = tk.Frame(main_container, bg='#f8f9fa')
-    finalizacion_frame.grid(row=4, column=0, columnspan=3, pady=20)
+    finalizacion_frame.grid(row=4, column=1, pady=20)
     
     # Botón Finalizar venta con estilo destacado y sin bordes problemáticos
     btn_finalizar = crear_boton_optimizado(finalizacion_frame, "✅ Finalizar Venta", 
@@ -234,48 +236,39 @@ def crear_pantalla_principal(conn, cursor, menubar):
     root.mainloop()
 
 def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
-    """Crear la interfaz de ventas dentro de un frame existente"""
+    """Crear la interfaz de ventas dentro de un frame existente usando el estilo estándar"""
     # Limpiar el frame padre
     for widget in parent_frame.winfo_children():
         widget.destroy()
     
-    # Crear un frame interno completamente centrado
-    frame_centrado = EstilosVentas.crear_frame(parent_frame)
-    frame_centrado.configure(padx=30, pady=20)
-    frame_centrado.place(relx=0.5, rely=0.5, anchor='center')
-    
-    # Los estilos de Treeview ya están configurados centralizadamente
-
+    # Variables para manejo de venta
     venta_actual_id = [None]
     folio_actual = [None]
-
-    # Header profesional centrado
-    header_frame = tk.Frame(frame_centrado, bg='#f8f9fa')
-    header_frame.grid(row=0, column=0, columnspan=3, sticky='ew', pady=(0, 15))
-    header_frame.columnconfigure(1, weight=1)
     
     # Configurar estilos centralizados
-    style = configurar_estilos_aplicacion()
+    configurar_estilos_aplicacion()
     
     # Configurar estilos específicos para macOS si es necesario
     if es_macos():
         configurar_estilos_macos()
     
-    # Botón para volver al menú con estilo centralizado
-    btn_volver = ttk.Button(header_frame, text="← Volver al Menú", 
-                           command=callback_volver, 
-                           style="VolverButton.TButton")
-    btn_volver.pack(side='left')
+    # Crear la interfaz con recuadro negro estándar usando función reutilizable
+    main_frame, frame_centrado = crear_recuadro_estandarizado(
+        parent_frame, 
+        "📊 MÓDULO DE VENTAS", 
+        callback_volver
+    )
+    
+    # Configurar el frame_centrado para centrar todo el contenido
+    frame_centrado.columnconfigure(0, weight=1)  # Columnas laterales con peso
+    frame_centrado.columnconfigure(1, weight=0)  # Columna central sin peso
+    frame_centrado.columnconfigure(2, weight=1)  # Columnas laterales con peso
 
-    # Título centrado con mejor estilo
-    titulo_ventas = EstilosVentas.crear_label_titulo(header_frame, "📊 MÓDULO DE VENTAS")
-    titulo_ventas.pack(side='right')
-
-    # Sección de información de venta
+    # Sección de información de venta (centrada)
     info_frame = tk.LabelFrame(frame_centrado, text="📋 Información de Venta", 
                               font=("Arial", 11, "bold"), bg='#f8f9fa', fg='#34495e', 
                               relief='groove', bd=2)
-    info_frame.grid(row=1, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
+    info_frame.grid(row=1, column=1, sticky='ew', pady=(0, 15), padx=10)
     info_frame.columnconfigure(0, minsize=180)
     info_frame.columnconfigure(1, weight=1)
 
@@ -296,11 +289,11 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
                             relief='solid', bd=1, bg='#ffffff', fg='#000000')
     entry_cliente.grid(row=1, column=1, padx=15, pady=10, sticky='w')
     
-    # Sección de entrada de productos
+    # Sección de entrada de productos (centrada)
     producto_frame = tk.LabelFrame(frame_centrado, text="🗺️ Agregar Producto", 
                                   font=("Arial", 11, "bold"), bg='#f8f9fa', fg='#34495e', 
                                   relief='groove', bd=2)
-    producto_frame.grid(row=2, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
+    producto_frame.grid(row=2, column=1, sticky='ew', pady=(0, 15), padx=10)
     producto_frame.columnconfigure(0, minsize=180)
     producto_frame.columnconfigure(1, weight=1)
 
@@ -332,6 +325,7 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
         )
 
     def finalizar_venta_wrapper():
+        cliente_nombre = entry_cliente.get().strip() or "Consumidor Final"
         venta_actual_id[0], folio_actual[0] = utils.finalizar_venta(
             tree, entry_folio, conn, cursor,
             lambda: utils.mostrar_popup_finalizar_venta(
@@ -339,7 +333,7 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
                 lambda: utils.imprimir(cursor, lambda: utils.mostrar_popup_sin_productos(root)),
                 cursor
             ),
-            venta_actual_id[0], folio_actual[0]
+            venta_actual_id[0], folio_actual[0], cliente_nombre
         )
 
     # Botones optimizados sin bordes problemáticos
@@ -348,14 +342,14 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
     btn_agregar.pack(side="left", padx=15)
 
     btn_cancelar = crear_boton_optimizado(frame_input_btns, "❌ Cancelar", 
-                                         lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio), "cancelar")
+                                         lambda: utils.cancelar(tree, entry_descripcion, entry_precio, entry_folio, entry_cliente), "cancelar")
     btn_cancelar.pack(side="left", padx=15)
 
-    # Sección de lista de productos
+    # Sección de lista de productos (centrada)
     lista_frame = tk.LabelFrame(frame_centrado, text="📋 Productos en la Venta", 
                                font=("Arial", 11, "bold"), bg='#f8f9fa', fg='#34495e', 
                                relief='groove', bd=2)
-    lista_frame.grid(row=3, column=0, columnspan=3, sticky='ew', pady=(0, 15), padx=10)
+    lista_frame.grid(row=3, column=1, sticky='ew', pady=(0, 15), padx=10)
     lista_frame.columnconfigure(0, weight=1)
 
     tree = ttk.Treeview(lista_frame, columns=("descripcion", "precio", "fecha_venta", "folio"), 
@@ -403,7 +397,7 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
 
     # Sección de finalización centrada
     finalizacion_frame = tk.Frame(frame_centrado, bg='#f8f9fa')
-    finalizacion_frame.grid(row=4, column=0, columnspan=3, pady=15)
+    finalizacion_frame.grid(row=4, column=1, pady=15)
     
     # Botón Finalizar venta con estilo destacado y sin bordes problemáticos
     btn_finalizar = crear_boton_optimizado(finalizacion_frame, "✅ Finalizar Venta", 
@@ -414,9 +408,13 @@ def crear_interfaz_ventas_en_frame(parent_frame, conn, cursor, callback_volver):
     output_frame = tk.Frame(finalizacion_frame, bg='#f8f9fa')
     output_frame.pack()
     
-    # Configurar estilo para botones ttk
+    # Configurar estilo para botones ttk y obtener ventana root
+    style = configurar_estilos_aplicacion()
     style.configure("Elegant.TButton", background="#2c3e50", foreground="white", 
                    font=("Arial", 11, "bold"), relief="raised")
+    
+    # Obtener la ventana root para los popups
+    root = parent_frame.winfo_toplevel()
 
     btn_imprimir = ttk.Button(
         output_frame,

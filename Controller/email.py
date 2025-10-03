@@ -1,4 +1,4 @@
-from Controller.db_operations import obtener_email_config
+from Controller.SQL.db_operations import obtener_email_config
 # Enviar correo usando credenciales almacenadas en la base de datos
 def enviar_correo_desde_db(destinatario, cuerpo, adjunto_path=None):
     remitente, password = obtener_email_config()

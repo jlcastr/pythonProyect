@@ -15,11 +15,12 @@ def enviar_por_correo(cursor, mostrar_popup_sin_productos):
                 messagebox.showerror("Error", "No hay venta finalizada para adjuntar.", parent=popup)
                 popup.destroy()
                 return
-            # Obtener datos de la venta
-            cursor.execute("SELECT folio, fecha_venta FROM VentaMaster WHERE id = ?", (venta_id,))
+            # Obtener datos de la venta incluyendo cliente
+            cursor.execute("SELECT folio, fecha_venta, cliente FROM VentaMaster WHERE id = ?", (venta_id,))
             venta_row = cursor.fetchone()
             folio = venta_row[0]
             fecha = venta_row[1]
+            cliente = venta_row[2] or "Consumidor Final"
             cursor.execute("SELECT descripcion, precio FROM ventas_items WHERE venta_master_id = ?", (venta_id,))
             productos_db = cursor.fetchall()
             if not productos_db:
@@ -40,7 +41,7 @@ def enviar_por_correo(cursor, mostrar_popup_sin_productos):
                         total += float(precio)
                     datos_venta = {
                         'fecha': fecha,
-                        'cliente': 'Consumidor Final',
+                        'cliente': cliente,
                         'folio': folio
                     }
                     from Controller.createpdf import generar_nota_venta
@@ -104,7 +105,7 @@ def enviar_por_correo(cursor, mostrar_popup_sin_productos):
 import re
 from tkinter import messagebox
 from datetime import datetime
-from .db_operations import obtener_siguiente_folio, finalizar_venta
+from .SQL.db_operations import obtener_siguiente_folio, finalizar_venta
 
 def validar_decimal(texto):
     if texto == "":
@@ -181,13 +182,14 @@ def mostrar_popup_finalizar_venta(root, popup_imprimir_nota, cursor):
     popup.grab_set()
     root.wait_window(popup)
 
-def cancelar(tree, entry_descripcion, entry_precio, entry_folio):
+def cancelar(tree, entry_descripcion, entry_precio, entry_folio, entry_cliente=None):
     import tkinter as tk
     tree.delete(*tree.get_children())
     entry_descripcion.delete(0, tk.END)
     entry_precio.delete(0, tk.END)
+    if entry_cliente:
+        entry_cliente.delete(0, tk.END)
     entry_folio.config(state="normal")
-    import tkinter as tk
     entry_folio.delete(0, tk.END)
     entry_folio.config(state="readonly")
     return None, None
@@ -196,10 +198,11 @@ def imprimir(cursor, mostrar_popup_sin_productos):
     cursor.execute("SELECT MAX(id) FROM VentaMaster")
     venta_id = cursor.fetchone()[0]
     if venta_id:
-        cursor.execute("SELECT folio, fecha_venta FROM VentaMaster WHERE id = ?", (venta_id,))
+        cursor.execute("SELECT folio, fecha_venta, cliente FROM VentaMaster WHERE id = ?", (venta_id,))
         venta_row = cursor.fetchone()
         folio = venta_row[0]
         fecha = venta_row[1]
+        cliente = venta_row[2] or "Consumidor Final"
         cursor.execute("""
             SELECT descripcion, precio FROM ventas_items WHERE venta_master_id = ?
         """, (venta_id,))
@@ -218,7 +221,7 @@ def imprimir(cursor, mostrar_popup_sin_productos):
                 total += float(precio)
             datos_venta = {
                 'fecha': fecha,
-                'cliente': 'Consumidor Final',
+                'cliente': cliente,
                 'folio': folio
             }
             from Controller.createpdf import generar_nota_venta

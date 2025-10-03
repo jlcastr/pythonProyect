@@ -8,7 +8,7 @@ import platform
 # Agregar el directorio padre al path para importar estilos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from Controller.styles import configurar_estilos_aplicacion
+from Controller.styles import configurar_estilos_aplicacion, crear_menu_estandarizado
 from Controller.styles_mac import configurar_estilos_macos, crear_boton_report_macos, crear_boton_volver_report_macos, es_macos
 
 def crear_boton_report_optimizado(parent, text, command, image=None):
@@ -50,18 +50,7 @@ def crear_boton_volver_report_optimizado(parent, text, command):
                         relief='raised', bd=2, cursor='hand2')
 
 def crear_menu_reportes(parent_frame, callback_volver):
-    """Crear el menú de reportes con botones en cuadrícula"""
-    
-    # Configurar estilos centralizados
-    style = configurar_estilos_aplicacion()
-    
-    # Configurar estilos específicos para macOS si es necesario
-    if es_macos():
-        configurar_estilos_macos()
-    
-    # Crear un frame centrado para los botones con fondo personalizado
-    frame_centrado = tk.Frame(parent_frame, bg='#f8f9fa')
-    frame_centrado.pack(expand=True)
+    """Crear el menú de reportes usando la función estandarizada"""
     
     # Cargar imágenes para los botones de reportes
     try:
@@ -82,48 +71,64 @@ def crear_menu_reportes(parent_frame, callback_volver):
     except Exception:
         img_inventario = None
     
-    # Botón para volver al menú principal optimizado
-    btn_volver = crear_boton_volver_report_optimizado(frame_centrado, "← Volver al Menú", callback_volver)
-    btn_volver.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-    
-    # Título del menú de reportes con fondo consistente
-    titulo_reportes = tk.Label(frame_centrado, text="📊 MENÚ DE REPORTES", 
-                              font=("Arial", 16, "bold"), fg="#2c3e50", bg='#f8f9fa')
-    titulo_reportes.grid(row=0, column=1, pady=10, columnspan=2)
+    # Funciones para cada botón
+    def volver_a_menu_reportes():
+        """Volver al menú de reportes desde un reporte específico"""
+        # Limpiar el frame padre antes de crear el nuevo menú
+        for widget in parent_frame.winfo_children():
+            widget.destroy()
+        crear_menu_reportes(parent_frame, callback_volver)
     
     def abrir_reporte_ventas():
         """Abrir el reporte de ventas en el mismo frame"""
         from View.ReportSales import mostrar_reporte_ventas_en_frame
-        mostrar_reporte_ventas_en_frame(parent_frame, callback_volver)
+        mostrar_reporte_ventas_en_frame(parent_frame, volver_a_menu_reportes)
     
     def abrir_historial_ventas():
         """Abrir el historial de notas de venta en el mismo frame"""
         from View.ReportHistorySales import mostrar_historial_ventas_en_frame
-        mostrar_historial_ventas_en_frame(parent_frame, callback_volver)
+        mostrar_historial_ventas_en_frame(parent_frame, volver_a_menu_reportes)
     
     def abrir_reporte_inventario():
         """Abrir el reporte de inventario"""
         from tkinter import messagebox
         messagebox.showinfo("Reporte de Inventario", "Módulo de reporte de inventario en desarrollo")
     
-    # Crear botones en cuadrícula optimizados (2x2, con el tercero en una segunda fila)
-    # Fila 1
-    btn_reporte_ventas = crear_boton_report_optimizado(frame_centrado, "REPORTE DE\nVENTAS", 
-                                                      abrir_reporte_ventas, img_reporte_ventas)
-    btn_reporte_ventas.grid(row=1, column=0, padx=20, pady=20, ipadx=50, ipady=30)
+    # Configurar botones usando la función estandarizada
+    botones_config = [
+        {
+            'texto': 'REPORTE DE\nVENTAS',
+            'comando': abrir_reporte_ventas,
+            'imagen': img_reporte_ventas,
+            'fila': 0,
+            'columna': 0
+        },
+        {
+            'texto': 'NOTAS DE\nVENTA',
+            'comando': abrir_historial_ventas,
+            'imagen': img_historial,
+            'fila': 0,
+            'columna': 1
+        },
+        {
+            'texto': 'REPORTE DE\nINVENTARIO',
+            'comando': abrir_reporte_inventario,
+            'imagen': img_inventario,
+            'fila': 1,
+            'columna': 0,
+            'columnspan': 2
+        }
+    ]
     
-    btn_historial_ventas = crear_boton_report_optimizado(frame_centrado, "HISTORIAL DE\nNOTAS DE VENTA", 
-                                                        abrir_historial_ventas, img_historial)
-    btn_historial_ventas.grid(row=1, column=1, padx=20, pady=20, ipadx=50, ipady=30)
-    
-    # Fila 2 - Centrar el botón de inventario optimizado
-    btn_reporte_inventario = crear_boton_report_optimizado(frame_centrado, "REPORTE DE\nINVENTARIO", 
-                                                          abrir_reporte_inventario, img_inventario)
-    btn_reporte_inventario.grid(row=2, column=0, columnspan=2, padx=20, pady=20, ipadx=50, ipady=30)
-    
-    # Centrar las columnas
-    frame_centrado.grid_columnconfigure(0, weight=1)
-    frame_centrado.grid_columnconfigure(1, weight=1)
+    # Usar la función estandarizada para crear el menú
+    crear_menu_estandarizado(
+        parent_frame,
+        "📊 MENÚ DE REPORTES",
+        "📋 Selecciona un Reporte:",
+        botones_config,
+        callback_volver,
+        "💡 Genera reportes detallados de tu negocio"
+    )
 
 if __name__ == "__main__":
     # Prueba del menú de reportes

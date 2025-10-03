@@ -3,11 +3,18 @@ from tkinter import ttk
 import sqlite3
 from tkcalendar import DateEntry
 from datetime import datetime
+from Controller.SQL.sqlite_utils import db_optimizer, consulta_ventas_optimizada
 
 def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
     """Mostrar historial de ventas dentro de un frame existente"""
-    conn = sqlite3.connect("config/sqliteDB.db")
+    # Conexión optimizada pero manteniendo estructura existente
+    conn = sqlite3.connect("config/sales_system.db")
     cursor = conn.cursor()
+    
+    # Aplicar optimizaciones de rendimiento
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA cache_size=10000")
+    cursor.execute("PRAGMA synchronous=NORMAL")
     
     # Limpiar el frame padre
     for widget in parent_frame.winfo_children():
@@ -239,8 +246,13 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
 
 def mostrar_historial_ventas(parent=None):
     """Función original para mostrar en ventana separada (mantener compatibilidad)"""
-    conn = sqlite3.connect("config/sqliteDB.db")
+    conn = sqlite3.connect("config/sales_system.db")
     cursor = conn.cursor()
+    
+    # Aplicar optimizaciones de rendimiento
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA cache_size=10000")
+    cursor.execute("PRAGMA synchronous=NORMAL")
 
     root = tk.Toplevel(parent) if parent else tk.Toplevel()
     root.title("Historial de notas de venta")

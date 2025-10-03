@@ -1,6 +1,6 @@
 import sqlite3
 
-def crear_conexion_y_tablas(db_path="sqliteDB.db"):
+def crear_conexion_y_tablas(db_path="config/sales_system.db"):
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -48,6 +48,26 @@ def crear_conexion_y_tablas(db_path="sqliteDB.db"):
             print("Campo 'cliente' agregado a la tabla VentaMaster")
     except sqlite3.Error as e:
         print(f"Error al agregar campo cliente: {e}")
+
+    # Optimizaciones de rendimiento
+    try:
+        # Crear índices para mejorar rendimiento de consultas
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventamaster_fecha ON VentaMaster(fecha_venta)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventamaster_cliente ON VentaMaster(cliente)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventamaster_folio ON VentaMaster(folio)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventaitems_venta_master ON ventas_items(venta_master_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventaitems_fecha ON ventas_items(fecha_venta)")
+        
+        # Configuraciones de rendimiento para SQLite
+        cursor.execute("PRAGMA journal_mode=WAL")  # Write-Ahead Logging para mejor concurrencia
+        cursor.execute("PRAGMA cache_size=10000")  # Aumentar caché a ~40MB
+        cursor.execute("PRAGMA synchronous=NORMAL")  # Balance entre seguridad y velocidad
+        cursor.execute("PRAGMA temp_store=MEMORY")  # Usar memoria para tablas temporales
+        cursor.execute("PRAGMA mmap_size=268435456")  # 256MB de memoria mapeada
+        
+        print("Índices y optimizaciones aplicadas exitosamente")
+    except sqlite3.Error as e:
+        print(f"Error al aplicar optimizaciones: {e}")
 
     conn.commit()
     conn.close()
