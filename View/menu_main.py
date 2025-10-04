@@ -14,7 +14,7 @@ from Controller.styles_mac import configurar_estilos_macos, crear_boton_macos, e
 def crear_menu_principal():
     """Crear ventana del menú principal con diseño profesional"""
     root = tk.Tk()
-    root.title('S&M - Sistema de Manejo de Ventas')
+    root.title('Sistema de Manejo de Ventas')
     root.state('zoomed')
     root.resizable(True, True)
     root.configure(bg='#ecf0f1')
@@ -32,30 +32,76 @@ def crear_menu_principal():
     if es_macos():
         configurar_estilos_macos()
     
-    # Título principal con estilo mejorado
-    titulo = tk.Label(root, text="S&M - Sistema de Manejo de Ventas", 
-                     font=("Arial", 32, "bold"), 
-                     fg="#2c3e50", bg="#ecf0f1",
-                     pady=30)
-    titulo.pack()
+    # Función para crear título visual con logo
+    def crear_titulo_visual():
+        # Frame contenedor para el título
+        titulo_frame = tk.Frame(root, bg='#ecf0f1', pady=20)
+        titulo_frame.pack(pady=(20, 10))
+        
+        # Intentar cargar logo desde la configuración de BD
+        logo_img = None
+        try:
+            from Controller.SQL.db_operations import consultar_logo_config
+            config_logo = consultar_logo_config('ventanas')
+            
+            if config_logo and config_logo['archivo_path'] and os.path.exists(config_logo['archivo_path']):
+                # Cargar logo desde la carpeta Logos
+                from PIL import Image, ImageTk
+                img = Image.open(config_logo['archivo_path'])
+                img = img.resize((80, 80), Image.Resampling.LANCZOS)  # Tamaño apropiado para título
+                logo_img = ImageTk.PhotoImage(img)
+            elif os.path.exists('Img/SM2.ico'):
+                # Fallback al logo por defecto
+                from PIL import Image, ImageTk
+                img = Image.open('Img/SM2.ico')
+                img = img.resize((80, 80), Image.Resampling.LANCZOS)
+                logo_img = ImageTk.PhotoImage(img)
+        except Exception as e:
+            print(f"No se pudo cargar el logo: {e}")
+        
+        if logo_img:
+            # Frame horizontal para logo + texto
+            contenido_frame = tk.Frame(titulo_frame, bg='#ecf0f1')
+            contenido_frame.pack()
+            
+            # Logo
+            logo_label = tk.Label(contenido_frame, image=logo_img, bg='#ecf0f1')
+            logo_label.image = logo_img  # Mantener referencia
+            logo_label.pack(side='left', padx=(0, 20))
+            
+            # Texto del título
+            texto_frame = tk.Frame(contenido_frame, bg='#ecf0f1')
+            texto_frame.pack(side='left')
+            
+            # Título principal
+            titulo_principal = tk.Label(texto_frame, text="Sistema de Manejo de Ventas", 
+                                       font=("Arial", 28, "bold"), 
+                                       fg="#2c3e50", bg="#ecf0f1")
+            titulo_principal.pack()
+            
+            # Subtítulo
+            subtitulo = tk.Label(texto_frame, text="Gestión Empresarial Profesional", 
+                               font=("Arial", 14), 
+                               fg="#7f8c8d", bg="#ecf0f1")
+            subtitulo.pack()
+        else:
+            # Sin logo, solo texto centrado
+            titulo_principal = tk.Label(titulo_frame, text="Sistema de Manejo de Ventas", 
+                                       font=("Arial", 32, "bold"), 
+                                       fg="#2c3e50", bg="#ecf0f1")
+            titulo_principal.pack()
+            
+            subtitulo = tk.Label(titulo_frame, text="Gestión Empresarial Profesional", 
+                               font=("Arial", 16), 
+                               fg="#7f8c8d", bg="#ecf0f1")
+            subtitulo.pack()
+        
+        return titulo_frame
     
-    # Crear frame contenedor con recuadro negro
-    frame_contenedor = tk.Frame(root, bg='#ecf0f1', pady=20)
-    frame_contenedor.pack(expand=True, fill="both", padx=50, pady=20)
+    # Crear título visual
+    titulo = crear_titulo_visual()
     
-    # Frame con borde negro (recuadro)
-    frame_recuadro = tk.Frame(frame_contenedor, bg=Colores.TEXTO_OSCURO, bd=1, relief="solid")
-    frame_recuadro.pack(expand=True, fill="both", padx=10, pady=10)
-    
-    # Frame interior con fondo claro
-    frame_interior = tk.Frame(frame_recuadro, bg=Colores.BLANCO, bd=0)
-    frame_interior.pack(expand=True, fill="both", padx=5, pady=5)
-    
-    # Frame principal para los botones (dentro del recuadro)
-    frame_botones = tk.Frame(frame_interior, bg=Colores.BLANCO)
-    frame_botones.pack(expand=True, pady=40)
-    
-    # Los efectos hover ahora se manejan automáticamente por ttk.Style
+
     
     def abrir_ventas():
         """Abrir el módulo de ventas con transición suave"""
@@ -156,108 +202,233 @@ def crear_menu_principal():
         frame_actual.destroy()
         configurar_estilos_aplicacion()
     
-    # Cargar imágenes para los botones (más pequeñas para dar espacio al texto)
+    def abrir_inventario():
+        """Abrir el módulo de inventario con transición suave"""
+        # Crear el frame de inventario ANTES de ocultar el menú
+        frame_inventario = tk.Frame(root, bg='#ecf0f1')
+        
+        # Ocultar elementos del menú
+        titulo.pack_forget()
+        frame_contenedor.pack_forget()
+        pie_pagina.pack_forget()
+        
+        # Mostrar frame de inventario inmediatamente
+        frame_inventario.pack(fill="both", expand=True)
+        root.update_idletasks()
+        
+        # Por ahora, mostrar un placeholder hasta que se implemente el módulo
+        placeholder_label = tk.Label(frame_inventario, 
+                                   text="📦 MÓDULO DE INVENTARIO\n\nEn desarrollo...",
+                                   font=("Arial", 20, "bold"),
+                                   fg="#2c3e50", bg="#ecf0f1")
+        placeholder_label.pack(expand=True)
+        
+        # Botón para volver al menú
+        btn_volver = tk.Button(frame_inventario, text="← Volver al Menú",
+                              command=lambda: volver_al_menu_desde_inventario(frame_inventario),
+                              font=("Arial", 12), bg="#3498db", fg="white",
+                              padx=20, pady=10)
+        btn_volver.pack(pady=20)
+    
+    def volver_al_menu_desde_inventario(frame_actual):
+        """Volver al menú principal desde inventario con transición suave"""
+        # Mostrar elementos del menú ANTES de destruir el frame actual
+        titulo.pack()
+        frame_contenedor.pack(expand=True, fill="both", padx=50, pady=20)
+        pie_pagina.pack(side="bottom", pady=15)
+        
+        # Forzar actualización inmediata de la interfaz
+        root.update_idletasks()
+        
+        # Destruir frame y reconfigurar estilos
+        frame_actual.destroy()
+        configurar_estilos_aplicacion()
+    
+    def abrir_inventario():
+        """Abrir el módulo de inventario con transición suave"""
+        # Crear el frame de inventario ANTES de ocultar el menú
+        frame_inventario = tk.Frame(root, bg='#ecf0f1')
+        
+        # Ocultar elementos del menú
+        titulo.pack_forget()
+        frame_contenedor.pack_forget()
+        pie_pagina.pack_forget()
+        
+        # Mostrar frame de inventario inmediatamente
+        frame_inventario.pack(fill="both", expand=True)
+        root.update_idletasks()
+        
+        # Por ahora, mostrar un placeholder hasta que se implemente el módulo
+        placeholder_label = tk.Label(frame_inventario, 
+                                   text="📦 MÓDULO DE INVENTARIO\n\nEn desarrollo...",
+                                   font=("Arial", 20, "bold"),
+                                   fg="#2c3e50", bg="#ecf0f1")
+        placeholder_label.pack(expand=True)
+        
+        # Botón para volver al menú
+        btn_volver = tk.Button(frame_inventario, text="← Volver al Menú",
+                              command=lambda: volver_al_menu_desde_inventario(frame_inventario),
+                              font=("Arial", 12), bg="#3498db", fg="white",
+                              padx=20, pady=10)
+        btn_volver.pack(pady=20)
+    
+    def volver_al_menu_desde_inventario(frame_actual):
+        """Volver al menú principal desde inventario con transición suave"""
+        # Mostrar elementos del menú ANTES de destruir el frame actual
+        titulo.pack()
+        frame_contenedor.pack(expand=True, fill="both", padx=50, pady=20)
+        pie_pagina.pack(side="bottom", pady=15)
+        
+        # Forzar actualización inmediata de la interfaz
+        root.update_idletasks()
+        
+        # Destruir frame y reconfigurar estilos
+        frame_actual.destroy()
+        configurar_estilos_aplicacion()
+    
+    def abrir_clientes():
+        """Abrir el módulo de clientes con transición suave"""
+        # Crear el frame de clientes ANTES de ocultar el menú
+        frame_clientes = tk.Frame(root, bg='#ecf0f1')
+        
+        # Ocultar elementos del menú
+        titulo.pack_forget()
+        frame_contenedor.pack_forget()
+        pie_pagina.pack_forget()
+        
+        # Mostrar frame de clientes inmediatamente
+        frame_clientes.pack(fill="both", expand=True)
+        root.update_idletasks()
+        
+        # Por ahora, mostrar un placeholder hasta que se implemente el módulo
+        placeholder_label = tk.Label(frame_clientes, 
+                                   text="👥 MÓDULO DE CLIENTES\n\nEn desarrollo...",
+                                   font=("Arial", 20, "bold"),
+                                   fg="#2c3e50", bg="#ecf0f1")
+        placeholder_label.pack(expand=True)
+        
+        # Botón para volver al menú
+        btn_volver = tk.Button(frame_clientes, text="← Volver al Menú",
+                              command=lambda: volver_al_menu_desde_clientes(frame_clientes),
+                              font=("Arial", 12), bg="#3498db", fg="white",
+                              padx=20, pady=10)
+        btn_volver.pack(pady=20)
+    
+    def volver_al_menu_desde_clientes(frame_actual):
+        """Volver al menú principal desde clientes con transición suave"""
+        # Mostrar elementos del menú ANTES de destruir el frame actual
+        titulo.pack()
+        frame_contenedor.pack(expand=True, fill="both", padx=50, pady=20)
+        pie_pagina.pack(side="bottom", pady=15)
+        
+        # Forzar actualización inmediata de la interfaz
+        root.update_idletasks()
+        
+        # Destruir frame y reconfigurar estilos
+        frame_actual.destroy()
+        configurar_estilos_aplicacion()
+    
+    def abrir_precios():
+        """Abrir el módulo de precios con transición suave"""
+        # Crear el frame de precios ANTES de ocultar el menú
+        frame_precios = tk.Frame(root, bg='#ecf0f1')
+        
+        # Ocultar elementos del menú
+        titulo.pack_forget()
+        frame_contenedor.pack_forget()
+        pie_pagina.pack_forget()
+        
+        # Mostrar frame de precios inmediatamente
+        frame_precios.pack(fill="both", expand=True)
+        root.update_idletasks()
+        
+        # Por ahora, mostrar un placeholder hasta que se implemente el módulo
+        placeholder_label = tk.Label(frame_precios, 
+                                   text="💰 MÓDULO DE PRECIOS\n\nEn desarrollo...",
+                                   font=("Arial", 20, "bold"),
+                                   fg="#2c3e50", bg="#ecf0f1")
+        placeholder_label.pack(expand=True)
+        
+        # Botón para volver al menú
+        btn_volver = tk.Button(frame_precios, text="← Volver al Menú",
+                              command=lambda: volver_al_menu_desde_precios(frame_precios),
+                              font=("Arial", 12), bg="#3498db", fg="white",
+                              padx=20, pady=10)
+        btn_volver.pack(pady=20)
+    
+    def volver_al_menu_desde_precios(frame_actual):
+        """Volver al menú principal desde precios con transición suave"""
+        # Mostrar elementos del menú ANTES de destruir el frame actual
+        titulo.pack()
+        frame_contenedor.pack(expand=True, fill="both", padx=50, pady=20)
+        pie_pagina.pack(side="bottom", pady=15)
+        
+        # Forzar actualización inmediata de la interfaz
+        root.update_idletasks()
+        
+        # Destruir frame y reconfigurar estilos
+        frame_actual.destroy()
+        configurar_estilos_aplicacion()
+    
+    # Cargar imágenes para los botones
     try:
-        img_ventas = tk.PhotoImage(file="Img/pago-en-efectivo.png")
-        img_ventas = img_ventas.subsample(4, 4)  # Más pequeñas
+        from PIL import Image, ImageTk
+        # Cargar imágenes con tamaño apropiado para el nuevo diseño
+        img_ventas = ImageTk.PhotoImage(Image.open("Img/pago-en-efectivo.png").resize((80, 80), Image.Resampling.LANCZOS))
     except Exception:
         img_ventas = None
     
     try:
-        img_reportes = tk.PhotoImage(file="Img/grafico.png")
-        img_reportes = img_reportes.subsample(4, 4)  # Más pequeñas
+        img_reportes = ImageTk.PhotoImage(Image.open("Img/grafico.png").resize((80, 80), Image.Resampling.LANCZOS))
     except Exception:
         img_reportes = None
     
     try:
-        img_configuraciones = tk.PhotoImage(file="Img/configuraciones.png")
-        img_configuraciones = img_configuraciones.subsample(4, 4)  # Más pequeñas
+        img_configuraciones = ImageTk.PhotoImage(Image.open("Img/configuraciones.png").resize((80, 80), Image.Resampling.LANCZOS))
     except Exception:
         img_configuraciones = None
     
     try:
-        img_salir = tk.PhotoImage(file="Img/cancelar.png")
-        img_salir = img_salir.subsample(4, 4)  # Más pequeñas
+        img_inventario = ImageTk.PhotoImage(Image.open("Img/inventario2.png").resize((80, 80), Image.Resampling.LANCZOS))
+    except Exception:
+        img_inventario = None
+    
+    try:
+        img_clientes = ImageTk.PhotoImage(Image.open("Img/agregar-usuario.png").resize((80, 80), Image.Resampling.LANCZOS))
+    except Exception:
+        img_clientes = None
+    
+    try:
+        img_precios = ImageTk.PhotoImage(Image.open("Img/dinero.png").resize((80, 80), Image.Resampling.LANCZOS))
+    except Exception:
+        img_precios = None
+    
+    try:
+        img_salir = ImageTk.PhotoImage(Image.open("Img/cancelar.png").resize((80, 80), Image.Resampling.LANCZOS))
     except Exception:
         img_salir = None
     
-    # Crear botones con estilo profesional usando ttk
-    # Botón VENTAS
-    ventas_style = 'MacVentas.TButton' if es_macos() else 'Ventas.TButton'
-    if img_ventas:
-        btn_ventas = ttk.Button(frame_botones, text="VENTAS", 
-                               image=img_ventas, compound=tk.TOP,
-                               command=abrir_ventas,
-                               style=ventas_style,
-                               cursor="hand2")
-        btn_ventas.image = img_ventas
+    # Configuración de botones para crear_menu_principal_estandarizado
+    botones_config = [
+        {'texto': 'VENTAS', 'comando': abrir_ventas, 'imagen': img_ventas, 'fila': 0, 'columna': 0},
+        {'texto': 'REPORTES', 'comando': abrir_reportes, 'imagen': img_reportes, 'fila': 0, 'columna': 1},
+        {'texto': 'INVENTARIO', 'comando': abrir_inventario, 'imagen': img_inventario, 'fila': 0, 'columna': 2},
+        {'texto': 'CLIENTES', 'comando': abrir_clientes, 'imagen': img_clientes, 'fila': 1, 'columna': 0},
+        {'texto': 'AJUSTES', 'comando': abrir_configuraciones, 'imagen': img_configuraciones, 'fila': 1, 'columna': 1},
+        {'texto': 'PRECIOS', 'comando': abrir_precios, 'imagen': img_precios, 'fila': 1, 'columna': 2},
+        {'texto': 'SALIR', 'comando': root.quit, 'imagen': img_salir, 'fila': 2, 'columna': 1, 'columnspan': 1}
+    ]
+    
+    # Usar la función estandarizada para crear el menú con btnblanco250.png
+    if es_macos():
+        from Controller.styles_mac import crear_menu_principal_estandarizado_mac
+        frame_contenedor, grid_frame = crear_menu_principal_estandarizado_mac(root, "Menú Principal", botones_config)
     else:
-        btn_ventas = ttk.Button(frame_botones, text="💰 VENTAS", 
-                               command=abrir_ventas,
-                               style=ventas_style,
-                               cursor="hand2")
-    
-    btn_ventas.grid(row=0, column=0, padx=30, pady=20, sticky="nsew", ipadx=20, ipady=40)
-    
-    # Botón REPORTES
-    reportes_style = 'MacReportes.TButton' if es_macos() else 'Reportes.TButton'
-    if img_reportes:
-        btn_reportes = ttk.Button(frame_botones, text="REPORTES", 
-                                 image=img_reportes, compound=tk.TOP,
-                                 command=abrir_reportes,
-                                 style=reportes_style,
-                                 cursor="hand2")
-        btn_reportes.image = img_reportes
-    else:
-        btn_reportes = ttk.Button(frame_botones, text="📊 REPORTES", 
-                                 command=abrir_reportes,
-                                 style=reportes_style,
-                                 cursor="hand2")
-    
-    btn_reportes.grid(row=0, column=1, padx=30, pady=20, sticky="nsew", ipadx=20, ipady=40)
-    
-    # Botón AJUSTES
-    ajustes_style = 'MacAjustes.TButton' if es_macos() else 'Ajustes.TButton'
-    if img_configuraciones:
-        btn_configuraciones = ttk.Button(frame_botones, text="AJUSTES", 
-                                         image=img_configuraciones, compound=tk.TOP,
-                                         command=abrir_configuraciones,
-                                         style=ajustes_style,
-                                         cursor="hand2")
-        btn_configuraciones.image = img_configuraciones
-    else:
-        btn_configuraciones = ttk.Button(frame_botones, text="⚙️ AJUSTES", 
-                                         command=abrir_configuraciones,
-                                         style=ajustes_style,
-                                         cursor="hand2")
-    
-    btn_configuraciones.grid(row=1, column=0, padx=30, pady=20, sticky="nsew", ipadx=20, ipady=40)
-    
-    # Botón SALIR
-    salir_style = 'MacSalir.TButton' if es_macos() else 'Salir.TButton'
-    if img_salir:
-        btn_salir = ttk.Button(frame_botones, text="SALIR", 
-                              image=img_salir, compound=tk.TOP,
-                              command=root.quit,
-                              style=salir_style,
-                              cursor="hand2")
-        btn_salir.image = img_salir
-    else:
-        btn_salir = ttk.Button(frame_botones, text="🚪 SALIR", 
-                              command=root.quit,
-                              style=salir_style,
-                              cursor="hand2")
-    
-    btn_salir.grid(row=1, column=1, padx=30, pady=20, sticky="nsew", ipadx=20, ipady=40)
-    
-    # Configurar el grid para distribución uniforme
-    frame_botones.grid_columnconfigure(0, weight=1)
-    frame_botones.grid_columnconfigure(1, weight=1)
-    frame_botones.grid_rowconfigure(0, weight=1)
-    frame_botones.grid_rowconfigure(1, weight=1)
+        from Controller.styles import crear_menu_principal_estandarizado
+        frame_contenedor, grid_frame = crear_menu_principal_estandarizado(root, "Menú Principal", botones_config)
     
     # Pie de página profesional
-    pie_pagina = tk.Label(root, text="© 2025 S&M - Sistema de Gestión Empresarial | Versión 1.0", 
+    pie_pagina = tk.Label(root, text="© 2025 Sistema de Gestión Empresarial | Versión 1.0", 
                          font=("Arial", 12), 
                          fg="#34495e", bg="#ecf0f1")
     pie_pagina.pack(side="bottom", pady=15)

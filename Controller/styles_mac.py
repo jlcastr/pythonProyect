@@ -186,10 +186,22 @@ def configurar_estilos_macos():
     # ESTILOS PARA BOTONES DE MENÚ PRINCIPAL
     # =========================================================================
     
-    # Botón Ventas (Azul) - Sin bordes problemáticos
+    # Cargar imagen de fondo para botones del menú principal en macOS
+    try:
+        from PIL import Image, ImageTk
+        # Cargar imagen de fondo desde la carpeta Buttons
+        btn_bg_image = Image.open('Img/Buttons/btnblanco250.png')
+        btn_bg_photo = ImageTk.PhotoImage(btn_bg_image)
+        
+        # Almacenar la imagen en el style para evitar que se elimine por garbage collector
+        style._btn_bg_image = btn_bg_photo
+    except Exception as e:
+        print(f"No se pudo cargar la imagen de fondo en macOS: {e}")
+        btn_bg_photo = None
+    
+    # Botón Ventas - Con imagen de fondo
     style.configure("MacVentas.TButton",
-                   background='#3498db',
-                   foreground='black',
+                   foreground='#2c3e50',  # Texto oscuro para contrastar
                    font=('SF Pro Display', 16, 'bold'),
                    borderwidth=0,  # Sin borde
                    relief='flat',  # Completamente plano
@@ -197,17 +209,14 @@ def configurar_estilos_macos():
                    padding=(50, 50))
     
     style.map("MacVentas.TButton",
-             background=[('active', '#2980b9'),
-                        ('pressed', '#2471a3')],
-             foreground=[('active', 'black'),
-                        ('pressed', 'black')],
+             foreground=[('active', '#1f618d'),
+                        ('pressed', '#154360')],
              relief=[('pressed', 'flat'),
                     ('!pressed', 'flat')])
     
-    # Botón Reportes (Rojo) - Sin bordes problemáticos
+    # Botón Reportes - Con imagen de fondo
     style.configure("MacReportes.TButton",
-                   background='#e74c3c',
-                   foreground='black',
+                   foreground='#2c3e50',
                    font=('SF Pro Display', 16, 'bold'),
                    borderwidth=0,  # Sin borde
                    relief='flat',  # Completamente plano
@@ -215,17 +224,14 @@ def configurar_estilos_macos():
                    padding=(50, 50))
     
     style.map("MacReportes.TButton",
-             background=[('active', '#c0392b'),
-                        ('pressed', '#a93226')],
-             foreground=[('active', 'black'),
-                        ('pressed', 'black')],
+             foreground=[('active', '#a93226'),
+                        ('pressed', '#922b21')],
              relief=[('pressed', 'flat'),
                     ('!pressed', 'flat')])
     
-    # Botón Ajustes (Naranja) - Sin bordes problemáticos
+    # Botón Ajustes - Con imagen de fondo
     style.configure("MacAjustes.TButton",
-                   background='#f39c12',
-                   foreground='black',
+                   foreground='#2c3e50',
                    font=('SF Pro Display', 16, 'bold'),
                    borderwidth=0,  # Sin borde
                    relief='flat',  # Completamente plano
@@ -233,17 +239,59 @@ def configurar_estilos_macos():
                    padding=(50, 50))
     
     style.map("MacAjustes.TButton",
-             background=[('active', '#e67e22'),
-                        ('pressed', '#d68910')],
-             foreground=[('active', 'black'),
-                        ('pressed', 'black')],
+             foreground=[('active', '#d68910'),
+                        ('pressed', '#b7950b')],
              relief=[('pressed', 'flat'),
                     ('!pressed', 'flat')])
     
-    # Botón Salir (Gris) - Sin bordes problemáticos
+    # Botón Inventario - Con imagen de fondo
+    style.configure("MacInventario.TButton",
+                   foreground='#2c3e50',
+                   font=('SF Pro Display', 16, 'bold'),
+                   borderwidth=0,  # Sin borde
+                   relief='flat',  # Completamente plano
+                   focuscolor='none',
+                   padding=(50, 50))
+    
+    style.map("MacInventario.TButton",
+             foreground=[('active', '#1e8449'),
+                        ('pressed', '#186a3b')],
+             relief=[('pressed', 'flat'),
+                    ('!pressed', 'flat')])
+    
+    # Botón Clientes - Con imagen de fondo
+    style.configure("MacClientes.TButton",
+                   foreground='#2c3e50',
+                   font=('SF Pro Display', 16, 'bold'),
+                   borderwidth=0,  # Sin borde
+                   relief='flat',  # Completamente plano
+                   focuscolor='none',
+                   padding=(50, 50))
+    
+    style.map("MacClientes.TButton",
+             foreground=[('active', '#7d3c98'),
+                        ('pressed', '#6c3483')],
+             relief=[('pressed', 'flat'),
+                    ('!pressed', 'flat')])
+    
+    # Botón Precios - Con imagen de fondo
+    style.configure("MacPrecios.TButton",
+                   foreground='#2c3e50',
+                   font=('SF Pro Display', 16, 'bold'),
+                   borderwidth=0,  # Sin borde
+                   relief='flat',  # Completamente plano
+                   focuscolor='none',
+                   padding=(50, 50))
+    
+    style.map("MacPrecios.TButton",
+             foreground=[('active', '#d68910'),
+                        ('pressed', '#b7950b')],
+             relief=[('pressed', 'flat'),
+                    ('!pressed', 'flat')])
+    
+    # Botón Salir - Con imagen de fondo
     style.configure("MacSalir.TButton",
-                   background='#95a5a6',
-                   foreground='black',
+                   foreground='#2c3e50',
                    font=('SF Pro Display', 16, 'bold'),
                    borderwidth=0,  # Sin borde
                    relief='flat',  # Completamente plano
@@ -251,10 +299,8 @@ def configurar_estilos_macos():
                    padding=(50, 50))
     
     style.map("MacSalir.TButton",
-             background=[('active', '#7f8c8d'),
-                        ('pressed', '#6c7b7d')],
-             foreground=[('active', 'black'),
-                        ('pressed', 'black')],
+             foreground=[('active', '#424949'),
+                        ('pressed', '#2e4053')],
              relief=[('pressed', 'flat'),
                     ('!pressed', 'flat')])
     
@@ -855,6 +901,170 @@ def crear_boton_macos(parent, text, command, estilo, **kwargs):
     btn_finalizar = crear_boton_macos(parent, "✅ Finalizar", None, "MacFinalizar.TButton")
     
     return [btn_agregar, btn_cancelar, btn_eliminar, btn_modificar, btn_limpiar, btn_finalizar]
+
+def crear_menu_principal_estandarizado_mac(parent_frame, titulo_seccion, botones_config):
+    """
+    Crear menú principal usando btnblanco250.png como fondo de botones y btnblanco2250.png para hover en macOS.
+    
+    Parámetros:
+    - parent_frame: Frame contenedor donde se creará el menú
+    - titulo_seccion: Título de la sección del menú
+    - botones_config: Lista de diccionarios con configuración de botones:
+      [{'texto': 'NOMBRE', 'comando': funcion, 'imagen': imagen_tk, 'fila': 0, 'columna': 0, 'columnspan': 1}]
+    """
+    from PIL import Image, ImageTk
+    import tkinter as tk
+    import os
+    
+    # Frame contenedor principal con estilo profesional
+    main_frame = tk.Frame(parent_frame, bg='#ecf0f1')
+    main_frame.pack(expand=True, fill="both", padx=50, pady=20)
+    
+    # Frame con borde negro (recuadro)
+    frame_recuadro = tk.Frame(main_frame, bg='#2c3e50', bd=1, relief="solid")
+    frame_recuadro.pack(expand=True, fill="both", padx=10, pady=10)
+    
+    # Frame interior con fondo claro
+    frame_interior = tk.Frame(frame_recuadro, bg='#f8f9fa', bd=0)
+    frame_interior.pack(expand=True, fill="both", padx=5, pady=5)
+    
+    # Frame centrado para los botones dentro del recuadro
+    frame_centrado = tk.Frame(frame_interior, bg='#f8f9fa')
+    frame_centrado.pack(expand=True, pady=20)
+    
+    # Título de la sección
+    titulo_seccion_label = tk.Label(frame_centrado, text=titulo_seccion, 
+                                   font=("SF Pro Display", 14, "bold"), bg="#f8f9fa", fg="#2c3e50")
+    titulo_seccion_label.pack(pady=(0, 20))
+    
+    # Frame interno para organizar botones en grid
+    grid_frame = tk.Frame(frame_centrado, bg="#f8f9fa")
+    grid_frame.pack(expand=True)
+    
+    # Cargar imágenes de fondo para los botones (normal y hover) para macOS
+    try:
+        # Obtener la ruta base del proyecto
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        imagen_fondo_normal_path = os.path.join(base_path, "Img", "Buttons", "btnblanco250.png")
+        imagen_fondo_hover_path = os.path.join(base_path, "Img", "Buttons", "btnblanco2250.png")  # Imagen para hover
+        
+        # Cargar y redimensionar las imágenes de fondo (normal y hover)
+        imagen_fondo_normal_pil = Image.open(imagen_fondo_normal_path)
+        imagen_fondo_normal_pil = imagen_fondo_normal_pil.resize((260, 210), Image.Resampling.LANCZOS)
+        imagen_fondo_normal_tk = ImageTk.PhotoImage(imagen_fondo_normal_pil)
+        
+        # Imagen para hover usando btnblanco2250.png
+        imagen_fondo_hover_pil = Image.open(imagen_fondo_hover_path)
+        imagen_fondo_hover_pil = imagen_fondo_hover_pil.resize((260, 210), Image.Resampling.LANCZOS)
+        imagen_fondo_hover_tk = ImageTk.PhotoImage(imagen_fondo_hover_pil)
+        
+        imagen_fondo_tk = imagen_fondo_normal_tk  # Por compatibilidad con código existente
+    except Exception as e:
+        print(f"Error cargando imágenes de fondo para macOS: {e}")
+        imagen_fondo_normal_tk = None
+        imagen_fondo_hover_tk = None
+        imagen_fondo_tk = None
+    
+    # Crear botones según configuración
+    max_fila = 0
+    max_columna = 0
+    
+    for boton_config in botones_config:
+        texto = boton_config['texto']
+        comando = boton_config['comando']
+        imagen = boton_config.get('imagen')
+        fila = boton_config['fila']
+        columna = boton_config['columna']
+        columnspan = boton_config.get('columnspan', 1)
+        
+        # Actualizar máximos para configurar el grid
+        max_fila = max(max_fila, fila)
+        max_columna = max(max_columna, columna)
+        
+        # Función para crear efecto hover en macOS
+        def crear_efecto_hover_mac(canvas_obj, imagen_normal, imagen_hover, icono_img, texto_btn, x_centro, y_centro, x_icono, y_icono, x_texto, y_texto):
+            def on_enter(event):
+                canvas_obj.delete("all")
+                canvas_obj.create_image(x_centro, y_centro, image=imagen_hover)
+                if icono_img:
+                    canvas_obj.create_image(x_icono, y_icono, image=icono_img)
+                canvas_obj.create_text(x_texto, y_texto, text=texto_btn, fill="#2c3e50", 
+                                     font=("SF Pro Display", 12, "bold"), justify=tk.CENTER)
+            
+            def on_leave(event):
+                canvas_obj.delete("all")
+                canvas_obj.create_image(x_centro, y_centro, image=imagen_normal)
+                if icono_img:
+                    canvas_obj.create_image(x_icono, y_icono, image=icono_img)
+                canvas_obj.create_text(x_texto, y_texto, text=texto_btn, fill="#2c3e50", 
+                                     font=("SF Pro Display", 12, "bold"), justify=tk.CENTER)
+            
+            canvas_obj.bind("<Enter>", on_enter)
+            canvas_obj.bind("<Leave>", on_leave)
+        
+        # Crear botón con imagen de fondo personalizada e ícono superpuesto para macOS
+        if imagen_fondo_normal_tk and imagen_fondo_hover_tk:
+            # Usar Canvas directo para superponer imágenes
+            canvas = tk.Canvas(grid_frame, width=260, height=210, highlightthickness=0, 
+                             bd=0, relief="flat", bg="#f8f9fa")
+            
+            # Dibujar estado inicial (normal)
+            canvas.create_image(130, 105, image=imagen_fondo_normal_tk)
+            if imagen:
+                # Dibujar ícono más centrado
+                canvas.create_image(130, 85, image=imagen)
+                # Dibujar texto un poco más abajo
+                canvas.create_text(130, 160, text=texto, fill="#2c3e50", 
+                                 font=("SF Pro Display", 12, "bold"), justify=tk.CENTER)
+            else:
+                # Dibujar texto centrado
+                canvas.create_text(130, 105, text=texto, fill="#2c3e50", 
+                                 font=("SF Pro Display", 14, "bold"), justify=tk.CENTER)
+            
+            # Aplicar efecto hover
+            if imagen:
+                crear_efecto_hover_mac(canvas, imagen_fondo_normal_tk, imagen_fondo_hover_tk, 
+                                     imagen, texto, 130, 105, 130, 85, 130, 160)
+            else:
+                crear_efecto_hover_mac(canvas, imagen_fondo_normal_tk, imagen_fondo_hover_tk, 
+                                     None, texto, 130, 105, 130, 105, 130, 105)
+            
+            # Hacer clickeable (con closure correcto)
+            canvas.bind("<Button-1>", lambda e, cmd=comando: cmd())
+            canvas.configure(cursor='hand2')
+            
+            # Usar canvas directamente
+            boton = canvas
+            boton.imagen_fondo_normal = imagen_fondo_normal_tk
+            boton.imagen_fondo_hover = imagen_fondo_hover_tk
+            if imagen:
+                boton.imagen_icono = imagen
+        else:
+            # Fallback si no se puede cargar la imagen de fondo en macOS
+            if imagen:
+                boton = tk.Button(grid_frame, text=texto, command=comando,
+                                 bg='#3498db', fg='white', font=("SF Pro Display", 13, "bold"),
+                                 relief='raised', bd=2, cursor='hand2',
+                                 image=imagen, compound=tk.TOP,
+                                 width=260, height=210)
+                boton.image = imagen
+            else:
+                boton = tk.Button(grid_frame, text=texto, command=comando,
+                                 bg='#3498db', fg='white', font=("SF Pro Display", 15, "bold"),
+                                 relief='raised', bd=2, cursor='hand2',
+                                 width=260, height=210)
+        
+        # Aplicar medidas reducidas para mejor distribución
+        boton.grid(row=fila, column=columna, columnspan=columnspan,
+                  padx=10, pady=10, sticky="nsew", ipadx=0, ipady=0)
+    
+    # Configurar expansión del grid
+    for col in range(max_columna + 1):
+        grid_frame.grid_columnconfigure(col, weight=1)
+    for row in range(max_fila + 1):
+        grid_frame.grid_rowconfigure(row, weight=1)
+    
+    return main_frame, grid_frame
 
 if __name__ == "__main__":
     # Test básico
