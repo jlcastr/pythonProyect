@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Lateral - S&M</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Contenido Principal (Demo) */
+        .main-content {
+            margin-left: 70px;
+            flex: 1;
+            padding: 40px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .content-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .content-header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .content-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 60px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- El sidebar se genera automáticamente con JavaScript -->
+    
+    <!-- Contenido Principal (Demo) -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1>🎯 Menú Lateral Demo</h1>
+            <p>Haz clic en los iconos del menú lateral para navegar entre páginas</p>
+        </div>
+
+        <div class="demo-card">
+            <h2>✨ Características del Menú Lateral:</h2>
+            <ul style="margin: 20px 0; line-height: 1.8;">
+                <li>🔹 <strong>Colapsable:</strong> Se expande al pasar el cursor</li>
+                <li>🔹 <strong>Navegación directa:</strong> Clic en iconos navega entre páginas</li>
+                <li>🔹 <strong>Animaciones:</strong> Transiciones suaves y efectos hover</li>
+                <li>🔹 <strong>Responsive:</strong> Se adapta a diferentes tamaños de pantalla</li>
+                <li>🔹 <strong>Estado activo:</strong> Indica la página actual</li>
+                <li>🔹 <strong>Diseño oscuro:</strong> Colores profesionales y elegantes</li>
+            </ul>
+
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3>🚀 Funcionalidad:</h3>
+                <p>Este menú lateral puede ser integrado fácilmente en cualquier página del sistema. 
+                Los enlaces están preparados para navegación y el estado activo se puede cambiar dinámicamente.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript para funcionalidad específica del demo -->
+    <script>
+        // Función para actualizar contenido demo cuando se hace clic en el sidebar
+        function updateDemoContent(section) {
+            const contentHeader = document.querySelector('.content-header h1');
+            const sectionNames = {
+                'inicio': '🏠 Página de Inicio',
+                'ventas': '💰 Módulo de Ventas', 
+                'reportes': '📊 Reportes y Análisis',
+                'inventario': '📦 Gestión de Inventario',
+                'clientes': '👥 Administrar Clientes',
+                'ajustes': '⚙️ Configuraciones',
+                'precios': '💲 Gestión de Precios'
+            };
+            
+            if (contentHeader) {
+                contentHeader.textContent = sectionNames[section] || '🎯 Menú Lateral Demo';
+            }
+        }
+
+        // Override de las funciones de navegación para el demo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Interceptar clicks del sidebar para mostrar demo y luego navegar
+            setTimeout(() => {
+                const sidebarLinks = document.querySelectorAll('.sidebar .menu-link');
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        const section = this.getAttribute('data-section');
+                        if (section) {
+                            // Actualizar contenido demo brevemente
+                            updateDemoContent(section);
+                            
+                            // Navegar a la página real después de 1 segundo
+                            setTimeout(() => {
+                                if (section === 'inicio') {
+                                    window.location.href = '../index.html';
+                                } else if (section === 'ventas') {
+                                    window.location.href = 'sales.html';
+                                } else if (section === 'reportes') {
+                                    window.location.href = '../Report/menu_report.html';
+                                }
+                                // Otros módulos no navegan aún
+                            }, 1000);
+                        }
+                    });
+                });
+            }, 200);
+        });
+    </script>
+    <script src="../js/sidebar-new.js"></script>
+</body>
+</html>

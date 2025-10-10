@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Manejo de Ventas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-circle">
+                        <span class="logo-text">S&M</span>
+                        <div class="logo-subtitle">PLATA 342</div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="main-title">Sistema de Manejo de Ventas</h1>
+                        <p class="subtitle">Gestión Empresarial Profesional</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="menu-container">
+                <div class="menu-frame">
+                    <h2 class="menu-title">Menú Principal</h2>
+                    
+                    <div class="menu-grid">
+                        <!-- Fila 1 -->
+                        <div class="menu-item" data-action="ventas">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-cash-register"></i>
+                                </div>
+                                <div class="button-text">VENTAS</div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item" data-action="reportes">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="button-text">REPORTES</div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item" data-action="inventario">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <div class="button-text">INVENTARIO</div>
+                            </div>
+                        </div>
+
+                        <!-- Fila 2 -->
+                        <div class="menu-item" data-action="clientes">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="button-text">CLIENTES</div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item" data-action="ajustes">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="button-text">AJUSTES</div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item" data-action="precios">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <div class="button-text">PRECIOS</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© 2025 Sistema de Gestión Empresarial | Versión 1.0</p>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Debug específico para el botón AJUSTES
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🐛 DEBUG: DOM loaded en index.html');
+            
+            setTimeout(() => {
+                console.log('🐛 DEBUG: Verificando botón AJUSTES después de 1 segundo');
+                
+                const ajustesButton = document.querySelector('[data-action="ajustes"]');
+                if (ajustesButton) {
+                    console.log('✅ Botón AJUSTES encontrado');
+                    
+                    const menuButton = ajustesButton.querySelector('.menu-button');
+                    if (menuButton) {
+                        console.log('✅ .menu-button encontrado dentro de AJUSTES');
+                        
+                        // Verificar si tiene event listeners
+                        const clonedButton = menuButton.cloneNode(true);
+                        const hasListeners = menuButton !== clonedButton;
+                        console.log('🎯 Event listeners detectados:', hasListeners);
+                        
+                        // Agregar listener manual como test
+                        menuButton.addEventListener('click', function(e) {
+                            console.log('🎯 CLICK MANUAL en botón AJUSTES detectado!');
+                            console.log('Navegando manualmente a Settings...');
+                            window.location.href = './Settings/menu_settings.html';
+                        });
+                        
+                        console.log('🔧 Listener manual agregado al botón AJUSTES');
+                    }
+                } else {
+                    console.error('❌ Botón AJUSTES NO encontrado');
+                }
+                
+                // Verificar si SalesSystemApp existe
+                if (typeof salesSystemApp !== 'undefined' && salesSystemApp) {
+                    console.log('✅ salesSystemApp existe:', salesSystemApp);
+                    console.log('✅ menuButtons:', salesSystemApp.menuButtons);
+                } else {
+                    console.error('❌ salesSystemApp no existe');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -15,8 +15,14 @@ def configurar_estilos_aplicacion():
     Incluye estilos para botones principales, reportes, configuraciones, etc.
     
     Returns:
-        ttk.Style: Objeto Style configurado con todos los estilos de la aplicación
-    """
+        ttk.Style: Objeto Style configurado con todos los estilos de la aplicac        # Cargar y redimensionar las imágenes de fondo (normal y hover) adaptativo
+        imagen_fondo_normal_pil = Image.open(imagen_fondo_normal_path)
+        imagen_fondo_normal_pil = imagen_fondo_normal_pil.resize((config['button_width'], config['button_height']), Image.Resampling.LANCZOS)
+        imagen_fondo_normal_tk = ImageTk.PhotoImage(imagen_fondo_normal_pil)
+        
+        imagen_fondo_hover_pil = Image.open(imagen_fondo_hover_path)
+        imagen_fondo_hover_pil = imagen_fondo_hover_pil.resize((config['button_width'], config['button_height']), Image.Resampling.LANCZOS)
+        imagen_fondo_hover_tk = ImageTk.PhotoImage(imagen_fondo_hover_pil) """
     style = ttk.Style()
     style.theme_use('clam')  # Tema consistente multiplataforma
     
@@ -775,9 +781,79 @@ def crear_recuadro_estandarizado(parent_frame, titulo_pantalla, callback_volver=
     
     return main_frame, frame_centrado
 
+def obtener_configuracion_adaptativa(window=None):
+    """
+    Obtener configuración adaptativa basada en la resolución de pantalla actual
+    """
+    import tkinter as tk
+    
+    # Obtener resolución de pantalla real
+    if window and window.winfo_exists():
+        try:
+            screen_width = window.winfo_screenwidth()
+            screen_height = window.winfo_screenheight()
+        except:
+            # Fallback
+            temp_root = tk.Tk()
+            temp_root.withdraw()
+            screen_width = temp_root.winfo_screenwidth()
+            screen_height = temp_root.winfo_screenheight()
+            temp_root.destroy()
+    else:
+        temp_root = tk.Tk()
+        temp_root.withdraw()
+        screen_width = temp_root.winfo_screenwidth()
+        screen_height = temp_root.winfo_screenheight()
+        temp_root.destroy()
+    
+    # Configuración basada en resolución de pantalla real
+    if screen_width >= 2560:  # 4K y superiores
+        config = {
+            'padx_main': int(screen_width * 0.08),  # 8% del ancho
+            'pady_main': 40,
+            'button_width': 320,
+            'button_height': 260,
+            'icon_size': 100,
+            'title_font': 18,
+            'button_font': 14
+        }
+    elif screen_width >= 1920:  # Full HD
+        config = {
+            'padx_main': int(screen_width * 0.07),  # 7% del ancho
+            'pady_main': 30,
+            'button_width': 280,
+            'button_height': 230,
+            'icon_size': 90,
+            'title_font': 16,
+            'button_font': 13
+        }
+    elif screen_width >= 1366:  # HD
+        config = {
+            'padx_main': int(screen_width * 0.06),  # 6% del ancho
+            'pady_main': 25,
+            'button_width': 260,
+            'button_height': 210,
+            'icon_size': 80,
+            'title_font': 14,
+            'button_font': 12
+        }
+    else:  # Resoluciones menores
+        config = {
+            'padx_main': int(screen_width * 0.05),  # 5% del ancho
+            'pady_main': 20,
+            'button_width': 220,
+            'button_height': 180,
+            'icon_size': 65,
+            'title_font': 12,
+            'button_font': 11
+        }
+    
+    return config
+
 def crear_menu_principal_estandarizado(parent_frame, titulo_seccion, botones_config):
     """
-    Crear menú principal usando btnblanco250.png como fondo de botones.
+    Crear menú principal adaptativo usando btnblanco250.png como fondo de botones.
+    Se adapta automáticamente a diferentes resoluciones de pantalla.
     
     Parámetros:
     - parent_frame: Frame contenedor donde se creará el menú
@@ -787,9 +863,17 @@ def crear_menu_principal_estandarizado(parent_frame, titulo_seccion, botones_con
     """
     from PIL import Image, ImageTk
     
-    # Frame contenedor principal con estilo profesional
+    # Obtener configuración adaptativa usando la ventana padre
+    try:
+        root_window = parent_frame.winfo_toplevel()
+        config = obtener_configuracion_adaptativa(root_window)
+    except:
+        # Fallback a detección automática si no se puede obtener la ventana
+        config = obtener_configuracion_adaptativa()
+    
+    # Frame contenedor principal adaptativo
     main_frame = tk.Frame(parent_frame, bg='#ecf0f1')
-    main_frame.pack(expand=True, fill="both", padx=50, pady=20)
+    main_frame.pack(expand=True, fill="both", padx=config['padx_main'], pady=config['pady_main'])
     
     # Frame con borde negro (recuadro)
     frame_recuadro = tk.Frame(main_frame, bg='#2c3e50', bd=1, relief="solid")
@@ -860,7 +944,7 @@ def crear_menu_principal_estandarizado(parent_frame, titulo_seccion, botones_con
                 if icono_img:
                     canvas_obj.create_image(x_icono, y_icono, image=icono_img)
                 canvas_obj.create_text(x_texto, y_texto, text=texto_btn, fill="#2c3e50", 
-                                     font=("Arial", 12, "bold"), justify=tk.CENTER)
+                                     font=("Arial", config['button_font'], "bold"), justify=tk.CENTER)
             
             def on_leave(event):
                 canvas_obj.delete("all")
@@ -868,37 +952,43 @@ def crear_menu_principal_estandarizado(parent_frame, titulo_seccion, botones_con
                 if icono_img:
                     canvas_obj.create_image(x_icono, y_icono, image=icono_img)
                 canvas_obj.create_text(x_texto, y_texto, text=texto_btn, fill="#2c3e50", 
-                                     font=("Arial", 12, "bold"), justify=tk.CENTER)
+                                     font=("Arial", config['button_font'], "bold"), justify=tk.CENTER)
             
             canvas_obj.bind("<Enter>", on_enter)
             canvas_obj.bind("<Leave>", on_leave)
         
-        # Crear botón con imagen de fondo personalizada e ícono superpuesto
+        # Crear botón adaptativo con imagen de fondo personalizada e ícono superpuesto
         if imagen_fondo_normal_tk and imagen_fondo_hover_tk:
-            # Usar Canvas directo para superponer imágenes
-            canvas = tk.Canvas(grid_frame, width=260, height=210, highlightthickness=0, 
-                             bd=0, relief="flat", bg="#f8f9fa")
+            # Calcular posiciones adaptativas
+            center_x = config['button_width'] // 2
+            center_y = config['button_height'] // 2
+            icon_y = center_y - 20
+            text_y = center_y + 35
+            
+            # Usar Canvas directo para superponer imágenes con tamaño adaptativo
+            canvas = tk.Canvas(grid_frame, width=config['button_width'], height=config['button_height'], 
+                             highlightthickness=0, bd=0, relief="flat", bg="#f8f9fa")
             
             # Dibujar estado inicial (normal)
-            canvas.create_image(130, 105, image=imagen_fondo_normal_tk)
+            canvas.create_image(center_x, center_y, image=imagen_fondo_normal_tk)
             if imagen:
                 # Dibujar ícono más centrado
-                canvas.create_image(130, 85, image=imagen)
+                canvas.create_image(center_x, icon_y, image=imagen)
                 # Dibujar texto un poco más abajo
-                canvas.create_text(130, 160, text=texto, fill="#2c3e50", 
-                                 font=("Arial", 12, "bold"), justify=tk.CENTER)
+                canvas.create_text(center_x, text_y, text=texto, fill="#2c3e50", 
+                                 font=("Arial", config['button_font'], "bold"), justify=tk.CENTER)
             else:
-                # Dibujar texto centrado
-                canvas.create_text(130, 105, text=texto, fill="#2c3e50", 
-                                 font=("Arial", 14, "bold"), justify=tk.CENTER)
+                # Dibujar texto centrado adaptativo
+                canvas.create_text(center_x, center_y, text=texto, fill="#2c3e50", 
+                                 font=("Arial", config['button_font'] + 2, "bold"), justify=tk.CENTER)
             
-            # Aplicar efecto hover
+            # Aplicar efecto hover adaptativo
             if imagen:
                 crear_efecto_hover(canvas, imagen_fondo_normal_tk, imagen_fondo_hover_tk, 
-                                 imagen, texto, 130, 105, 130, 85, 130, 160)
+                                 imagen, texto, center_x, center_y, center_x, icon_y, center_x, text_y)
             else:
                 crear_efecto_hover(canvas, imagen_fondo_normal_tk, imagen_fondo_hover_tk, 
-                                 None, texto, 130, 105, 130, 105, 130, 105)
+                                 None, texto, center_x, center_y, center_x, center_y, center_x, center_y)
             
             # Hacer clickeable (con closure correcto)
             canvas.bind("<Button-1>", lambda e, cmd=comando: cmd())

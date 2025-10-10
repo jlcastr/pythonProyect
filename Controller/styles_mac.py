@@ -915,10 +915,19 @@ def crear_menu_principal_estandarizado_mac(parent_frame, titulo_seccion, botones
     from PIL import Image, ImageTk
     import tkinter as tk
     import os
+    from Controller.styles import obtener_configuracion_adaptativa
     
-    # Frame contenedor principal con estilo profesional
+    # Obtener configuración adaptativa usando la ventana padre
+    try:
+        root_window = parent_frame.winfo_toplevel()
+        config = obtener_configuracion_adaptativa(root_window)
+    except:
+        # Fallback a detección automática si no se puede obtener la ventana
+        config = obtener_configuracion_adaptativa()
+    
+    # Frame contenedor principal adaptativo para macOS
     main_frame = tk.Frame(parent_frame, bg='#ecf0f1')
-    main_frame.pack(expand=True, fill="both", padx=50, pady=20)
+    main_frame.pack(expand=True, fill="both", padx=config['padx_main'], pady=config['pady_main'])
     
     # Frame con borde negro (recuadro)
     frame_recuadro = tk.Frame(main_frame, bg='#2c3e50', bd=1, relief="solid")

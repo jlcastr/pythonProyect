@@ -2,7 +2,7 @@ import sqlite3
 
 def crear_conexion_y_tablas(db_path="config/sales_system.db"):
 
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, check_same_thread=False)
     cursor = conn.cursor()
     # Crear tabla Emails
     cursor.execute("""
@@ -71,6 +71,56 @@ def crear_conexion_y_tablas(db_path="config/sales_system.db"):
 
     conn.commit()
     conn.close()
+
+def obtener_conexion(db_path="config/sales_system.db"):
+    """
+    Obtener conexión a la base de datos SQLite
+    
+    Args:
+        db_path (str): Ruta a la base de datos
+        
+    Returns:
+        sqlite3.Connection: Conexión a la base de datos
+    """
+    try:
+        # Crear las tablas si no existen
+        crear_conexion_y_tablas(db_path)
+        
+        # Establecer conexión con check_same_thread=False para permitir uso en múltiples threads
+        conn = sqlite3.connect(db_path, check_same_thread=False)
+        
+        # Configurar la conexión para optimizar rendimiento
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA cache_size=10000")
+        cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.execute("PRAGMA temp_store=MEMORY")
+        cursor.execute("PRAGMA foreign_keys=ON")  # Habilitar claves foráneas
+        
+        return conn
+        
+    except sqlite3.Error as e:
+        print(f"Error conectando a la base de datos: {e}")
+        return None
+
+def obtener_cursor(db_path="config/sales_system.db"):
+    """
+    Obtener cursor de la base de datos
+    
+    Args:
+        db_path (str): Ruta a la base de datos
+        
+    Returns:
+        sqlite3.Cursor: Cursor de la base de datos
+    """
+    try:
+        conn = obtener_conexion(db_path)
+        if conn:
+            return conn.cursor()
+        return None
+    except Exception as e:
+        print(f"Error obteniendo cursor: {e}")
+        return None
 
 if __name__ == "__main__":
     crear_conexion_y_tablas()

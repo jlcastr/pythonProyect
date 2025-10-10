@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Reporte de Ventas - S&M</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .loading-content {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+        }
+        
+        .loading-spinner {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .info-message {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border-left: 4px solid #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header" style="padding: 0.75rem 1rem; min-height: auto;">
+            <div class="header-content" style="padding: 0;">
+                <div class="logo-section" style="align-items: center; gap: 1rem;">
+                    <div class="logo-circle" style="width: 50px; height: 50px; font-size: 0.85rem;">
+                        <span class="logo-text" style="font-size: 0.9rem; font-weight: bold;">S&M</span>
+                        <div class="logo-subtitle" style="font-size: 0.6rem; margin-top: 2px;">REPORTES</div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="main-title" style="font-size: 1.25rem; margin: 0; line-height: 1.2;">📊 Reporte de Ventas</h1>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="sales-container">
+                
+                
+                <!-- Date Filters Section -->
+                <div class="sales-section">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Filtros de Fecha
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 200px; gap: 1rem; align-items: end; margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label" for="fecha-inicio">📅 Fecha Inicio:</label>
+                            <input type="date" id="fecha-inicio" class="form-input" name="fecha-inicio">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="fecha-fin">📅 Fecha Fin:</label>
+                            <input type="date" id="fecha-fin" class="form-input" name="fecha-fin">
+                        </div>
+                        
+                        <button class="btn-sales btn-success" onclick="filtrarVentas()">
+                            <i class="fas fa-search"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Section -->
+                <div class="sales-section">
+                    <div class="section-title">
+                        <i class="fas fa-shopping-cart"></i>
+                        Productos Vendidos
+                        <span id="contador-productos" style="margin-left: auto; background: var(--secondary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.9rem;">0</span>
+                    </div>
+                    
+                    <div id="productos-container">
+                        <div class="empty-state">
+                            <i class="fas fa-chart-bar"></i>
+                            <p>No hay datos de ventas disponibles</p>
+                            <p>Use los filtros de fecha para consultar información</p>
+                        </div>
+                    </div>
+                    
+                    <table id="productos-tabla" class="products-table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Descripción del Producto</th>
+                                <th>Precio</th>
+                                <th>Fecha de Venta</th>
+                                <th>Folio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productos-tbody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Total Section -->
+                <div class="sales-section" id="total-section" style="display: none;">
+                    <div class="total-section">
+                        <div>Total de Ventas en el Período</div>
+                        <div class="total-amount" id="total-venta">$0.00</div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2025 Sistema de Ventas S&M - Módulo de Reportes</p>
+        </footer>
+        
+        <!-- Error/Success Messages -->
+        <div id="message-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Variables globales
+        let salesData = [];
+        let filteredData = [];
+        
+        // Configuración de fechas por defecto
+        function configurarFechasPorDefecto() {
+            const hoy = new Date();
+            const fechaHoyStr = hoy.toISOString().split('T')[0];
+            
+            // Ambas fechas del día en curso
+            const fechaInicio = document.getElementById('fecha-inicio');
+            const fechaFin = document.getElementById('fecha-fin');
+            
+            fechaInicio.value = fechaHoyStr;
+            fechaFin.value = fechaHoyStr;
+        }
+        
+        // Mostrar indicador de carga
+        function mostrarCargando(mensaje = 'Cargando datos...') {
+            const overlay = document.createElement('div');
+            overlay.id = 'loading-overlay';
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = `
+                <div class="loading-content">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <div>${mensaje}</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        // Ocultar indicador de carga
+        function ocultarCargando() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+        
+        // Mostrar mensaje
+        function mostrarMensaje(mensaje, tipo = 'error') {
+            const container = document.getElementById('message-container');
+            const messageDiv = document.createElement('div');
+            
+            let className = 'error-message';
+            let icon = 'exclamation-triangle';
+            
+            if (tipo === 'success') {
+                className = 'success-message';
+                icon = 'check-circle';
+            } else if (tipo === 'info') {
+                className = 'info-message';
+                icon = 'info-circle';
+            }
+            
+            messageDiv.className = className;
+            messageDiv.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                ${mensaje}
+            `;
+            container.appendChild(messageDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+        
+        // Cargar datos de ventas
+        async function cargarDatosVentas(fechaInicio = '', fechaFin = '') {
+            try {
+                mostrarCargando('Cargando datos de ventas...');
+                console.log('[API] Intentando cargar datos con fechas:', fechaInicio, fechaFin);
+                
+                // Verificar si PyWebView está disponible
+                if (window.pywebview && window.pywebview.api) {
+                    console.log('[API] PyWebView disponible, verificando función get_sales_data...');
+                    
+                    if (window.pywebview.api.get_sales_data) {
+                        console.log('[API] Llamando a get_sales_data...');
+                        const result = await window.pywebview.api.get_sales_data(fechaInicio, fechaFin);
+                        console.log('[API] Resultado recibido:', result);
+                        
+                        salesData = result || [];
+                        
+                        if (salesData.length > 0) {
+                            mostrarMensaje(`✅ Datos reales cargados exitosamente. ${salesData.length} registros encontrados.`, 'success');
+                            console.log('[API] Datos de la base de datos cargados correctamente');
+                            console.log('[API] Primer registro:', salesData[0]);
+                            console.log('[API] Último registro:', salesData[salesData.length - 1]);
+                        } else {
+                            mostrarMensaje('📊 No se encontraron datos en la base de datos para el período especificado.', 'info');
+                            console.log('[API] La base de datos no retornó registros');
+                        }
+                    } else {
+                        console.log('[API] Función get_sales_data no disponible');
+                        salesData = [];
+                        mostrarMensaje('❌ Error: API de base de datos no disponible. Verifique la conexión.', 'error');
+                    }
+                } else {
+                    console.log('[API] PyWebView no disponible - no se pueden cargar datos');
+                    salesData = [];
+                    mostrarMensaje('❌ Error: No se pudo conectar con la base de datos. Asegúrese de ejecutar la aplicación desde el launcher de Python.', 'error');
+                }
+                
+                filteredData = [...salesData];
+                actualizarTabla();
+                calcularTotal();
+                
+            } catch (error) {
+                console.error('[API] Error cargando dados:', error);
+                mostrarMensaje('❌ Error al cargar los datos de ventas desde la base de datos.');
+                
+                // No usar datos de demostración - dejar vacío
+                salesData = [];
+                filteredData = [];
+                actualizarTabla();
+                calcularTotal();
+            } finally {
+                ocultarCargando();
+            }
+        }
+        
+        // Filtrar ventas por fecha
+        async function filtrarVentas() {
+            const fechaInicio = document.getElementById('fecha-inicio').value;
+            const fechaFin = document.getElementById('fecha-fin').value;
+            
+            console.log('[FILTER] Aplicando filtro - Inicio:', fechaInicio, 'Fin:', fechaFin);
+            
+            // Validar fechas
+            if (fechaInicio && fechaFin && new Date(fechaInicio) > new Date(fechaFin)) {
+                mostrarMensaje('❌ La fecha de inicio no puede ser mayor que la fecha de fin.');
+                return;
+            }
+            
+            // Si tenemos acceso a la API, cargar datos con filtro desde la base de datos
+            if (window.pywebview && window.pywebview.api && window.pywebview.api.get_sales_data) {
+                console.log('[FILTER] Cargando datos filtrados desde la base de datos...');
+                await cargarDatosVentas(fechaInicio, fechaFin);
+            } else {
+                console.log('[FILTER] PyWebView no disponible - no se puede filtrar');
+                mostrarMensaje('❌ Error: No se pudo conectar con la base de datos para aplicar filtros.', 'error');
+            }
+        }
+        
+        // Actualizar tabla de datos
+        function actualizarTabla() {
+            const tbody = document.getElementById('productos-tbody');
+            const emptyState = document.querySelector('.empty-state');
+            const table = document.getElementById('productos-tabla');
+            const contador = document.getElementById('contador-productos');
+            const totalSection = document.getElementById('total-section');
+            
+            // Limpiar tabla
+            tbody.innerHTML = '';
+            
+            // Actualizar contador
+            contador.textContent = filteredData.length;
+            
+            if (filteredData.length === 0) {
+                table.style.display = 'none';
+                emptyState.style.display = 'block';
+                totalSection.style.display = 'none';
+                return;
+            }
+            
+            table.style.display = 'table';
+            emptyState.style.display = 'none';
+            totalSection.style.display = 'block';
+            
+            // Llenar tabla
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.descripcion}</td>
+                    <td>$${parseFloat(item.precio).toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td>${formatearFecha(item.fecha_venta)}</td>
+                    <td>${item.folio}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Calcular y mostrar total
+        function calcularTotal() {
+            const total = filteredData.reduce((sum, item) => sum + parseFloat(item.precio), 0);
+            const totalElement = document.getElementById('total-venta');
+            if (totalElement) {
+                totalElement.textContent = `$${total.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
+            }
+        }
+        
+        // Formatear fecha para mostrar
+        function formatearFecha(fechaStr) {
+            try {
+                // La fecha viene en formato 'YYYY-MM-DD HH:MM:SS' desde la base de datos
+                // Reemplazar el espacio con 'T' para hacer compatible con JavaScript
+                const fechaISO = fechaStr.replace(' ', 'T');
+                const fecha = new Date(fechaISO);
+                
+                // Verificar si la fecha es válida
+                if (isNaN(fecha.getTime())) {
+                    console.warn('[DATE] Fecha inválida:', fechaStr);
+                    return fechaStr; // Devolver la fecha original si no se puede parsear
+                }
+                
+                return fecha.toLocaleDateString('es-MX', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            } catch (error) {
+                console.error('[DATE] Error formateando fecha:', fechaStr, error);
+                return fechaStr; // Devolver la fecha original en caso de error
+            }
+        }
+        
+        // Volver al menú de reportes
+        function volverAlMenuReportes() {
+            console.log('[NAV] Volviendo al menú de reportes...');
+            try {
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.volver_menu_reportes) {
+                    console.log('[NAV] Usando API de PyWebView para navegar');
+                    window.pywebview.api.volver_menu_reportes();
+                } else {
+                    console.log('[NAV] Navegación HTML directa');
+                    window.location.href = 'menu_report.html';
+                }
+            } catch (error) {
+                console.error('[NAV] Error volviendo al menú de reportes:', error);
+                window.location.href = 'menu_report.html';
+            }
+        }
+        
+        // Función para esperar a que PyWebView esté listo
+        function esperarPyWebView(callback, intentos = 0) {
+            const maxIntentos = 20; // Máximo 10 segundos (20 * 500ms)
+            
+            if (window.pywebview && window.pywebview.api) {
+                console.log('[DEBUG] PyWebView listo después de', intentos, 'intentos');
+                callback();
+            } else if (intentos < maxIntentos) {
+                console.log('[DEBUG] Esperando PyWebView... intento', intentos + 1);
+                setTimeout(() => esperarPyWebView(callback, intentos + 1), 500);
+            } else {
+                console.log('[DEBUG] PyWebView no disponible después de', maxIntentos, 'intentos');
+                callback(); // Continuar sin PyWebView
+            }
+        }
+
+        // Inicialización al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📊 Reporte de Ventas - Inicializando...');
+            
+            configurarFechasPorDefecto();
+            
+            // Esperar a que PyWebView esté listo antes de cargar datos
+            esperarPyWebView(function() {
+                console.log('[DEBUG] Verificando disponibilidad de PyWebView...');
+                
+                // Debug de la API disponible
+                if (window.pywebview) {
+                    console.log('[DEBUG] PyWebView detectado');
+                    if (window.pywebview.api) {
+                        console.log('[DEBUG] API de PyWebView disponible');
+                        console.log('[DEBUG] Funciones disponibles:', Object.keys(window.pywebview.api));
+                    } else {
+                        console.log('[DEBUG] API de PyWebView no disponible');
+                    }
+                } else {
+                    console.log('[DEBUG] PyWebView no detectado - modo standalone');
+                }
+                
+                cargarDatosVentas();
+            });
+        });
+        
+        // Limpiar mensajes al hacer clic
+        document.getElementById('message-container').addEventListener('click', function(e) {
+            if (e.target.closest('.error-message') || e.target.closest('.success-message')) {
+                e.target.closest('.error-message, .success-message').remove();
+            }
+        });
+    </script>
+    
+    <script src="../js/sidebar-new.js"></script>
+</body>
+</html>

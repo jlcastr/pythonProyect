@@ -1,0 +1,2 @@
+# Dependencias para la interfaz web nativa (compatible Python 3.13)
+pywebview>=4.0.0

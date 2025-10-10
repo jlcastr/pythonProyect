@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Botón AJUSTES - Index.html</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 400px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .debug-panel h3 {
+            margin: 0 0 10px 0;
+            color: #4CAF50;
+        }
+        .menu-item {
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .menu-item.debug-highlight {
+            border-color: #ff0000 !important;
+            box-shadow: 0 0 10px rgba(255,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-panel" id="debugPanel">
+        <h3>🐛 Debug AJUSTES</h3>
+        <div id="debugLog">Cargando...</div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header igual al original -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-circle">
+                        <span class="logo-text">S&M</span>
+                        <div class="logo-subtitle">PLATA 342</div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="main-title">Sistema de Manejo de Ventas</h1>
+                        <p class="subtitle">DEBUG - Botón AJUSTES</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content - Exacto como index.html -->
+        <main class="main-content">
+            <div class="menu-container">
+                <div class="menu-frame">
+                    <h2 class="menu-title">Menú Principal</h2>
+                    
+                    <div class="menu-grid">
+                        <!-- Fila 1 -->
+                        <div class="menu-item" data-action="ventas">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-cash-register"></i>
+                                </div>
+                                <div class="button-text">VENTAS</div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item" data-action="reportes">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="button-text">REPORTES</div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item" data-action="inventario">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <div class="button-text">INVENTARIO</div>
+                            </div>
+                        </div>
+
+                        <!-- Fila 2 -->
+                        <div class="menu-item" data-action="clientes">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="button-text">CLIENTES</div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item debug-target" data-action="ajustes">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="button-text">AJUSTES</div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item" data-action="precios">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <div class="button-text">PRECIOS</div>
+                            </div>
+                        </div>
+
+                        <!-- Fila 3 -->
+                        <div class="menu-item menu-item-single" data-action="salir">
+                            <div class="menu-button exit-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <div class="button-text">SALIR</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>© 2025 DEBUG - Botón AJUSTES</p>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Debug personalizado
+        let debugLog = '';
+        function debugAdd(message) {
+            const time = new Date().toLocaleTimeString();
+            debugLog += `[${time}] ${message}\n`;
+            document.getElementById('debugLog').innerHTML = debugLog.replace(/\n/g, '<br>');
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        // Interceptar Logger original
+        if (typeof Logger !== 'undefined') {
+            const originalLog = Logger.log;
+            const originalError = Logger.error;
+            
+            Logger.log = function(message, data = null) {
+                originalLog(message, data);
+                debugAdd(`LOG: ${message} ${data ? JSON.stringify(data) : ''}`);
+            };
+            
+            Logger.error = function(message, error = null) {
+                originalError(message, error);
+                debugAdd(`ERROR: ${message} ${error ? error.toString() : ''}`);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            debugAdd('🚀 DOM cargado');
+            
+            // Verificar si main.js se cargó
+            if (typeof MenuManager !== 'undefined') {
+                debugAdd('✅ main.js cargado correctamente');
+            } else {
+                debugAdd('❌ main.js NO se cargó');
+            }
+            
+            // Buscar el botón AJUSTES específicamente
+            const ajustesButton = document.querySelector('[data-action="ajustes"]');
+            if (ajustesButton) {
+                debugAdd('✅ Botón AJUSTES encontrado');
+                ajustesButton.classList.add('debug-highlight');
+                
+                const menuButton = ajustesButton.querySelector('.menu-button');
+                const buttonText = menuButton ? menuButton.querySelector('.button-text').textContent.trim() : 'NO ENCONTRADO';
+                debugAdd(`Texto del botón: "${buttonText}"`);
+                
+                // Agregar listener manual para debug
+                ajustesButton.addEventListener('click', function(e) {
+                    debugAdd('🎯 CLICK MANUAL DETECTADO en AJUSTES');
+                    debugAdd(`Event target: ${e.target.tagName}`);
+                    debugAdd(`Current target: ${e.currentTarget.getAttribute('data-action')}`);
+                });
+                
+                if (menuButton) {
+                    menuButton.addEventListener('click', function(e) {
+                        debugAdd('🎯 CLICK en .menu-button de AJUSTES');
+                    });
+                }
+            } else {
+                debugAdd('❌ Botón AJUSTES NO encontrado');
+            }
+            
+            // Verificar todos los botones
+            const allMenuItems = document.querySelectorAll('.menu-item');
+            debugAdd(`Total botones encontrados: ${allMenuItems.length}`);
+            
+            allMenuItems.forEach((item, index) => {
+                const action = item.getAttribute('data-action');
+                const button = item.querySelector('.menu-button');
+                const text = button ? button.querySelector('.button-text').textContent.trim() : 'NO TEXT';
+                debugAdd(`Botón ${index}: action="${action}", text="${text}"`);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# Dependencias para la interfaz web con pywebview (compatible Python 3.13)
+pywebview>=4.0.0
+pillow>=9.0.0
+requests>=2.25.0

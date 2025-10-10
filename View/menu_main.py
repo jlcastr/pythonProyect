@@ -12,10 +12,30 @@ from Controller.styles import configurar_estilos_aplicacion, Colores, Fuentes
 from Controller.styles_mac import configurar_estilos_macos, crear_boton_macos, es_macos
 
 def crear_menu_principal():
-    """Crear ventana del menú principal con diseño profesional"""
+    """Crear ventana del menú principal con diseño profesional y adaptativo"""
     root = tk.Tk()
     root.title('Sistema de Manejo de Ventas')
-    root.state('zoomed')
+    
+    # Configuración inicial de ventana adaptativa
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    
+    # Calcular tamaño de ventana basado en resolución
+    if screen_width >= 1920:
+        window_width = int(screen_width * 0.85)
+        window_height = int(screen_height * 0.85)
+    elif screen_width >= 1366:
+        window_width = int(screen_width * 0.90)
+        window_height = int(screen_height * 0.90)
+    else:
+        window_width = int(screen_width * 0.95)
+        window_height = int(screen_height * 0.95)
+    
+    # Centrar ventana
+    x = (screen_width - window_width) // 2
+    y = (screen_height - window_height) // 2
+    
+    root.geometry(f"{window_width}x{window_height}+{x}+{y}")
     root.resizable(True, True)
     root.configure(bg='#ecf0f1')
     
@@ -31,6 +51,49 @@ def crear_menu_principal():
     # Configurar estilos específicos para macOS
     if es_macos():
         configurar_estilos_macos()
+    
+    # Variables globales para manejo de redimensionamiento
+    current_config = None
+    menu_elements = {}
+    last_window_size = (0, 0)
+    
+    def recrear_menu_adaptativo():
+        """Recrear el menú con la nueva configuración adaptativa"""
+        print("🔄 Recreando menú con nueva resolución...")
+
+    def on_window_resize(event=None):
+        """Función que detecta cambios de resolución"""
+        nonlocal last_window_size, current_config
+        
+        # Solo procesar eventos de la ventana principal
+        if event and event.widget != root:
+            return
+            
+        try:
+            # Obtener resolución actual de pantalla
+            screen_width = root.winfo_screenwidth()
+            screen_height = root.winfo_screenheight()
+            current_size = (screen_width, screen_height)
+            
+            # Solo informar si cambió la resolución de pantalla
+            if current_size != last_window_size:
+                last_window_size = current_size
+                
+                # Obtener nueva configuración adaptativa
+                from Controller.styles import obtener_configuracion_adaptativa
+                new_config = obtener_configuracion_adaptativa(root)
+                
+                if new_config != current_config:
+                    current_config = new_config
+                    print(f"🖥️  Resolución detectada: {screen_width}x{screen_height}")
+                    print(f"📐 Nueva configuración: Botones {new_config['button_width']}x{new_config['button_height']}, Íconos {new_config['icon_size']}px")
+                    print("💡 Reinicia la aplicación para ver los cambios aplicados")
+                    
+        except Exception as e:
+            print(f"Error detectando resolución: {e}")
+    
+    # Detectar cambios de resolución
+    root.bind('<Configure>', on_window_resize)
     
     # Función para crear título visual con logo
     def crear_titulo_visual():
@@ -370,41 +433,47 @@ def crear_menu_principal():
         frame_actual.destroy()
         configurar_estilos_aplicacion()
     
-    # Cargar imágenes para los botones
+    # Obtener configuración adaptativa para íconos usando la ventana actual
+    from Controller.styles import obtener_configuracion_adaptativa
+    config = obtener_configuracion_adaptativa(root)
+    current_config = config  # Guardar configuración inicial
+    icon_size = config['icon_size']
+    
+    # Cargar imágenes adaptativas para los botones
     try:
         from PIL import Image, ImageTk
-        # Cargar imágenes con tamaño apropiado para el nuevo diseño
-        img_ventas = ImageTk.PhotoImage(Image.open("Img/pago-en-efectivo.png").resize((80, 80), Image.Resampling.LANCZOS))
+        # Cargar imágenes con tamaño adaptativo
+        img_ventas = ImageTk.PhotoImage(Image.open("Img/pago-en-efectivo.png").resize((icon_size, icon_size), Image.Resampling.LANCZOS))
     except Exception:
         img_ventas = None
     
     try:
-        img_reportes = ImageTk.PhotoImage(Image.open("Img/grafico.png").resize((80, 80), Image.Resampling.LANCZOS))
+        img_reportes = ImageTk.PhotoImage(Image.open("Img/grafico.png").resize((icon_size, icon_size), Image.Resampling.LANCZOS))
     except Exception:
         img_reportes = None
     
     try:
-        img_configuraciones = ImageTk.PhotoImage(Image.open("Img/configuraciones.png").resize((80, 80), Image.Resampling.LANCZOS))
+        img_configuraciones = ImageTk.PhotoImage(Image.open("Img/configuraciones.png").resize((icon_size, icon_size), Image.Resampling.LANCZOS))
     except Exception:
         img_configuraciones = None
     
     try:
-        img_inventario = ImageTk.PhotoImage(Image.open("Img/inventario2.png").resize((80, 80), Image.Resampling.LANCZOS))
+        img_inventario = ImageTk.PhotoImage(Image.open("Img/inventario2.png").resize((icon_size, icon_size), Image.Resampling.LANCZOS))
     except Exception:
         img_inventario = None
     
     try:
-        img_clientes = ImageTk.PhotoImage(Image.open("Img/agregar-usuario.png").resize((80, 80), Image.Resampling.LANCZOS))
+        img_clientes = ImageTk.PhotoImage(Image.open("Img/agregar-usuario.png").resize((icon_size, icon_size), Image.Resampling.LANCZOS))
     except Exception:
         img_clientes = None
     
     try:
-        img_precios = ImageTk.PhotoImage(Image.open("Img/dinero.png").resize((80, 80), Image.Resampling.LANCZOS))
+        img_precios = ImageTk.PhotoImage(Image.open("Img/dinero.png").resize((icon_size, icon_size), Image.Resampling.LANCZOS))
     except Exception:
         img_precios = None
     
     try:
-        img_salir = ImageTk.PhotoImage(Image.open("Img/cancelar.png").resize((80, 80), Image.Resampling.LANCZOS))
+        img_salir = ImageTk.PhotoImage(Image.open("Img/cancelar.png").resize((icon_size, icon_size), Image.Resampling.LANCZOS))
     except Exception:
         img_salir = None
     
