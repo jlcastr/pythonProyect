@@ -840,3 +840,222 @@ body {
 .modal-header span {
     transition: all 0.3s ease;
 }
+
+/* ==============================================
+   ESTILOS MEJORADOS PARA MODALES PERSONALIZADOS
+   ============================================== */
+
+/* Overlay principal mejorado */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-overlay.show {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Contenido del modal mejorado */
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(0);
+    animation: slideUp 0.3s ease-out;
+}
+
+/* Header del modal mejorado */
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.modal-header i {
+    font-size: 1.3rem;
+}
+
+/* Body del modal mejorado */
+.modal-body {
+    padding: 1rem 1.5rem;
+}
+
+/* Estilos específicos para modales de confirmación más compactos */
+#confirmModal .modal-body {
+    padding: 1rem 1.5rem 0.5rem;
+    text-align: center;
+}
+
+#confirmModal #confirm-message {
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+#confirmModal #confirm-icon-large {
+    display: none !important;
+}
+
+/* Acciones del modal mejoradas */
+.modal-actions {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Botones del modal mejorados */
+.modal-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.modal-btn:not(.cancel) {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.modal-btn:not(.cancel):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
+}
+
+.modal-btn.cancel {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.modal-btn.cancel:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+/* Input del modal mejorado */
+.modal-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+}
+
+.modal-input-group {
+    margin-top: 1.5rem;
+}
+
+.modal-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.modal-text {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+/* Animaciones mejoradas */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Estilos específicos para el modal de confirmación */
+#confirmModal .modal-content {
+    border: 2px solid var(--primary-color);
+}
+
+#confirm-details {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+    border-left: 4px solid var(--primary-color);
+    padding: 0.5rem !important;
+    margin: 0.5rem 0 !important;
+    font-size: 0.75rem !important;
+    border-radius: 4px;
+    text-align: left !important;
+    max-width: 280px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+#confirm-details p {
+    margin: 0.1rem 0 !important;
+    line-height: 1.2;
+    font-size: 0.75rem;
+    padding: 0;
+}
+
+#confirm-details strong {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+/* Responsive para modales mejorados */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

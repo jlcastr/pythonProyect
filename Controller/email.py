@@ -41,6 +41,47 @@ def enviar_correo(destinatario, asunto, cuerpo, remitente, password, adjunto_pat
         smtp.login(remitente, password)
         smtp.send_message(msg)
 
+def enviar_correo_prueba(remitente, password, destinatario):
+    """
+    Enviar correo de prueba para verificar configuración
+    
+    Args:
+        remitente: Email del remitente
+        password: Contraseña del remitente
+        destinatario: Email de destino (puede ser el mismo remitente)
+    
+    Returns:
+        bool: True si el envío fue exitoso, False en caso contrario
+    """
+    try:
+        asunto = "🔧 Prueba de Configuración - Sistema S&M"
+        cuerpo = """
+¡Hola!
+
+Este es un correo de prueba del Sistema de Ventas S&M.
+
+Si estás recibiendo este mensaje, significa que la configuración de tu correo electrónico está funcionando correctamente.
+
+✅ Configuración verificada exitosamente
+📧 Remitente: {}
+🕒 Fecha: {}
+
+¡Ya puedes usar el sistema para enviar reportes y facturas!
+
+---
+Sistema de Ventas S&M
+Configuración de Email
+        """.format(remitente, __import__('datetime').datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        
+        # Enviar el correo
+        enviar_correo(destinatario, asunto, cuerpo, remitente, password)
+        print(f"[EMAIL] Correo de prueba enviado exitosamente a: {destinatario}")
+        return True
+        
+    except Exception as e:
+        print(f"[EMAIL] Error enviando correo de prueba: {e}")
+        return False
+
 # Ejemplo de uso:
 # enviar_correo(
 #     destinatario='destino@email.com',

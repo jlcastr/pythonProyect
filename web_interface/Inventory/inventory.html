@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario - S&M</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-circle">
+                        <span class="logo-text">S&M</span>
+                        <div class="logo-subtitle">INVENTARIO</div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="main-title">Inventario</h1>
+                        <p class="subtitle">Control y gestión de productos</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <div class="content-container" style="max-width: 800px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                <div class="info-message" style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.5rem; border-radius: 5px; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="color: #2196f3; font-size: 1.5rem;">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: #1976d2;">Módulo en desarrollo</h3>
+                            <p style="margin: 0.5rem 0 0 0; color: #424242;">
+                                La funcionalidad completa del inventario está siendo desarrollada. 
+                                Por ahora puede gestionar los tipos de mercancía desde el menú principal.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="navegarATipoMercancia()" class="main-btn" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-tags"></i>
+                        Gestionar tipos de mercancía
+                    </button>
+                    <button onclick="navegarAMenuInventario()" class="main-btn secondary" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver al menú
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="app-footer">
+            <p>© 2025 Sistema de Gestión Empresarial | Módulo de Inventario</p>
+        </footer>
+    </div>
+    
+    <script>
+        function navegarATipoMercancia() {
+            window.location.href = 'typeofmerchandise.html';
+        }
+        
+        function navegarAMenuInventario() {
+            window.location.href = 'menu_inventory.html';
+        }
+    </script>
+    <script src="../js/sidebar-new.js"></script>
+</body>
+</html>

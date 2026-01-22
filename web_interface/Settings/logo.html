@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Logo y Títulos - S&M</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .logo-section {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .logo-section h3 {
+            color: var(--primary-color);
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-preview {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .logo-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-preview-placeholder {
+            color: #6c757d;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .logo-info {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .logo-info-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .logo-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-file {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .btn-clear {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .titles-section {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .form-group-logo {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group-logo label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group-logo input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group-logo small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .options-section {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn-success { background: #27ae60; }
+        .btn-danger { background: #e74c3c; }
+        .btn-warning { background: #f39c12; }
+        .btn-info { background: #3498db; }
+        .btn-secondary { background: #95a5a6; }
+        .btn-purple { background: #9b59b6; }
+
+        .btn-success:hover { background: #229954; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-warning:hover { background: #d68910; }
+        .btn-info:hover { background: #2980b9; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .btn-purple:hover { background: #8e44ad; }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-body {
+            margin-bottom: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .history-item {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-item h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-color);
+        }
+
+        .history-item p {
+            margin: 0.25rem 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .gallery-item {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .gallery-preview {
+            width: 100px;
+            height: 100px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin: 0 auto 0.5rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .gallery-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .logo-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header" style="padding: 0.75rem 1rem; min-height: auto;">
+            <div class="header-content" style="padding: 0;">
+                <div class="logo-section" style="align-items: center; gap: 1rem;">
+                    <div class="logo-circle" style="width: 50px; height: 50px; font-size: 0.85rem;">
+                        <span class="logo-text" style="font-size: 0.9rem; font-weight: bold;">S&M</span>
+                        <div class="logo-subtitle" style="font-size: 0.6rem; margin-top: 2px;">LOGO</div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="main-title" style="font-size: 1.25rem; margin: 0; line-height: 1.2;">🖼️ Configuración de Logo y Títulos</h1>
+                        <p class="subtitle" style="font-size: 0.9rem; margin: 0;">⚙️ Gestión de Logos, Iconos y Títulos del Sistema</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="sales-container">
+
+                <!-- Configuración de Logos -->
+                <div class="sales-section">
+                    <div class="section-title">
+                        <i class="fas fa-image"></i>
+                        Configuración de Logos
+                    </div>
+
+                    <!-- Logo de Ventanas -->
+                    <div class="logo-section">
+                        <h3><i class="fas fa-desktop"></i> Icono de Ventanas</h3>
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                            <div class="logo-preview" id="preview-ventanas">
+                                <div class="logo-preview-placeholder">Sin logo</div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div class="logo-info">
+                                    <p class="logo-info-text" id="info-ventanas">Sin logo configurado</p>
+                                </div>
+                                <div class="logo-buttons">
+                                    <button class="btn-file" onclick="seleccionarArchivo('ventanas')">
+                                        <i class="fas fa-folder-open"></i> Seleccionar
+                                    </button>
+                                    <button class="btn-clear" onclick="limpiarLogo('ventanas')">
+                                        <i class="fas fa-trash"></i> Limpiar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" id="file-ventanas" class="hidden-input" accept="image/*,.ico" onchange="procesarArchivo('ventanas', this)">
+                    </div>
+
+                    <!-- Logo de Reportes -->
+                    <div class="logo-section">
+                        <h3><i class="fas fa-chart-bar"></i> Reportes PDF</h3>
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                            <div class="logo-preview" id="preview-reportes">
+                                <div class="logo-preview-placeholder">Sin logo</div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div class="logo-info">
+                                    <p class="logo-info-text" id="info-reportes">Sin logo configurado</p>
+                                </div>
+                                <div class="logo-buttons">
+                                    <button class="btn-file" onclick="seleccionarArchivo('reportes')">
+                                        <i class="fas fa-folder-open"></i> Seleccionar
+                                    </button>
+                                    <button class="btn-clear" onclick="limpiarLogo('reportes')">
+                                        <i class="fas fa-trash"></i> Limpiar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" id="file-reportes" class="hidden-input" accept="image/*" onchange="procesarArchivo('reportes', this)">
+                    </div>
+
+                    <!-- Logo de Facturas -->
+                    <div class="logo-section">
+                        <h3><i class="fas fa-receipt"></i> Facturas y Documentos</h3>
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                            <div class="logo-preview" id="preview-facturas">
+                                <div class="logo-preview-placeholder">Sin logo</div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div class="logo-info">
+                                    <p class="logo-info-text" id="info-facturas">Sin logo configurado</p>
+                                </div>
+                                <div class="logo-buttons">
+                                    <button class="btn-file" onclick="seleccionarArchivo('facturas')">
+                                        <i class="fas fa-folder-open"></i> Seleccionar
+                                    </button>
+                                    <button class="btn-clear" onclick="limpiarLogo('facturas')">
+                                        <i class="fas fa-trash"></i> Limpiar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" id="file-facturas" class="hidden-input" accept="image/*" onchange="procesarArchivo('facturas', this)">
+                    </div>
+                </div>
+
+                <!-- Configuración de Títulos -->
+                <div class="sales-section">
+                    <div class="section-title">
+                        <i class="fas fa-heading"></i>
+                        Configuración de Títulos
+                    </div>
+
+                    <div class="titles-section">
+                        <div class="form-group-logo">
+                            <label for="titulo-sistema">
+                                <i class="fas fa-building"></i> Título del Sistema:
+                            </label>
+                            <input type="text" id="titulo-sistema" placeholder="Sistema de Manejo de Ventas">
+                            <small>Se mostrará como título principal de la aplicación</small>
+                        </div>
+
+                        <div class="form-group-logo">
+                            <label for="titulo-reporte">
+                                <i class="fas fa-chart-line"></i> Título de Reportes:
+                            </label>
+                            <input type="text" id="titulo-reporte" placeholder="Reporte de Ventas">
+                            <small>Se mostrará en PDFs de reportes y documentos</small>
+                        </div>
+
+                        <div class="form-group-logo">
+                            <label for="titulo-ventana">
+                                <i class="fas fa-window-maximize"></i> Título de Ventana:
+                            </label>
+                            <input type="text" id="titulo-ventana" placeholder="Sistema de Gestión">
+                            <small>Se mostrará en la barra de título de las ventanas</small>
+                        </div>
+
+                        <button class="btn-sales btn-success" onclick="guardarTitulos()" style="margin-top: 1rem;">
+                            <i class="fas fa-save"></i> Guardar Títulos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Opciones Globales -->
+                <div class="sales-section">
+                    <div class="section-title">
+                        <i class="fas fa-cogs"></i>
+                        Opciones Globales
+                    </div>
+
+                    <div class="options-section">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="aplicar-todas" onchange="toggleAplicarTodas()">
+                            <label for="aplicar-todas" style="font-weight: 600;">
+                                <i class="fas fa-check-double"></i> Aplicar logo seleccionado a todas las secciones
+                            </label>
+                        </div>
+                        <p style="color: #6c757d; font-size: 0.9rem; margin: 0.5rem 0 0 0;">
+                            Cuando esta opción esté activada, al seleccionar un logo en cualquier sección se aplicará automáticamente a todas las demás secciones.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="action-buttons">
+                    <button class="btn-sales btn-success" onclick="aplicarLogos()">
+                        <i class="fas fa-check"></i> Aplicar Logos
+                    </button>
+                    <button class="btn-sales btn-danger" onclick="restablecerLogos()">
+                        <i class="fas fa-undo"></i> Restablecer
+                    </button>
+                    <button class="btn-sales btn-secondary" onclick="limpiarTodos()">
+                        <i class="fas fa-broom"></i> Limpiar Todo
+                    </button>
+                    <button class="btn-sales btn-info" onclick="mostrarHistorial()">
+                        <i class="fas fa-history"></i> Historial
+                    </button>
+                    <button class="btn-sales btn-purple" onclick="mostrarGaleria()">
+                        <i class="fas fa-images"></i> Galería
+                    </button>
+                    <button class="btn-sales btn-warning" onclick="restablecerTitulos()">
+                        <i class="fas fa-text-height"></i> Reset Títulos
+                    </button>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2025 Sistema de Ventas S&M - Configuración de Logo y Títulos</p>
+        </footer>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                <h3>Operación Exitosa</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Operación completada correctamente.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-sales btn-success" onclick="cerrarModal('confirmModal')">
+                    <i class="fas fa-check"></i> Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Error -->
+    <div id="errorModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
+                <h3>Error</h3>
+            </div>
+            <div class="modal-body">
+                <p id="error-message">Ha ocurrido un error.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-sales btn-danger" onclick="cerrarModal('errorModal')">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Historial -->
+    <div id="historialModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <i class="fas fa-history" style="color: #3498db;"></i>
+                <h3>Historial de Cambios</h3>
+            </div>
+            <div class="modal-body">
+                <div id="historial-content">
+                    <p style="text-align: center; color: #6c757d;">Cargando historial...</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-sales btn-info" onclick="cerrarModal('historialModal')">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Galería -->
+    <div id="galeriaModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <i class="fas fa-images" style="color: #9b59b6;"></i>
+                <h3>Galería de Logos</h3>
+            </div>
+            <div class="modal-body">
+                <div id="galeria-content">
+                    <p style="text-align: center; color: #6c757d;">Cargando galería...</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-sales btn-purple" onclick="cerrarModal('galeriaModal')">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Variables globales
+        let logosSeleccionados = {
+            ventanas: { archivo: null, preview: null },
+            reportes: { archivo: null, preview: null },
+            facturas: { archivo: null, preview: null }
+        };
+
+        let titulosConfig = {
+            sistema: '',
+            reporte: '',
+            ventana: ''
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🖼️ Módulo de configuración de logo cargado');
+            cargarConfiguracionActual();
+            cargarLogosActuales();
+        });
+
+        // Función para cargar configuración actual de títulos
+        async function cargarConfiguracionActual() {
+            try {
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.obtener_titulos_config) {
+                    const config = await window.pywebview.api.obtener_titulos_config();
+                    
+                    if (config && config.status === 'success') {
+                        document.getElementById('titulo-sistema').value = config.data.sistema || '';
+                        document.getElementById('titulo-reporte').value = config.data.reporte || '';
+                        document.getElementById('titulo-ventana').value = config.data.ventana || '';
+                        
+                        titulosConfig = config.data;
+                        console.log('✅ Títulos cargados desde BD');
+                    }
+                } else {
+                    // Valores por defecto
+                    document.getElementById('titulo-sistema').value = 'Sistema de Manejo de Ventas';
+                    document.getElementById('titulo-reporte').value = 'Reporte de Ventas';
+                    document.getElementById('titulo-ventana').value = 'Sistema de Gestión';
+                    console.log('⚠️ PyWebView API no disponible, usando valores por defecto');
+                }
+            } catch (error) {
+                console.error('Error cargando configuración de títulos:', error);
+                // Usar valores por defecto en caso de error
+                document.getElementById('titulo-sistema').value = 'Sistema de Manejo de Ventas';
+                document.getElementById('titulo-reporte').value = 'Reporte de Ventas';
+                document.getElementById('titulo-ventana').value = 'Sistema de Gestión';
+            }
+        }
+
+        // Función para cargar logos actuales desde la BD
+        async function cargarLogosActuales() {
+            try {
+                const secciones = ['ventanas', 'reportes', 'facturas'];
+                
+                for (let seccion of secciones) {
+                    if (window.pywebview && window.pywebview.api && window.pywebview.api.obtener_logo_info) {
+                        try {
+                            const info = await window.pywebview.api.obtener_logo_info(seccion);
+                            if (info && info.status === 'success') {
+                                actualizarInfoLogo(seccion, info.data.info_text, info.data.preview_url);
+                            } else {
+                                // Mostrar información por defecto
+                                mostrarLogoDefecto(seccion);
+                            }
+                        } catch (error) {
+                            console.error(`Error cargando logo ${seccion}:`, error);
+                            mostrarLogoDefecto(seccion);
+                        }
+                    } else {
+                        mostrarLogoDefecto(seccion);
+                    }
+                }
+            } catch (error) {
+                console.error('Error cargando logos actuales:', error);
+            }
+        }
+
+        // Función para mostrar logo por defecto
+        function mostrarLogoDefecto(seccion) {
+            const archivosDefecto = {
+                'ventanas': 'Img/SM2.ico',
+                'reportes': 'Img/logo_reportes.png',
+                'facturas': 'Img/logo_facturas.png'
+            };
+            
+            const archivo = archivosDefecto[seccion];
+            document.getElementById(`info-${seccion}`).textContent = `${archivo} - Logo actual`;
+            
+            // Si existe el archivo, mostrar preview (esto sería ideal con una API real)
+            // Por ahora mostramos un placeholder
+        }
+
+        // Función para seleccionar archivo
+        function seleccionarArchivo(seccion) {
+            console.log(`📁 Seleccionando archivo para ${seccion}`);
+            document.getElementById(`file-${seccion}`).click();
+        }
+
+        // Función para procesar archivo seleccionado
+        function procesarArchivo(seccion, input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            console.log(`📄 Procesando archivo para ${seccion}: ${file.name}`);
+
+            // Verificar que es una imagen
+            if (!file.type.startsWith('image/')) {
+                mostrarError('El archivo seleccionado no es una imagen válida.');
+                return;
+            }
+
+            // Verificar tamaño (máximo 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                mostrarError('El archivo es demasiado grande. Máximo 5MB.');
+                return;
+            }
+
+            try {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Actualizar información
+                        const sizeKB = (file.size / 1024).toFixed(1);
+                        const infoText = `${file.name} (${sizeKB} KB, ${img.width}x${img.height}px)`;
+                        
+                        // Guardar información
+                        logosSeleccionados[seccion] = {
+                            archivo: file,
+                            preview: e.target.result,
+                            info: infoText
+                        };
+                        
+                        // Actualizar interfaz
+                        actualizarPreview(seccion, e.target.result);
+                        document.getElementById(`info-${seccion}`).textContent = infoText;
+                        
+                        // Si está activado "aplicar a todas", aplicar a otras secciones
+                        if (document.getElementById('aplicar-todas').checked) {
+                            aplicarATodas(seccion, file, e.target.result, infoText);
+                        }
+                        
+                        console.log(`✅ Archivo procesado para ${seccion}: ${infoText}`);
+                    };
+                    
+                    img.onerror = function() {
+                        mostrarError('No se pudo cargar la imagen seleccionada.');
+                    };
+                    
+                    img.src = e.target.result;
+                };
+                
+                reader.onerror = function() {
+                    mostrarError('Error al leer el archivo seleccionado.');
+                };
+                
+                reader.readAsDataURL(file);
+                
+            } catch (error) {
+                console.error('Error procesando archivo:', error);
+                mostrarError('Error al procesar el archivo: ' + error.message);
+            }
+        }
+
+        // Función para actualizar preview
+        function actualizarPreview(seccion, imageSrc) {
+            const preview = document.getElementById(`preview-${seccion}`);
+            preview.innerHTML = `<img src="${imageSrc}" alt="Preview ${seccion}">`;
+        }
+
+        // Función para aplicar a todas las secciones
+        function aplicarATodas(seccionOrigen, file, imageSrc, infoText) {
+            const secciones = ['ventanas', 'reportes', 'facturas'];
+            
+            secciones.forEach(seccion => {
+                if (seccion !== seccionOrigen) {
+                    logosSeleccionados[seccion] = {
+                        archivo: file,
+                        preview: imageSrc,
+                        info: infoText
+                    };
+                    
+                    actualizarPreview(seccion, imageSrc);
+                    document.getElementById(`info-${seccion}`).textContent = infoText;
+                }
+            });
+            
+            console.log(`✅ Archivo aplicado a todas las secciones desde ${seccionOrigen}`);
+        }
+
+        // Función para limpiar logo de una sección
+        function limpiarLogo(seccion) {
+            logosSeleccionados[seccion] = { archivo: null, preview: null };
+            
+            document.getElementById(`preview-${seccion}`).innerHTML = 
+                '<div class="logo-preview-placeholder">Sin logo</div>';
+            document.getElementById(`info-${seccion}`).textContent = 'Sin logo configurado';
+            document.getElementById(`file-${seccion}`).value = '';
+            
+            console.log(`🗑️ Logo limpiado para ${seccion}`);
+        }
+
+        // Función para toggle aplicar a todas
+        function toggleAplicarTodas() {
+            const checked = document.getElementById('aplicar-todas').checked;
+            console.log(`⚙️ Aplicar a todas: ${checked ? 'Activado' : 'Desactivado'}`);
+        }
+
+        // Función para guardar títulos
+        async function guardarTitulos() {
+            try {
+                const sistema = document.getElementById('titulo-sistema').value.trim();
+                const reporte = document.getElementById('titulo-reporte').value.trim();
+                const ventana = document.getElementById('titulo-ventana').value.trim();
+
+                if (!sistema && !reporte && !ventana) {
+                    mostrarError('Debe completar al menos un campo de título antes de guardar.');
+                    return;
+                }
+
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.guardar_titulos_config) {
+                    const resultado = await window.pywebview.api.guardar_titulos_config(sistema, reporte, ventana);
+                    
+                    if (resultado && resultado.status === 'success') {
+                        titulosConfig = { sistema, reporte, ventana };
+                        mostrarConfirmacion('Títulos guardados correctamente.\n\nLos cambios se verán al reiniciar la aplicación.');
+                    } else {
+                        mostrarError(resultado?.message || 'Error desconocido al guardar títulos.');
+                    }
+                } else {
+                    // Simular guardado en modo demo
+                    titulosConfig = { sistema, reporte, ventana };
+                    mostrarConfirmacion('Títulos guardados en modo demostración.\n\nLos cambios se verán al reiniciar la aplicación.');
+                }
+                
+                console.log('💾 Títulos guardados:', { sistema, reporte, ventana });
+                
+            } catch (error) {
+                console.error('Error guardando títulos:', error);
+                mostrarError('Error al guardar títulos: ' + error.message);
+            }
+        }
+
+        // Función para aplicar logos
+        async function aplicarLogos() {
+            try {
+                const logosParaAplicar = Object.entries(logosSeleccionados).filter(([seccion, data]) => data.archivo);
+                
+                if (logosParaAplicar.length === 0) {
+                    mostrarError('No hay logos seleccionados para aplicar.');
+                    return;
+                }
+
+                let aplicados = [];
+                let errores = [];
+
+                // Guardar títulos primero si hay cambios
+                await guardarTitulosSilencioso();
+
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.aplicar_logos) {
+                    for (let [seccion, data] of logosParaAplicar) {
+                        try {
+                            // Convertir archivo a base64 para envío
+                            const base64 = await convertirArchivoABase64(data.archivo);
+                            
+                            const resultado = await window.pywebview.api.aplicar_logo(
+                                seccion, 
+                                data.archivo.name, 
+                                base64,
+                                data.archivo.type
+                            );
+                            
+                            if (resultado && resultado.status === 'success') {
+                                aplicados.push(seccion);
+                            } else {
+                                errores.push(`${seccion}: ${resultado?.message || 'Error desconocido'}`);
+                            }
+                        } catch (error) {
+                            errores.push(`${seccion}: ${error.message}`);
+                        }
+                    }
+                } else {
+                    // Modo demostración
+                    aplicados = logosParaAplicar.map(([seccion]) => seccion);
+                }
+
+                // Mostrar resultado
+                if (aplicados.length > 0 && errores.length === 0) {
+                    mostrarConfirmacion(
+                        `Logos aplicados correctamente en:\n• ${aplicados.join('\n• ')}\n\nLos cambios se verán al reiniciar la aplicación.`
+                    );
+                } else if (aplicados.length > 0 && errores.length > 0) {
+                    mostrarError(
+                        `Logos aplicados en:\n• ${aplicados.join('\n• ')}\n\nErrores en:\n• ${errores.join('\n• ')}`
+                    );
+                } else if (errores.length > 0) {
+                    mostrarError(`Errores al aplicar logos:\n• ${errores.join('\n• ')}`);
+                }
+                
+                console.log('🎯 Aplicación de logos completada:', { aplicados, errores });
+                
+            } catch (error) {
+                console.error('Error aplicando logos:', error);
+                mostrarError('Error general al aplicar logos: ' + error.message);
+            }
+        }
+
+        // Función auxiliar para guardar títulos silenciosamente
+        async function guardarTitulosSilencioso() {
+            try {
+                const sistema = document.getElementById('titulo-sistema').value.trim();
+                const reporte = document.getElementById('titulo-reporte').value.trim();
+                const ventana = document.getElementById('titulo-ventana').value.trim();
+
+                if (sistema || reporte || ventana) {
+                    if (window.pywebview && window.pywebview.api && window.pywebview.api.guardar_titulos_config) {
+                        await window.pywebview.api.guardar_titulos_config(sistema, reporte, ventana);
+                    }
+                    console.log('📝 Títulos guardados silenciosamente');
+                }
+            } catch (error) {
+                console.error('Error guardando títulos silenciosamente:', error);
+            }
+        }
+
+        // Función para convertir archivo a base64
+        function convertirArchivoABase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // Remover el prefijo data:image/...;base64,
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Función para restablecer logos
+        async function restablecerLogos() {
+            if (!confirm('¿Estás seguro de que quieres restablecer los logos desde los respaldos?\nSe perderán los logos actuales.')) {
+                return;
+            }
+
+            try {
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.restablecer_logos) {
+                    const resultado = await window.pywebview.api.restablecer_logos();
+                    
+                    if (resultado && resultado.status === 'success') {
+                        mostrarConfirmacion('Logos restablecidos correctamente desde los respaldos.\n\nLos cambios se verán al reiniciar la aplicación.');
+                        // Recargar logos actuales
+                        cargarLogosActuales();
+                    } else {
+                        mostrarError(resultado?.message || 'No se encontraron respaldos de logos.');
+                    }
+                } else {
+                    mostrarConfirmacion('Logos restablecidos en modo demostración.');
+                }
+                
+                console.log('🔄 Logos restablecidos');
+                
+            } catch (error) {
+                console.error('Error restableciendo logos:', error);
+                mostrarError('Error al restablecer logos: ' + error.message);
+            }
+        }
+
+        // Función para limpiar todos los logos seleccionados
+        function limpiarTodos() {
+            if (!confirm('¿Limpiar todas las selecciones actuales?')) {
+                return;
+            }
+
+            ['ventanas', 'reportes', 'facturas'].forEach(seccion => {
+                limpiarLogo(seccion);
+            });
+            
+            mostrarConfirmacion('Todas las selecciones han sido limpiadas.');
+            console.log('🧹 Todas las selecciones limpiadas');
+        }
+
+        // Función para restablecer títulos
+        function restablecerTitulos() {
+            if (!confirm('¿Restablecer todos los títulos a valores por defecto?')) {
+                return;
+            }
+
+            document.getElementById('titulo-sistema').value = 'Sistema de Manejo de Ventas';
+            document.getElementById('titulo-reporte').value = 'Reporte de Ventas';
+            document.getElementById('titulo-ventana').value = 'Sistema de Gestión';
+            
+            mostrarConfirmacion('Títulos restablecidos a valores por defecto.');
+            console.log('📝 Títulos restablecidos');
+        }
+
+        // Función para mostrar historial
+        async function mostrarHistorial() {
+            try {
+                document.getElementById('historial-content').innerHTML = 
+                    '<p style="text-align: center; color: #6c757d;">Cargando historial...</p>';
+                
+                document.getElementById('historialModal').style.display = 'flex';
+
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.obtener_historial_logos) {
+                    const historial = await window.pywebview.api.obtener_historial_logos();
+                    
+                    if (historial && historial.status === 'success' && historial.data.length > 0) {
+                        mostrarHistorialContent(historial.data);
+                    } else {
+                        document.getElementById('historial-content').innerHTML = 
+                            '<p style="text-align: center; color: #6c757d;">No hay historial de cambios disponible.</p>';
+                    }
+                } else {
+                    // Mostrar historial demo
+                    const historialDemo = [
+                        {
+                            seccion: 'ventanas',
+                            archivo_original: 'logo_ejemplo.ico',
+                            fecha_aplicado: '2025-10-15 14:30:00',
+                            aplicado_por: 'Usuario',
+                            dimensiones: '32x32',
+                            tamaño_kb: '15.2'
+                        }
+                    ];
+                    mostrarHistorialContent(historialDemo);
+                }
+                
+            } catch (error) {
+                console.error('Error mostrando historial:', error);
+                document.getElementById('historial-content').innerHTML = 
+                    `<p style="color: #e74c3c;">Error al cargar historial: ${error.message}</p>`;
+            }
+        }
+
+        // Función para mostrar contenido del historial
+        function mostrarHistorialContent(historial) {
+            const seccionEmojis = {
+                'ventanas': '🖥️',
+                'reportes': '📊',
+                'facturas': '🧾'
+            };
+
+            let html = '';
+            historial.forEach((cambio, index) => {
+                const emoji = seccionEmojis[cambio.seccion] || '📄';
+                const fecha = cambio.fecha_aplicado ? cambio.fecha_aplicado.substring(0, 16) : 'Fecha desconocida';
+                
+                html += `
+                    <div class="history-item">
+                        <h4>${emoji} ${cambio.seccion.charAt(0).toUpperCase() + cambio.seccion.slice(1)}</h4>
+                        <p><strong>Archivo:</strong> ${cambio.archivo_original}</p>
+                        <p><strong>Fecha:</strong> ${fecha} | <strong>Por:</strong> ${cambio.aplicado_por || 'Usuario'}</p>
+                        ${cambio.dimensiones && cambio.tamaño_kb ? 
+                            `<p><strong>Detalles:</strong> ${cambio.dimensiones} px, ${cambio.tamaño_kb} KB</p>` : ''}
+                    </div>
+                `;
+            });
+
+            document.getElementById('historial-content').innerHTML = html;
+        }
+
+        // Función para mostrar galería
+        async function mostrarGaleria() {
+            try {
+                document.getElementById('galeria-content').innerHTML = 
+                    '<p style="text-align: center; color: #6c757d;">Cargando galería...</p>';
+                
+                document.getElementById('galeriaModal').style.display = 'flex';
+
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.listar_imagenes_galeria) {
+                    const galeria = await window.pywebview.api.listar_imagenes_galeria();
+                    
+                    if (galeria && galeria.status === 'success' && galeria.data.length > 0) {
+                        mostrarGaleriaContent(galeria.data);
+                    } else {
+                        document.getElementById('galeria-content').innerHTML = 
+                            '<p style="text-align: center; color: #6c757d;">No hay imágenes guardadas en la galería.</p>';
+                    }
+                } else {
+                    // Mostrar galería demo
+                    const galeriaDemo = [
+                        {
+                            nombre: 'logo_ejemplo1.png',
+                            ruta: 'Logos/logo_ejemplo1.png',
+                            tamaño_kb: '25.6',
+                            dimensiones: '64x64'
+                        },
+                        {
+                            nombre: 'logo_ejemplo2.ico',
+                            ruta: 'Logos/logo_ejemplo2.ico',
+                            tamaño_kb: '12.3',
+                            dimensiones: '32x32'
+                        }
+                    ];
+                    mostrarGaleriaContent(galeriaDemo);
+                }
+                
+            } catch (error) {
+                console.error('Error mostrando galería:', error);
+                document.getElementById('galeria-content').innerHTML = 
+                    `<p style="color: #e74c3c;">Error al cargar galería: ${error.message}</p>`;
+            }
+        }
+
+        // Función para mostrar contenido de la galería
+        function mostrarGaleriaContent(imagenes) {
+            let html = '<div class="gallery-grid">';
+            
+            imagenes.forEach((imagen, index) => {
+                html += `
+                    <div class="gallery-item">
+                        <div class="gallery-preview">
+                            <div style="color: #6c757d; font-size: 0.8rem;">Preview</div>
+                        </div>
+                        <h5 style="margin: 0.5rem 0; color: var(--primary-color); font-size: 0.9rem;">${imagen.nombre}</h5>
+                        <p style="margin: 0; color: #6c757d; font-size: 0.8rem;">
+                            ${imagen.dimensiones || 'N/A'} | ${imagen.tamaño_kb || 'N/A'} KB
+                        </p>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            html += `<p style="text-align: center; margin-top: 1rem; color: #6c757d;">Total de imágenes: ${imagenes.length}</p>`;
+            
+            document.getElementById('galeria-content').innerHTML = html;
+        }
+
+        // Funciones de UI para modales
+        function mostrarConfirmacion(mensaje) {
+            document.getElementById('confirm-message').textContent = mensaje;
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function mostrarError(mensaje) {
+            document.getElementById('error-message').textContent = mensaje;
+            document.getElementById('errorModal').style.display = 'flex';
+        }
+
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Función para actualizar información de logo
+        function actualizarInfoLogo(seccion, infoText, previewUrl) {
+            document.getElementById(`info-${seccion}`).textContent = infoText;
+            
+            if (previewUrl) {
+                document.getElementById(`preview-${seccion}`).innerHTML = 
+                    `<img src="${previewUrl}" alt="Preview ${seccion}">`;
+            }
+        }
+
+        // Cerrar modales con Escape
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                ['confirmModal', 'errorModal', 'historialModal', 'galeriaModal'].forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    if (modal.style.display === 'flex') {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        // Cerrar modales al hacer click fuera
+        window.addEventListener('click', function(event) {
+            ['confirmModal', 'errorModal', 'historialModal', 'galeriaModal'].forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        console.log('🖼️ Logo configuration module loaded successfully');
+    </script>
+    
+    <script src="../js/sidebar-new.js"></script>
+</body>
+</html>

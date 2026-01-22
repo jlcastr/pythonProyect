@@ -60,16 +60,6 @@
                                 <div class="button-text">INVENTARIO</div>
                             </div>
                         </div>
-
-                        <!-- Fila 2 - Botón Volver -->
-                        <div class="menu-item menu-item-single" onclick="volverAlMenuPrincipal()">
-                            <div class="menu-button exit-button">
-                                <div class="button-icon">
-                                    <i class="fas fa-arrow-left"></i>
-                                </div>
-                                <div class="button-text">VOLVER</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -112,29 +102,29 @@
         }
         
         function abrirHistorialVentas() {
-            console.log('[REPORTES] Abriendo Historial de Ventas...');
+            console.log('[REPORTES] Abriendo Notas de Venta...');
             
             // Mostrar indicador de carga
-            mostrarCargando('Cargando historial de ventas...');
+            mostrarCargando('Cargando notas de venta...');
             
-            // Comunicar con Python si está disponible
-            if (window.pywebview && window.pywebview.api && window.pywebview.api.reports_historial) {
-                window.pywebview.api.reports_historial().then(result => {
-                    console.log('[REPORTES] Resultado historial ventas:', result);
+            // Navegar a la página de notas de venta
+            setTimeout(() => {
+                try {
+                    // Intentar usar PyWebView API si está disponible
+                    if (window.pywebview && window.pywebview.api && window.pywebview.api.open_sales_notes) {
+                        window.pywebview.api.open_sales_notes();
+                    } else {
+                        // Navegación HTML directa
+                        window.location.href = 'report_sales notes.html';
+                    }
+                } catch (error) {
+                    console.error('[REPORTES] Error abriendo notas de venta:', error);
+                    // Fallback a navegación directa
+                    window.location.href = 'report_sales notes.html';
+                } finally {
                     ocultarCargando();
-                    // Manejar resultado si es necesario
-                }).catch(error => {
-                    console.error('[REPORTES] Error en historial ventas:', error);
-                    ocultarCargando();
-                    mostrarMensajeDemo('Historial de Ventas');
-                });
-            } else {
-                // Modo demostración
-                setTimeout(() => {
-                    ocultarCargando();
-                    mostrarMensajeDemo('Historial de Ventas');
-                }, 1000);
-            }
+                }
+            }, 500);
         }
         
         function abrirReporteInventario() {
@@ -146,24 +136,6 @@
                 'Módulo de reporte de inventario en desarrollo',
                 'info'
             );
-        }
-        
-        function volverAlMenuPrincipal() {
-            console.log('[REPORTES] Volviendo al menú principal...');
-            
-            // Intentar navegar de vuelta al índice
-            try {
-                if (window.pywebview && window.pywebview.api && window.pywebview.api.volver_menu_principal) {
-                    window.pywebview.api.volver_menu_principal();
-                } else {
-                    // Navegación directa
-                    window.location.href = '../index.html';
-                }
-            } catch (error) {
-                console.error('[REPORTES] Error volviendo al menú:', error);
-                // Fallback
-                window.location.href = '../index.html';
-            }
         }
         
         // Funciones auxiliares

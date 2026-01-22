@@ -12,6 +12,8 @@ function navegarInicio() {
         window.location.href = '../index.html';
     } else if (path.includes('/Settings/')) {
         window.location.href = '../index.html';
+    } else if (path.includes('/Inventory/')) {
+        window.location.href = '../index.html';
     } else {
         window.location.href = 'index.html';
     }
@@ -25,6 +27,8 @@ function navegarVentas() {
     } else if (path.includes('/Report/')) {
         window.location.href = '../Sales/sales.html';
     } else if (path.includes('/Settings/')) {
+        window.location.href = '../Sales/sales.html';
+    } else if (path.includes('/Inventory/')) {
         window.location.href = '../Sales/sales.html';
     } else {
         window.location.href = 'Sales/sales.html';
@@ -40,8 +44,26 @@ function navegarReportes() {
         window.location.href = 'menu_report.html';
     } else if (path.includes('/Settings/')) {
         window.location.href = '../Report/menu_report.html';
+    } else if (path.includes('/Inventory/')) {
+        window.location.href = '../Report/menu_report.html';
     } else {
         window.location.href = 'Report/menu_report.html';
+    }
+}
+
+function navegarInventario() {
+    console.log('📦 Navegando a Inventario...');
+    const path = window.location.pathname;
+    if (path.includes('/Sales/')) {
+        window.location.href = '../Inventory/menu_inventory.html';
+    } else if (path.includes('/Report/')) {
+        window.location.href = '../Inventory/menu_inventory.html';
+    } else if (path.includes('/Settings/')) {
+        window.location.href = '../Inventory/menu_inventory.html';
+    } else if (path.includes('/Inventory/')) {
+        window.location.href = 'menu_inventory.html';
+    } else {
+        window.location.href = 'Inventory/menu_inventory.html';
     }
 }
 
@@ -54,6 +76,8 @@ function navegarAjustes() {
         window.location.href = '../Settings/menu_settings.html';
     } else if (path.includes('/Settings/')) {
         window.location.href = 'menu_settings.html';
+    } else if (path.includes('/Inventory/')) {
+        window.location.href = '../Settings/menu_settings.html';
     } else {
         window.location.href = 'Settings/menu_settings.html';
     }
@@ -199,7 +223,7 @@ function agregarEventListeners() {
                     navegarReportes();
                     break;
                 case 'inventario':
-                    mostrarEnDesarrollo('Inventario');
+                    navegarInventario();
                     break;
                 case 'clientes':
                     mostrarEnDesarrollo('Clientes');
@@ -226,10 +250,12 @@ function marcarPaginaActiva() {
     
     if (path.includes('sales.html')) {
         seccionActiva = 'ventas';
-    } else if (path.includes('menu_report.html')) {
+    } else if (path.includes('menu_report.html') || path.includes('report_sales')) {
         seccionActiva = 'reportes';
-    } else if (path.includes('menu_settings.html')) {
+    } else if (path.includes('menu_settings.html') || path.includes('email.html') || path.includes('logo.html')) {
         seccionActiva = 'ajustes';
+    } else if (path.includes('menu_inventory.html') || path.includes('inventory.html') || path.includes('typeofmerchandise.html')) {
+        seccionActiva = 'inventario';
     } else if (path.includes('index.html') || path.endsWith('/')) {
         seccionActiva = 'inicio';
     }

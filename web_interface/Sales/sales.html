@@ -73,15 +73,6 @@
                         <button class="btn-sales btn-danger" onclick="cancelarOperacion()">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
-                        <button class="btn-sales" onclick="testPyWebView()" style="background: #17a2b8;">
-                            <i class="fas fa-bug"></i> Test API
-                        </button>
-                        <button class="btn-sales" onclick="testSimple()" style="background: #6c757d;">
-                            <i class="fas fa-flask"></i> Test Simple
-                        </button>
-                        <button class="btn-sales" onclick="testDirectPython()" style="background: #dc3545;">
-                            <i class="fas fa-fire"></i> Test Python
-                        </button>
                     </div>
                 </div>
 
@@ -203,6 +194,37 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación Personalizado -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 380px;">
+            <div class="modal-header">
+                <i id="confirm-icon" class="fas fa-question-circle" style="color: var(--primary-color);"></i>
+                <span id="confirm-title">Confirmación</span>
+            </div>
+            
+            <div class="modal-body">
+                <div id="confirm-icon-large" style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <p id="confirm-message" style="font-size: 1rem; color: var(--text-color); margin-bottom: 0.5rem; line-height: 1.4;">
+                    ¿Está seguro de realizar esta acción?
+                </p>
+                <div id="confirm-details">
+                    <!-- Detalles adicionales aquí -->
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="cerrarModalConfirm()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button id="confirm-accept-btn" class="modal-btn" onclick="aceptarConfirmacion()">
+                    <i class="fas fa-check"></i> Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script>
         console.log('[DEBUG] Iniciando carga de sales.js...');
@@ -221,6 +243,85 @@
         });
     </script>
     <script>
+        // Variables globales para el sistema de confirmación
+        let confirmCallback = null;
+        let confirmData = null;
+
+        // Función para mostrar modal de confirmación personalizado
+        function mostrarConfirmacion(opciones) {
+            const {
+                titulo = 'Confirmación',
+                mensaje = '¿Está seguro de realizar esta acción?',
+                detalles = '',
+                icono = 'fas fa-question-circle',
+                colorIcono = 'var(--primary-color)',
+                textoAceptar = 'Aceptar',
+                iconoAceptar = 'fas fa-check',
+                callback = null,
+                data = null
+            } = opciones;
+
+            // Guardar callback y datos
+            confirmCallback = callback;
+            confirmData = data;
+
+            // Configurar modal
+            const modal = document.getElementById('confirmModal');
+            const titulo_elem = document.getElementById('confirm-title');
+            const icono_elem = document.getElementById('confirm-icon');
+            const iconoGrande_elem = document.getElementById('confirm-icon-large');
+            const mensaje_elem = document.getElementById('confirm-message');
+            const detalles_elem = document.getElementById('confirm-details');
+            const aceptarBtn = document.getElementById('confirm-accept-btn');
+
+            if (titulo_elem) titulo_elem.textContent = titulo;
+            if (icono_elem) {
+                icono_elem.className = icono;
+                icono_elem.style.color = colorIcono;
+            }
+            if (iconoGrande_elem) {
+                iconoGrande_elem.innerHTML = `<i class="${icono}"></i>`;
+                iconoGrande_elem.style.color = colorIcono;
+            }
+            if (mensaje_elem) mensaje_elem.textContent = mensaje;
+            if (detalles_elem) {
+                if (detalles) {
+                    detalles_elem.innerHTML = detalles;
+                    detalles_elem.style.display = 'block';
+                } else {
+                    detalles_elem.style.display = 'none';
+                }
+            }
+            if (aceptarBtn) {
+                aceptarBtn.innerHTML = `<i class="${iconoAceptar}"></i> ${textoAceptar}`;
+            }
+
+            // Mostrar modal
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
+        }
+
+        // Función para cerrar modal de confirmación
+        function cerrarModalConfirm() {
+            const modal = document.getElementById('confirmModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+            }
+            confirmCallback = null;
+            confirmData = null;
+        }
+
+        // Función para aceptar confirmación
+        function aceptarConfirmacion() {
+            if (confirmCallback && typeof confirmCallback === 'function') {
+                confirmCallback(confirmData);
+            }
+            cerrarModalConfirm();
+        }
+
         // Función para abrir el modal de correo
         function abrirModalCorreo() {
             // Verificar si hay una venta finalizada
@@ -229,13 +330,40 @@
             
             // Solo permitir envío si la sección post-venta está visible (venta finalizada)
             if (!postVentaSection || postVentaSection.style.display === 'none') {
-                alert('Error: Debe finalizar una venta antes de poder enviarla por correo.\n\n1. Agregue productos\n2. Haga clic en "Finalizar Venta"\n3. Luego podrá enviar por correo');
+                mostrarConfirmacion({
+                    titulo: 'Venta No Finalizada',
+                    mensaje: 'Debe finalizar una venta antes de poder enviarla por correo.',
+                    detalles: `
+                        <div style="text-align: left;">
+                            <p style="margin: 0 0 0.5rem 0; font-weight: bold; color: var(--primary-color);">
+                                <i class="fas fa-list-ol" style="margin-right: 0.5rem;"></i>Pasos para enviar por correo:
+                            </p>
+                            <ol style="margin: 0; padding-left: 1.5rem;">
+                                <li>Agregue productos a la venta</li>
+                                <li>Haga clic en "Finalizar Venta"</li>
+                                <li>Luego use "Enviar por Correo"</li>
+                            </ol>
+                        </div>
+                    `,
+                    icono: 'fas fa-exclamation-triangle',
+                    colorIcono: '#f39c12',
+                    textoAceptar: 'Entendido',
+                    iconoAceptar: 'fas fa-check'
+                });
                 return;
             }
             
             // Verificar que hay un folio
             if (!folioInput || !folioInput.value) {
-                alert('Error: No se encontró el folio de la venta. Debe finalizar una venta primero.');
+                mostrarConfirmacion({
+                    titulo: 'Error de Folio',
+                    mensaje: 'No se encontró el folio de la venta.',
+                    detalles: 'Debe finalizar una venta primero para generar un folio válido.',
+                    icono: 'fas fa-exclamation-circle',
+                    colorIcono: '#e74c3c',
+                    textoAceptar: 'Entendido',
+                    iconoAceptar: 'fas fa-check'
+                });
                 return;
             }
             
@@ -255,7 +383,15 @@
                     setTimeout(() => emailInput.focus(), 100);
                 }
             } else {
-                alert('Error: No se pudo abrir el modal de correo');
+                mostrarConfirmacion({
+                    titulo: 'Error del Sistema',
+                    mensaje: 'No se pudo abrir el modal de correo.',
+                    detalles: 'Ocurrió un error interno. Intente recargar la página.',
+                    icono: 'fas fa-exclamation-circle',
+                    colorIcono: '#e74c3c',
+                    textoAceptar: 'Entendido',
+                    iconoAceptar: 'fas fa-check'
+                });
             }
         }
         
@@ -307,22 +443,80 @@
             const email = emailInput ? emailInput.value.trim() : '';
             
             if (!email) {
-                alert('Por favor ingrese un correo electrónico');
+                mostrarConfirmacion({
+                    titulo: 'Campo Requerido',
+                    mensaje: 'Por favor ingrese un correo electrónico',
+                    detalles: 'El campo de correo electrónico es obligatorio para enviar la venta.',
+                    icono: 'fas fa-at',
+                    colorIcono: '#f39c12',
+                    textoAceptar: 'Entendido',
+                    iconoAceptar: 'fas fa-check',
+                    callback: () => {
+                        // Enfocar el campo de email después de cerrar el modal
+                        setTimeout(() => {
+                            if (emailInput) emailInput.focus();
+                        }, 200);
+                    }
+                });
                 return;
             }
             
             // Validación básica de email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                alert('El formato del correo electrónico no es válido');
+                mostrarConfirmacion({
+                    titulo: 'Formato Incorrecto',
+                    mensaje: 'El formato del correo electrónico no es válido',
+                    detalles: `
+                        <div style="text-align: left;">
+                            <p style="margin: 0 0 0.5rem 0;"><strong>Email ingresado:</strong> <span style="color: #e74c3c;">${email}</span></p>
+                            <p style="margin: 0; font-size: 0.9rem; color: #666;">
+                                <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
+                                Ejemplo válido: usuario@ejemplo.com
+                            </p>
+                        </div>
+                    `,
+                    icono: 'fas fa-envelope-open-text',
+                    colorIcono: '#e74c3c',
+                    textoAceptar: 'Corregir',
+                    iconoAceptar: 'fas fa-edit',
+                    callback: () => {
+                        // Enfocar y seleccionar el texto del campo de email
+                        setTimeout(() => {
+                            if (emailInput) {
+                                emailInput.focus();
+                                emailInput.select();
+                            }
+                        }, 200);
+                    }
+                });
                 return;
             }
             
-            // Mostrar indicador de carga
-            mostrarCargandoEmail();
-            
-            // Enviar correo real usando PyWebView API
-            enviarCorreoReal(email);
+            // Mostrar confirmación final antes de enviar
+            mostrarConfirmacion({
+                titulo: 'Confirmar Envío',
+                mensaje: '¿Está seguro de enviar la venta por correo electrónico?',
+                detalles: `
+                    <div style="text-align: left;">
+                        <p style="margin: 0 0 0.5rem 0;"><strong>Destinatario:</strong> ${email}</p>
+                        <p style="margin: 0 0 0.5rem 0;"><strong>Folio:</strong> ${document.getElementById('modal-folio')?.textContent || 'N/A'}</p>
+                        <p style="margin: 0; font-size: 0.9rem; color: #666;">
+                            <i class="fas fa-paper-plane" style="margin-right: 0.5rem;"></i>
+                            Se enviará un PDF con los detalles de la venta
+                        </p>
+                    </div>
+                `,
+                icono: 'fas fa-paper-plane',
+                colorIcono: 'var(--primary-color)',
+                textoAceptar: 'Enviar Ahora',
+                iconoAceptar: 'fas fa-paper-plane',
+                callback: () => {
+                    // Mostrar indicador de carga y enviar
+                    mostrarCargandoEmail();
+                    enviarCorreoReal(email);
+                }
+            });
         }
         
         async function enviarCorreoReal(email) {
@@ -558,76 +752,7 @@
                 modalActions.style.justifyContent = 'center';
             }
         }
-        
-        // Función de prueba para verificar PyWebView
-        async function testPyWebView() {
-            alert('Iniciando prueba de PyWebView...');
-            
-            try {
-                if (window.pywebview && window.pywebview.api) {
-                    alert('PyWebView detectado. Llamando a test_connection...');
-                    
-                    if (window.pywebview.api.test_connection) {
-                        const resultado = await window.pywebview.api.test_connection();
-                        alert(`Resultado: ${JSON.stringify(resultado)}`);
-                    } else {
-                        alert('ERROR: Función test_connection no encontrada');
-                    }
-                } else {
-                    alert('ERROR: PyWebView no está disponible');
-                }
-            } catch (error) {
-                alert(`ERROR: ${error.message}`);
-            }
-        }
-        
-        // Función de prueba simple
-        function testSimple() {
-            alert('Función testSimple ejecutada correctamente!');
-            console.log('TEST: Función simple funcionando');
-            
-            // Verificar si existe ventasManager
-            if (typeof ventasManager !== 'undefined') {
-                alert('ventasManager existe!');
-                console.log('TEST: ventasManager encontrado:', ventasManager);
-            } else {
-                alert('ERROR: ventasManager no existe!');
-                console.log('TEST: ventasManager no encontrado');
-            }
-            
-            // Verificar si existe VentasManager
-            if (typeof VentasManager !== 'undefined') {
-                alert('VentasManager clase existe!');
-                console.log('TEST: VentasManager clase encontrada');
-            } else {
-                alert('ERROR: VentasManager clase no existe!');
-                console.log('TEST: VentasManager clase no encontrada');
-            }
-        }
-        
-        // Función de prueba directa a Python
-        async function testDirectPython() {
-            alert('Probando llamada directa a Python...');
-            
-            try {
-                if (window.pywebview && window.pywebview.api && window.pywebview.api.sales_agregar_producto) {
-                    console.log('[TEST] Llamando directamente a sales_agregar_producto...');
-                    const resultado1 = await window.pywebview.api.sales_agregar_producto('Producto Test Directo', '100.00');
-                    console.log('[TEST] Resultado agregar:', resultado1);
-                    
-                    // Ahora finalizar para guardar en BD
-                    console.log('[TEST] Llamando directamente a sales_finalizar_venta...');
-                    const resultado2 = await window.pywebview.api.sales_finalizar_venta('Cliente Test Directo');
-                    console.log('[TEST] Resultado finalizar:', resultado2);
-                    
-                    alert(`Agregado: ${JSON.stringify(resultado1)}\n\nFinalizado: ${JSON.stringify(resultado2)}`);
-                } else {
-                    alert('ERROR: API sales_agregar_producto no disponible');
-                }
-            } catch (error) {
-                alert(`ERROR: ${error.message}`);
-            }
-        }
+
     </script>
     <script src="../js/sidebar-new.js"></script>
 </body>

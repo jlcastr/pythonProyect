@@ -236,14 +236,28 @@ class VentasManager {
     }
     
     eliminarProducto(indice) {
-        if (confirm('¿Está seguro de eliminar este producto?')) {
-            const productoEliminado = this.productos.splice(indice, 1)[0];
-            this.mostrarNotificacion('Producto eliminado correctamente', 'success');
-            this.actualizarInterfaz();
-            
-            // Comunicar con Python si está disponible
-            this.comunicarConPython('eliminar_producto', { indice: indice, producto: productoEliminado }).catch(console.error);
-        }
+        const producto = this.productos[indice];
+        
+        window.mostrarConfirmacion({
+            titulo: 'Eliminar Producto',
+            mensaje: '¿Está seguro de eliminar este producto?',
+            detalles: `
+                <p><strong>Producto:</strong> ${producto.descripcion}</p>
+                <p><strong>Precio:</strong> $${producto.precio}</p>
+            `,
+            icono: 'fas fa-trash-alt',
+            colorIcono: '#e74c3c',
+            textoAceptar: 'Eliminar',
+            iconoAceptar: 'fas fa-trash-alt',
+            callback: () => {
+                const productoEliminado = this.productos.splice(indice, 1)[0];
+                this.mostrarNotificacion('Producto eliminado correctamente', 'success');
+                this.actualizarInterfaz();
+                
+                // Comunicar con Python si está disponible
+                this.comunicarConPython('eliminar_producto', { indice: indice, producto: productoEliminado }).catch(console.error);
+            }
+        });
     }
     
     editarProducto(indice) {
@@ -270,19 +284,34 @@ class VentasManager {
             return;
         }
         
-        if (confirm('¿Está seguro de limpiar todos los productos?')) {
-            this.productos = [];
-            this.folio = null;
-            this.folioInput.value = '';
-            this.cliente = "Consumidor Final";
-            this.clienteInput.value = this.cliente;
-            this.limpiarCampos();
-            this.actualizarInterfaz();
-            this.mostrarNotificacion('Venta limpiada correctamente', 'success');
-            
-            // Comunicar con Python si está disponible
-            this.comunicarConPython('limpiar_venta', {});
-        }
+        window.mostrarConfirmacion({
+            titulo: 'Limpiar Venta',
+            mensaje: '¿Está seguro de limpiar todos los productos?',
+            detalles: `
+                <p><strong>Productos a eliminar:</strong> ${this.productos.length}</p>
+                <p style="color: #e74c3c;">
+                    <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+                    Esta acción no se puede deshacer
+                </p>
+            `,
+            icono: 'fas fa-broom',
+            colorIcono: '#f39c12',
+            textoAceptar: 'Limpiar Todo',
+            iconoAceptar: 'fas fa-broom',
+            callback: () => {
+                this.productos = [];
+                this.folio = null;
+                this.folioInput.value = '';
+                this.cliente = "Consumidor Final";
+                this.clienteInput.value = '';  // Limpiar el campo, no establecer valor
+                this.limpiarCampos();
+                this.actualizarInterfaz();
+                this.mostrarNotificacion('Venta limpiada correctamente', 'success');
+                
+                // Comunicar con Python si está disponible
+                this.comunicarConPython('limpiar_venta', {});
+            }
+        });
     }
     
     cancelarOperacion() {
@@ -296,18 +325,31 @@ class VentasManager {
             return;
         }
         
-        if (confirm('¿Está seguro de finalizar la venta?')) {
-            // Obtener el valor actual del input de cliente
-            const clienteActual = this.clienteInput.value.trim() || "Consumidor Final";
-            
-            console.log(`[DEBUG] Cliente del objeto: "${this.cliente}"`);
-            console.log(`[DEBUG] Cliente del input: "${clienteActual}"`);
-            
-            const ventaFinalizada = {
-                folio: this.folio,
-                cliente: clienteActual, // Usar el valor del input directamente
-                productos: [...this.productos],
-                total: this.total,
+        // Usar modal personalizado para confirmación
+        const clienteActual = this.clienteInput.value.trim() || "Consumidor Final";
+        
+        window.mostrarConfirmacion({
+            titulo: 'Finalizar Venta',
+            mensaje: '¿Está seguro de finalizar la venta?',
+            detalles: `
+                <p><strong>Folio:</strong> ${this.folio}</p>
+                <p><strong>Cliente:</strong> ${clienteActual}</p>
+                <p><strong>Productos:</strong> ${this.productos.length}</p>
+                <p><strong>Total:</strong> $${this.total.toFixed(2)}</p>
+            `,
+            icono: 'fas fa-question-circle',
+            colorIcono: 'var(--primary-color)',
+            textoAceptar: 'Finalizar Venta',
+            iconoAceptar: 'fas fa-check',
+            callback: () => {
+                console.log(`[DEBUG] Cliente del objeto: "${this.cliente}"`);
+                console.log(`[DEBUG] Cliente del input: "${clienteActual}"`);
+                
+                const ventaFinalizada = {
+                    folio: this.folio,
+                    cliente: clienteActual, // Usar el valor del input directamente
+                    productos: [...this.productos],
+                    total: this.total,
                 fecha: new Date().toLocaleString('es-MX')
             };
             
@@ -331,7 +373,8 @@ class VentasManager {
             
             // Comunicar con Python si está disponible
             this.comunicarConPython('finalizar_venta', ventaFinalizada);
-        }
+            }
+        });
     }
     
     imprimirVenta() {
@@ -367,7 +410,7 @@ class VentasManager {
         this.folio = null;
         this.folioInput.value = '';
         this.cliente = "Consumidor Final";
-        this.clienteInput.value = this.cliente;
+        this.clienteInput.value = '';  // Limpiar el campo, no establecer valor
         this.limpiarCampos();
         
         // Ocultar secciones post-venta

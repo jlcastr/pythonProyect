@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú de Inventario - S&M</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header" style="padding: 0.75rem 1rem; min-height: auto;">
+            <div class="header-content" style="padding: 0;">
+                <div class="logo-section" style="align-items: center; gap: 1rem;">
+                    <div class="logo-circle" style="width: 50px; height: 50px; font-size: 0.85rem;">
+                        <span class="logo-text" style="font-size: 0.9rem; font-weight: bold;">S&M</span>
+                        <div class="logo-subtitle" style="font-size: 0.6rem; margin-top: 2px;">INVENTARIO</div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="main-title" style="font-size: 1.25rem; margin: 0; line-height: 1.2;">Menú de Inventario</h1>
+                        <p class="subtitle" style="font-size: 0.9rem; margin: 0;">Gestión y Control de Mercancía</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="menu-container">
+                <div class="menu-frame">
+                    <h2 class="menu-title">Menú de Inventario</h2>
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="abrirInventario()">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <div class="button-text">INVENTARIO</div>
+                            </div>
+                        </div>
+                        <div class="menu-item" onclick="abrirTipoMercancia()">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div class="button-text">TIPO DE<br>MERCANCÍA</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© 2025 Sistema de Gestión Empresarial | Módulo de Inventario</p>
+        </footer>
+    </div>
+
+    <script>
+        function abrirInventario() {
+            try {
+                // Navegación o acción para Inventario
+                window.location.href = 'inventory.html';
+            } catch (error) {
+                mostrarPopupNoDesarrollado('Inventario');
+            }
+        }
+        function abrirTipoMercancia() {
+            try {
+                // Navegación o acción para Tipo de mercancía
+                window.location.href = 'typeofmerchandise.html';
+            } catch (error) {
+                mostrarPopupNoDesarrollado('Tipo de mercancía');
+            }
+        }
+        function mostrarPopupNoDesarrollado(modulo) {
+            // Crear modal de mensaje
+            const modal = document.createElement('div');
+            modal.id = 'message-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            modal.innerHTML = `
+                <div style="background: white; padding: 2rem; border-radius: 10px; max-width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                    <div style="color: #f39c12; font-size: 2.5rem; margin-bottom: 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h2 style="color: var(--text-color); margin-bottom: 1rem;">Módulo no disponible</h2>
+                    <p style="color: var(--text-color); margin-bottom: 2rem;">El módulo <b>${modulo}</b> aún no se ha desarrollado.<br>Por favor, consulte con el administrador del sistema.</p>
+                    <button onclick="cerrarPopupNoDesarrollado()" style="background: #f39c12; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 5px; cursor: pointer; font-size: 1rem;">
+                        <i class="fas fa-check"></i> Entendido
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        function cerrarPopupNoDesarrollado() {
+            const modal = document.getElementById('message-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+    </script>
+    <script src="../js/sidebar-new.js"></script>
+</body>
+</html>

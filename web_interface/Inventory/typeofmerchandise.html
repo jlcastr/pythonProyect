@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipo de mercancía - S&M</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-circle">
+                        <span class="logo-text">S&M</span>
+                        <div class="logo-subtitle">TIPO DE MERCANCÍA</div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="main-title">Tipo de mercancía</h1>
+                        <p class="subtitle">Registro y clasificación de mercancía</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="form-container" style="max-width: 500px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                <form id="tipo-mercancia-form">
+                    <h2 style="margin-bottom: 1.5rem;">Registrar tipo de mercancía</h2>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="tipoMercancia">Tipo de mercancía</label>
+                        <input type="text" id="tipoMercancia" name="tipoMercancia" class="form-input" placeholder="Ejemplo: Cadena de oro" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="descripcion">Descripción</label>
+                        <input type="text" id="descripcion" name="descripcion" class="form-input" placeholder="Descripción detallada" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label for="categoriaGeneral">Categoría general</label>
+                        <select id="categoriaGeneral" name="categoriaGeneral" class="form-input" required>
+                            <option value="">Seleccione una categoría</option>
+                            <option value="Cadenas">Cadenas</option>
+                            <option value="Dijes">Dijes</option>
+                            <option value="Anillos">Anillos</option>
+                            <option value="Pulseras">Pulseras</option>
+                            <option value="Aretes">Aretes</option>
+                            <option value="Collares/Gargantillas">Collares/Gargantillas</option>
+                            <option value="Tobilleras">Tobilleras</option>
+                            <option value="Set de joyería">Set de joyería</option>
+                            <option value="Broqueles/Piercings">Broqueles/Piercings</option>
+                            <option value="Relojes">Relojes</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="main-btn" style="width: 100%; margin-bottom: 1rem;">Registrar</button>
+                    <button type="button" onclick="volverAMenu()" class="main-btn secondary" style="width: 100%;">
+                        <i class="fas fa-arrow-left"></i> Volver al menú
+                    </button>
+                </form>
+            </div>
+        </main>
+        <footer class="app-footer">
+            <p>© 2025 Sistema de Gestión Empresarial | Módulo de Inventario</p>
+        </footer>
+    </div>
+    <script>
+        function volverAMenu() {
+            window.location.href = 'menu_inventory.html';
+        }
+        
+        // Manejar el envío del formulario
+        document.getElementById('tipo-mercancia-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obtener valores del formulario
+            const tipoMercancia = document.getElementById('tipoMercancia').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const categoria = document.getElementById('categoriaGeneral').value;
+            
+            // Mostrar mensaje de confirmación (simulación)
+            alert(`Tipo de mercancía registrado:\n\nTipo: ${tipoMercancia}\nDescripción: ${descripcion}\nCategoría: ${categoria}\n\nNota: Esta es una simulación. La funcionalidad completa será implementada próximamente.`);
+            
+            // Limpiar formulario
+            this.reset();
+        });
+    </script>
+    <script src="../js/sidebar-new.js"></script>
+</body>
+</html>

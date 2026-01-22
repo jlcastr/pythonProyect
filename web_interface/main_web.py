@@ -312,6 +312,126 @@ class SalesSystemAPI:
             traceback.print_exc()
             return []
 
+    def get_sales_master(self, fecha_inicio='', fecha_fin=''):
+        """API: Obtener datos de ventas maestras (VentaMaster)"""
+        try:
+            print(f"[API] Obteniendo ventas maestras - Desde: {fecha_inicio}, Hasta: {fecha_fin}")
+            
+            import sqlite3
+            from datetime import datetime
+            
+            # Conectar a la base de datos
+            db_path = Path(__file__).parent.parent / "config" / "sales_system.db"
+            
+            if not db_path.exists():
+                print(f"[ERROR] Base de datos no encontrada en: {db_path}")
+                return {"status": "error", "message": "Base de datos no encontrada"}
+            
+            conn = sqlite3.connect(str(db_path))
+            cursor = conn.cursor()
+            
+            # Query para obtener ventas maestras con total calculado
+            query = """
+                SELECT vm.folio, vm.cliente, vm.fecha_venta, vm.id,
+                       COALESCE(SUM(vi.precio), 0) as total
+                FROM VentaMaster vm
+                LEFT JOIN ventas_items vi ON vm.id = vi.venta_master_id
+            """
+            params = []
+            
+            # Aplicar filtros de fecha si se proporcionan
+            if fecha_inicio and fecha_fin:
+                query += " WHERE date(vm.fecha_venta) BETWEEN ? AND ?"
+                params = [fecha_inicio, fecha_fin]
+            elif fecha_inicio:
+                query += " WHERE date(vm.fecha_venta) >= ?"
+                params = [fecha_inicio]
+            elif fecha_fin:
+                query += " WHERE date(vm.fecha_venta) <= ?"
+                params = [fecha_fin]
+            
+            query += " GROUP BY vm.id, vm.folio, vm.cliente, vm.fecha_venta ORDER BY vm.fecha_venta DESC"
+            
+            # Ejecutar query
+            print(f"[API] Ejecutando query ventas maestras: {query}")
+            print(f"[API] Con parámetros: {params}")
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            
+            # Convertir a formato que espera JavaScript
+            ventas_data = []
+            for row in rows:
+                ventas_data.append({
+                    'folio': row[0],
+                    'cliente': row[1],
+                    'fecha_venta': row[2],
+                    'id': row[3],
+                    'total': str(row[4])  # Convertir a string para JSON
+                })
+            
+            conn.close()
+            
+            print(f"[API] Ventas maestras obtenidas: {len(ventas_data)} registros")
+            
+            return {"status": "success", "data": ventas_data}
+            
+        except Exception as e:
+            print(f"[API] Error obteniendo ventas maestras: {e}")
+            import traceback
+            traceback.print_exc()
+            return {"status": "error", "message": str(e)}
+
+    def get_sales_items(self, venta_master_id):
+        """API: Obtener items de una venta específica"""
+        try:
+            print(f"[API] Obteniendo items para venta ID: {venta_master_id}")
+            
+            import sqlite3
+            
+            # Conectar a la base de datos
+            db_path = Path(__file__).parent.parent / "config" / "sales_system.db"
+            
+            if not db_path.exists():
+                print(f"[ERROR] Base de datos no encontrada en: {db_path}")
+                return {"status": "error", "message": "Base de datos no encontrada"}
+            
+            conn = sqlite3.connect(str(db_path))
+            cursor = conn.cursor()
+            
+            # Query para obtener items de la venta
+            query = """
+                SELECT descripcion, precio 
+                FROM ventas_items 
+                WHERE venta_master_id = ? 
+                ORDER BY id
+            """
+            
+            # Ejecutar query
+            print(f"[API] Ejecutando query items: {query}")
+            print(f"[API] Con parámetro: {venta_master_id}")
+            cursor.execute(query, (venta_master_id,))
+            rows = cursor.fetchall()
+            
+            # Convertir a formato que espera JavaScript
+            items_data = []
+            for row in rows:
+                items_data.append({
+                    'descripcion': row[0],
+                    'precio': str(row[1])  # Convertir a string para JSON
+                })
+            
+            conn.close()
+            
+            print(f"[API] Items obtenidos: {len(items_data)} registros")
+            
+            return {"status": "success", "data": items_data}
+            
+        except Exception as e:
+            print(f"[API] Error obteniendo items: {e}")
+            import traceback
+            traceback.print_exc()
+            return {"status": "error", "message": str(e)}
+
     def volver_menu_principal(self):
         """API: Volver al menú principal"""
         try:
@@ -408,6 +528,761 @@ class SalesSystemAPI:
                 }
             }
 
+    # Funciones de configuración del sistema
+    def get_configuraciones(self):
+        """Obtener las configuraciones del sistema"""
+        try:
+            if DEMO_MODE:
+                return {
+                    "status": "success",
+                    "data": {
+                        "id": 1,
+                        "IsLocal": True,
+                        "IsWeb": False,
+                        "IsPremiun": False,
+                        "IsGenerico": True,
+                        "IsJoyeria": False
+                    }
+                }
+            
+            conn = obtener_conexion()
+            if not conn:
+                return {"status": "error", "message": "Error de conexión a la base de datos"}
+            
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM configuraciones ORDER BY id LIMIT 1")
+            result = cursor.fetchone()
+            
+            if result:
+                data = {
+                    "id": result[0],
+                    "IsLocal": bool(result[1]),
+                    "IsWeb": bool(result[2]),
+                    "IsPremiun": bool(result[3]),
+                    "IsGenerico": bool(result[4]),
+                    "IsJoyeria": bool(result[5])
+                }
+                conn.close()
+                return {"status": "success", "data": data}
+            else:
+                conn.close()
+                return {"status": "error", "message": "No se encontró configuración"}
+                
+        except Exception as e:
+            print(f"[ERROR] get_configuraciones: {e}")
+            return {"status": "error", "message": f"Error al obtener configuraciones: {str(e)}"}
+
+    def update_configuraciones(self, configuraciones):
+        """Actualizar las configuraciones del sistema"""
+        try:
+            if DEMO_MODE:
+                print(f"[DEMO] Actualizando configuraciones: {configuraciones}")
+                return {"status": "success", "message": "Configuraciones actualizadas (modo demo)"}
+            
+            conn = obtener_conexion()
+            if not conn:
+                return {"status": "error", "message": "Error de conexión a la base de datos"}
+            
+            cursor = conn.cursor()
+            
+            # Verificar si existe al menos un registro
+            cursor.execute("SELECT COUNT(*) FROM configuraciones")
+            count = cursor.fetchone()[0]
+            
+            if count == 0:
+                # Insertar nuevo registro
+                cursor.execute("""
+                    INSERT INTO configuraciones (IsLocal, IsWeb, IsPremiun, IsGenerico, IsJoyeria) 
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    int(configuraciones.get('IsLocal', False)),
+                    int(configuraciones.get('IsWeb', False)),
+                    int(configuraciones.get('IsPremiun', False)),
+                    int(configuraciones.get('IsGenerico', True)),
+                    int(configuraciones.get('IsJoyeria', False))
+                ))
+                message = "Configuraciones creadas exitosamente"
+            else:
+                # Actualizar primer registro
+                cursor.execute("""
+                    UPDATE configuraciones 
+                    SET IsLocal = ?, IsWeb = ?, IsPremiun = ?, IsGenerico = ?, IsJoyeria = ?
+                    WHERE id = (SELECT MIN(id) FROM configuraciones)
+                """, (
+                    int(configuraciones.get('IsLocal', False)),
+                    int(configuraciones.get('IsWeb', False)),
+                    int(configuraciones.get('IsPremiun', False)),
+                    int(configuraciones.get('IsGenerico', True)),
+                    int(configuraciones.get('IsJoyeria', False))
+                ))
+                message = "Configuraciones actualizadas exitosamente"
+            
+            conn.commit()
+            conn.close()
+            
+            print(f"[INFO] {message}")
+            return {"status": "success", "message": message}
+            
+        except Exception as e:
+            print(f"[ERROR] update_configuraciones: {e}")
+            return {"status": "error", "message": f"Error al actualizar configuraciones: {str(e)}"}
+    
+    # Funciones de configuración de Email
+    def obtener_config_email(self):
+        """API: Obtener configuración de email actual"""
+        try:
+            print("[EMAIL] Obteniendo configuración de email...")
+            
+            if not DEMO_MODE:
+                try:
+                    # Importar funciones de email
+                    from Controller.SQL.db_operations import consultar_email_config, obtener_email_config
+                    
+                    print("[EMAIL] Consultando tabla Emails...")
+                    
+                    # Consultar datos de la tabla Emails
+                    email = consultar_email_config()
+                    email_completo, password = obtener_email_config()
+                    
+                    print(f"[EMAIL] Email de BD (consultar_email_config): '{email}'")
+                    print(f"[EMAIL] Email completo de BD (obtener_email_config): '{email_completo}'")
+                    print(f"[EMAIL] Password existe: {bool(password)}")
+                    print(f"[EMAIL] Email es None: {email is None}")
+                    print(f"[EMAIL] Password es None: {password is None}")
+                    
+                    # Usar el email de la función más específica si está disponible
+                    email_final = email_completo if email_completo else email
+                    
+                    # Manejar casos donde no hay configuración
+                    if email_final is None or email_final == "":
+                        email_display = "No configurado"
+                        email_real = ""
+                    else:
+                        email_display = email_final
+                        email_real = email_final
+                    
+                    if password is None or password == "":
+                        password_display = "No configurada"
+                        password_real = ""
+                    else:
+                        password_display = "••••••••"
+                        password_real = password
+                    
+                    result = {
+                        "status": "success",
+                        "email": email_display,
+                        "password": password_display,
+                        "email_real": email_real,
+                        "password_real": password_real,
+                        "has_config": bool(email_real and password_real)
+                    }
+                    
+                    print(f"[EMAIL] Resultado final: {result}")
+                    return result
+                    
+                except ImportError as ie:
+                    print(f"[EMAIL] Error importando módulos: {ie}")
+                    return {
+                        "status": "error",
+                        "message": f"Módulos de base de datos no disponibles: {str(ie)}"
+                    }
+                except Exception as db_error:
+                    print(f"[EMAIL] Error accediendo a la base de datos: {db_error}")
+                    import traceback
+                    traceback.print_exc()
+                    return {
+                        "status": "error",
+                        "message": f"Error de base de datos: {str(db_error)}"
+                    }
+            else:
+                print("[EMAIL] Modo demostración activado")
+                return {
+                    "status": "success",
+                    "email": "No configurado (modo demo)",
+                    "password": "No configurada (modo demo)",
+                    "email_real": "",
+                    "password_real": "",
+                    "has_config": False
+                }
+                
+        except Exception as e:
+            print(f"[EMAIL] Error obteniendo configuración: {e}")
+            return {
+                "status": "error",
+                "message": f"Error al obtener configuración: {str(e)}"
+            }
+    
+    def guardar_config_email(self, email, password):
+        """API: Guardar configuración de email"""
+        try:
+            print(f"[EMAIL] Guardando configuración para: {email}")
+            
+            # Validaciones
+            if not email or not password:
+                return {
+                    "status": "error",
+                    "message": "Email y contraseña son obligatorios"
+                }
+            
+            if "@" not in email or "." not in email:
+                return {
+                    "status": "error",
+                    "message": "Formato de email inválido"
+                }
+            
+            if len(password) < 6:
+                return {
+                    "status": "error",
+                    "message": "La contraseña debe tener al menos 6 caracteres"
+                }
+            
+            if not DEMO_MODE:
+                # Importar y usar funciones de email
+                from Controller.SQL.db_operations import guardar_email_config
+                
+                # Guardar en la base de datos
+                guardar_email_config(email, password)
+                
+                print(f"[EMAIL] Configuración guardada exitosamente para: {email}")
+                return {
+                    "status": "success",
+                    "message": "Configuración guardada correctamente"
+                }
+            else:
+                print(f"[EMAIL] Modo demo - configuración simulada para: {email}")
+                return {
+                    "status": "success",
+                    "message": "Configuración guardada (modo demostración)"
+                }
+                
+        except Exception as e:
+            print(f"[EMAIL] Error guardando configuración: {e}")
+            return {
+                "status": "error",
+                "message": f"Error al guardar configuración: {str(e)}"
+            }
+    
+    def probar_email_config(self, email, password):
+        """API: Probar configuración de email enviando correo de prueba"""
+        try:
+            print(f"[EMAIL] Probando configuración para: {email}")
+            
+            if not email or not password:
+                return {
+                    "status": "error",
+                    "message": "Email y contraseña son obligatorios para la prueba"
+                }
+            
+            if not DEMO_MODE:
+                # Importar módulo de email
+                try:
+                    from Controller.email import enviar_correo_prueba
+                    
+                    # Intentar enviar correo de prueba
+                    resultado = enviar_correo_prueba(email, password, email)
+                    
+                    if resultado:
+                        print(f"[EMAIL] Correo de prueba enviado exitosamente")
+                        return {
+                            "status": "success",
+                            "message": "¡Correo de prueba enviado exitosamente!"
+                        }
+                    else:
+                        return {
+                            "status": "error",
+                            "message": "Error al enviar correo de prueba. Verifique la configuración."
+                        }
+                        
+                except ImportError:
+                    print("[EMAIL] Módulo de email no disponible")
+                    return {
+                        "status": "error",
+                        "message": "Módulo de email no está configurado"
+                    }
+            else:
+                # Simular envío en modo demo
+                print(f"[EMAIL] Modo demo - simulando envío de prueba")
+                return {
+                    "status": "success",
+                    "message": "Correo de prueba enviado exitosamente (modo demostración)"
+                }
+                
+        except Exception as e:
+            print(f"[EMAIL] Error probando configuración: {e}")
+            return {
+                "status": "error",
+                "message": f"Error al probar configuración: {str(e)}"
+            }
+    
+    def navegar_a(self, pagina):
+        """API: Navegar a una página específica"""
+        try:
+            print(f"[NAV] Solicitud de navegación a: {pagina}")
+            
+            # Construir ruta completa
+            if pagina.startswith('Settings/'):
+                html_path = Path(__file__).parent / pagina
+            else:
+                html_path = Path(__file__).parent / "Settings" / pagina
+            
+            if html_path.exists():
+                url = f"file://{html_path.absolute().as_posix()}"
+                print(f"[NAV] Navegando a URL: {url}")
+                
+                # Usar threading para evitar problemas de callback
+                def navegar():
+                    try:
+                        if hasattr(webview, 'windows') and webview.windows:
+                            webview.windows[0].load_url(url)
+                    except Exception as nav_error:
+                        print(f"[NAV] Error en navegación: {nav_error}")
+                
+                # Ejecutar navegación en hilo separado
+                threading.Thread(target=navegar, daemon=True).start()
+                
+                # Retornar inmediatamente
+                return {
+                    "status": "success",
+                    "message": f"Navegando a {pagina}",
+                    "url": url
+                }
+            else:
+                print(f"[NAV] Archivo no encontrado: {html_path}")
+                return {
+                    "status": "error",
+                    "message": f"Página no encontrada: {pagina}"
+                }
+                
+        except Exception as e:
+            print(f"[NAV] Error navegando: {e}")
+            return {
+                "status": "error",
+                "message": f"Error de navegación: {str(e)}"
+            }
+    
+    # Funciones de configuración de Logo y Títulos
+    def obtener_titulos_config(self):
+        """API: Obtener configuración de títulos actual"""
+        try:
+            print("[LOGO] Obteniendo configuración de títulos...")
+            
+            if not DEMO_MODE:
+                try:
+                    from Controller.SQL.db_operations import consultar_titulo_config
+                    
+                    titulos = consultar_titulo_config()
+                    
+                    return {
+                        "status": "success",
+                        "data": {
+                            "sistema": titulos.get('sistema', ''),
+                            "reporte": titulos.get('reporte', ''),
+                            "ventana": titulos.get('ventana', '')
+                        }
+                    }
+                    
+                except ImportError as ie:
+                    print(f"[LOGO] Error importando módulos: {ie}")
+                    return {
+                        "status": "error",
+                        "message": f"Módulos de base de datos no disponibles: {str(ie)}"
+                    }
+                except Exception as db_error:
+                    print(f"[LOGO] Error accediendo a la base de datos: {db_error}")
+                    return {
+                        "status": "error",
+                        "message": f"Error de base de datos: {str(db_error)}"
+                    }
+            else:
+                print("[LOGO] Modo demostración - títulos por defecto")
+                return {
+                    "status": "success",
+                    "data": {
+                        "sistema": "Sistema de Manejo de Ventas",
+                        "reporte": "Reporte de Ventas", 
+                        "ventana": "Sistema de Gestión"
+                    }
+                }
+                
+        except Exception as e:
+            print(f"[LOGO] Error general obteniendo títulos: {e}")
+            return {
+                "status": "error",
+                "message": f"Error: {str(e)}"
+            }
+    
+    def guardar_titulos_config(self, sistema, reporte, ventana):
+        """API: Guardar configuración de títulos"""
+        try:
+            print(f"[LOGO] Guardando títulos: sistema='{sistema}', reporte='{reporte}', ventana='{ventana}'")
+            
+            if not DEMO_MODE:
+                from Controller.SQL.db_operations import guardar_titulo_config
+                
+                # Guardar en la base de datos
+                resultado = guardar_titulo_config(sistema, reporte, ventana)
+                
+                if resultado:
+                    print("[LOGO] Títulos guardados exitosamente")
+                    return {
+                        "status": "success",
+                        "message": "Títulos guardados correctamente"
+                    }
+                else:
+                    return {
+                        "status": "error",
+                        "message": "No se guardaron títulos porque todos los campos estaban vacíos"
+                    }
+            else:
+                # Modo demostración
+                print("[LOGO] Modo demo - títulos simulados")
+                return {
+                    "status": "success",
+                    "message": "Títulos guardados correctamente (modo demostración)"
+                }
+                
+        except Exception as e:
+            print(f"[LOGO] Error guardando títulos: {e}")
+            return {
+                "status": "error",
+                "message": f"Error al guardar títulos: {str(e)}"
+            }
+    
+    def obtener_logo_info(self, seccion):
+        """API: Obtener información de logo de una sección"""
+        try:
+            print(f"[LOGO] Obteniendo información de logo para: {seccion}")
+            
+            if not DEMO_MODE:
+                try:
+                    from Controller.SQL.db_operations import consultar_logo_config
+                    import os
+                    
+                    # Archivos por defecto por sección
+                    archivos_defecto = {
+                        'ventanas': 'Img/SM2.ico',
+                        'reportes': 'Img/logo_reportes.png',
+                        'facturas': 'Img/logo_facturas.png'
+                    }
+                    
+                    archivo_path = archivos_defecto.get(seccion, '')
+                    config_bd = consultar_logo_config(seccion)
+                    
+                    if config_bd and os.path.exists(archivo_path):
+                        fecha = config_bd['fecha_aplicado'][:10]
+                        info_text = f"{config_bd['archivo_original']} - Aplicado {fecha}"
+                    elif os.path.exists(archivo_path):
+                        info_text = f"{os.path.basename(archivo_path)} - Logo actual"
+                    else:
+                        info_text = 'Sin logo configurado'
+                    
+                    return {
+                        "status": "success",
+                        "data": {
+                            "info_text": info_text,
+                            "preview_url": archivo_path if os.path.exists(archivo_path) else None
+                        }
+                    }
+                    
+                except ImportError as ie:
+                    print(f"[LOGO] Error importando módulos: {ie}")
+                    return {
+                        "status": "error",
+                        "message": f"Módulos no disponibles: {str(ie)}"
+                    }
+                except Exception as db_error:
+                    print(f"[LOGO] Error accediendo a datos de logo: {db_error}")
+                    return {
+                        "status": "error",
+                        "message": f"Error de datos: {str(db_error)}"
+                    }
+            else:
+                # Modo demo
+                return {
+                    "status": "success",
+                    "data": {
+                        "info_text": f"Logo {seccion} - Modo demostración",
+                        "preview_url": None
+                    }
+                }
+                
+        except Exception as e:
+            print(f"[LOGO] Error general obteniendo info de logo: {e}")
+            return {
+                "status": "error",
+                "message": f"Error: {str(e)}"
+            }
+    
+    def aplicar_logo(self, seccion, nombre_archivo, archivo_base64, tipo_archivo):
+        """API: Aplicar logo a una sección específica"""
+        try:
+            print(f"[LOGO] Aplicando logo a {seccion}: {nombre_archivo}")
+            
+            if not DEMO_MODE:
+                try:
+                    from Controller.SQL.db_operations import guardar_logo_config
+                    import base64
+                    import os
+                    from PIL import Image
+                    from io import BytesIO
+                    
+                    # Decodificar imagen de base64
+                    image_data = base64.b64decode(archivo_base64)
+                    img = Image.open(BytesIO(image_data))
+                    
+                    # Configuración por sección
+                    config_secciones = {
+                        'ventanas': {'destino': 'Img/SM2.ico', 'formato': 'ICO', 'tamaño': (32, 32)},
+                        'reportes': {'destino': 'Img/logo_reportes.png', 'formato': 'PNG', 'tamaño': (64, 64)},
+                        'facturas': {'destino': 'Img/logo_facturas.png', 'formato': 'PNG', 'tamaño': (100, 100)}
+                    }
+                    
+                    if seccion not in config_secciones:
+                        return {
+                            "status": "error", 
+                            "message": f"Sección '{seccion}' no válida"
+                        }
+                    
+                    config = config_secciones[seccion]
+                    
+                    # Crear backup si existe archivo actual
+                    if os.path.exists(config['destino']):
+                        backup_dir = "Img/backup"
+                        os.makedirs(backup_dir, exist_ok=True)
+                        backup_name = f"{os.path.splitext(os.path.basename(config['destino']))[0]}_backup{os.path.splitext(config['destino'])[1]}"
+                        backup_path = os.path.join(backup_dir, backup_name)
+                        
+                        try:
+                            import shutil
+                            shutil.copy2(config['destino'], backup_path)
+                            print(f"[LOGO] Backup creado: {backup_path}")
+                        except Exception as backup_error:
+                            print(f"[LOGO] Error creando backup: {backup_error}")
+                    
+                    # Redimensionar imagen
+                    img_resized = img.resize(config['tamaño'], Image.Resampling.LANCZOS)
+                    
+                    # Guardar imagen
+                    os.makedirs(os.path.dirname(config['destino']), exist_ok=True)
+                    
+                    if config['formato'] == 'ICO':
+                        img_resized.save(config['destino'], format='ICO')
+                    else:
+                        img_resized.save(config['destino'], format=config['formato'])
+                    
+                    # Guardar en BD
+                    size_kb = len(image_data) / 1024
+                    guardar_logo_config(
+                        seccion=seccion,
+                        archivo_original=nombre_archivo,
+                        archivo_destino=config['destino'],
+                        dimensiones=f"{img.size[0]}x{img.size[1]}",
+                        tamaño_kb=f"{size_kb:.1f}",
+                        aplicado_por="Usuario Web"
+                    )
+                    
+                    print(f"[LOGO] Logo aplicado exitosamente para {seccion}")
+                    return {
+                        "status": "success",
+                        "message": f"Logo aplicado correctamente en {seccion}"
+                    }
+                    
+                except ImportError as ie:
+                    print(f"[LOGO] Error importando módulos: {ie}")
+                    return {
+                        "status": "error",
+                        "message": f"Módulos no disponibles: {str(ie)}"
+                    }
+                except Exception as apply_error:
+                    print(f"[LOGO] Error aplicando logo: {apply_error}")
+                    return {
+                        "status": "error",
+                        "message": f"Error aplicando logo: {str(apply_error)}"
+                    }
+            else:
+                # Modo demo
+                print(f"[LOGO] Modo demo - logo aplicado simulado para {seccion}")
+                return {
+                    "status": "success",
+                    "message": f"Logo aplicado correctamente en {seccion} (modo demostración)"
+                }
+                
+        except Exception as e:
+            print(f"[LOGO] Error general aplicando logo: {e}")
+            return {
+                "status": "error",
+                "message": f"Error: {str(e)}"
+            }
+    
+    def restablecer_logos(self):
+        """API: Restablecer logos desde respaldos"""
+        try:
+            print("[LOGO] Restableciendo logos desde respaldos...")
+            
+            if not DEMO_MODE:
+                try:
+                    import os
+                    import shutil
+                    
+                    backup_dir = "Img/backup"
+                    restaurados = []
+                    
+                    respaldos = {
+                        'ventanas': {'backup': f"{backup_dir}/SM2_backup.ico", 'destino': 'Img/SM2.ico'},
+                        'reportes': {'backup': f"{backup_dir}/logo_reportes_backup.png", 'destino': 'Img/logo_reportes.png'},
+                        'facturas': {'backup': f"{backup_dir}/logo_facturas_backup.png", 'destino': 'Img/logo_facturas.png'}
+                    }
+                    
+                    for seccion, config in respaldos.items():
+                        if os.path.exists(config['backup']):
+                            try:
+                                shutil.copy2(config['backup'], config['destino'])
+                                restaurados.append(seccion)
+                                print(f"[LOGO] Restaurado {seccion} desde {config['backup']}")
+                            except Exception as restore_error:
+                                print(f"[LOGO] Error restaurando {seccion}: {restore_error}")
+                    
+                    if restaurados:
+                        return {
+                            "status": "success",
+                            "message": f"Logos restaurados en: {', '.join(restaurados)}"
+                        }
+                    else:
+                        return {
+                            "status": "error",
+                            "message": "No se encontraron respaldos de logos"
+                        }
+                        
+                except Exception as restore_error:
+                    print(f"[LOGO] Error restableciendo logos: {restore_error}")
+                    return {
+                        "status": "error",
+                        "message": f"Error restableciendo logos: {str(restore_error)}"
+                    }
+            else:
+                # Modo demo
+                return {
+                    "status": "success",
+                    "message": "Logos restablecidos correctamente (modo demostración)"
+                }
+                
+        except Exception as e:
+            print(f"[LOGO] Error general restableciendo logos: {e}")
+            return {
+                "status": "error",
+                "message": f"Error: {str(e)}"
+            }
+    
+    def obtener_historial_logos(self, limit=20):
+        """API: Obtener historial de cambios de logos"""
+        try:
+            print(f"[LOGO] Obteniendo historial de logos (límite: {limit})")
+            
+            if not DEMO_MODE:
+                try:
+                    from Controller.SQL.db_operations import obtener_historial_logos
+                    
+                    historial = obtener_historial_logos(limit=limit)
+                    
+                    return {
+                        "status": "success",
+                        "data": historial if historial else []
+                    }
+                    
+                except ImportError as ie:
+                    print(f"[LOGO] Error importando módulos: {ie}")
+                    return {
+                        "status": "error",
+                        "message": f"Módulos no disponibles: {str(ie)}"
+                    }
+                except Exception as hist_error:
+                    print(f"[LOGO] Error obteniendo historial: {hist_error}")
+                    return {
+                        "status": "error",
+                        "message": f"Error obteniendo historial: {str(hist_error)}"
+                    }
+            else:
+                # Historial demo  
+                historial_demo = [
+                    {
+                        'seccion': 'ventanas',
+                        'archivo_original': 'logo_ejemplo.ico',
+                        'fecha_aplicado': '2025-10-15 14:30:00',
+                        'aplicado_por': 'Usuario',
+                        'dimensiones': '32x32',
+                        'tamaño_kb': '15.2'
+                    }
+                ]
+                
+                return {
+                    "status": "success",
+                    "data": historial_demo
+                }
+                
+        except Exception as e:
+            print(f"[LOGO] Error general obteniendo historial: {e}")
+            return {
+                "status": "error",
+                "message": f"Error: {str(e)}"
+            }
+    
+    def listar_imagenes_galeria(self):
+        """API: Listar imágenes en la galería (carpeta Logos)"""
+        try:
+            print("[LOGO] Listando imágenes de galería...")
+            
+            if not DEMO_MODE:
+                try:
+                    from Controller.SQL.db_operations import listar_imagenes_logos
+                    
+                    imagenes = listar_imagenes_logos()
+                    
+                    return {
+                        "status": "success",
+                        "data": imagenes if imagenes else []
+                    }
+                    
+                except ImportError as ie:
+                    print(f"[LOGO] Error importando módulos: {ie}")
+                    return {
+                        "status": "error",
+                        "message": f"Módulos no disponibles: {str(ie)}"
+                    }
+                except Exception as gallery_error:
+                    print(f"[LOGO] Error listando galería: {gallery_error}")
+                    return {
+                        "status": "error",
+                        "message": f"Error listando galería: {str(gallery_error)}"
+                    }
+            else:
+                # Galería demo
+                galeria_demo = [
+                    {
+                        'nombre': 'logo_ejemplo1.png',
+                        'ruta': 'Logos/logo_ejemplo1.png',
+                        'tamaño_kb': '25.6',
+                        'dimensiones': '64x64'
+                    },
+                    {
+                        'nombre': 'logo_ejemplo2.ico',
+                        'ruta': 'Logos/logo_ejemplo2.ico', 
+                        'tamaño_kb': '12.3',
+                        'dimensiones': '32x32'
+                    }
+                ]
+                
+                return {
+                    "status": "success",
+                    "data": galeria_demo
+                }
+                
+        except Exception as e:
+            print(f"[LOGO] Error general listando galería: {e}")
+            return {
+                "status": "error",
+                "message": f"Error: {str(e)}"
+            }
+
 class SalesSystemWebApp:
     """Aplicación principal con interfaz web usando PyWebView"""
     
@@ -452,13 +1327,51 @@ class SalesSystemWebApp:
             
             # Verificar base de datos si está disponible
             try:
+                print("[DB] Verificando base de datos...")
                 conn = obtener_conexion()
                 if not conn:
-                    print("[INFO] Creando base de datos...")
+                    print("[DB] Creando base de datos...")
                     crear_conexion_y_tablas()
-                else:
+                    conn = obtener_conexion()
+                
+                if conn:
+                    cursor = conn.cursor()
+                    
+                    # Verificar que la tabla Emails exista
+                    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='Emails'")
+                    table_exists = cursor.fetchone()
+                    
+                    if table_exists:
+                        print("[DB] ✅ Tabla Emails encontrada")
+                        
+                        # Verificar contenido de la tabla Emails
+                        cursor.execute("SELECT COUNT(*) FROM Emails")
+                        count = cursor.fetchone()[0]
+                        print(f"[DB] Registros en tabla Emails: {count}")
+                        
+                        if count > 0:
+                            cursor.execute("SELECT email FROM Emails LIMIT 1")
+                            sample_email = cursor.fetchone()
+                            print(f"[DB] Email de muestra en BD: {sample_email[0] if sample_email else 'None'}")
+                        
+                    else:
+                        print("[DB] ❌ Tabla Emails NO encontrada - creando...")
+                        cursor.execute("""
+                            CREATE TABLE IF NOT EXISTS Emails (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                email TEXT NOT NULL,
+                                pass TEXT NOT NULL,
+                                createon TEXT NOT NULL,
+                                updateon TEXT
+                            )
+                        """)
+                        conn.commit()
+                        print("[DB] ✅ Tabla Emails creada")
+                    
                     conn.close()
-            except:
+                    
+            except Exception as db_err:
+                print(f"[DB] Error verificando base de datos: {db_err}")
                 print("[INFO] Funcionando en modo demostración")
             
             # Obtener configuración de ventana

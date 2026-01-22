@@ -1,6 +1,6 @@
 import sqlite3
 
-def crear_conexion_y_tablas(db_path="config/sales_system.db"):
+def crear_conexion_y_tablas(db_path="sales_system.db"):
 
     conn = sqlite3.connect(db_path, check_same_thread=False)
     cursor = conn.cursor()
@@ -37,6 +37,31 @@ def crear_conexion_y_tablas(db_path="config/sales_system.db"):
         )
     """)
 
+    # Crear tabla configuraciones
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS configuraciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            IsLocal BOOLEAN NOT NULL DEFAULT 0,
+            IsWeb BOOLEAN NOT NULL DEFAULT 0,
+            IsPremiun BOOLEAN NOT NULL DEFAULT 0,
+            IsGenerico BOOLEAN NOT NULL DEFAULT 1,
+            IsJoyeria BOOLEAN NOT NULL DEFAULT 0
+        )
+    """)
+
+    # Insertar configuración por defecto si la tabla está vacía
+    try:
+        cursor.execute("SELECT COUNT(*) FROM configuraciones")
+        count = cursor.fetchone()[0]
+        if count == 0:
+            cursor.execute("""
+                INSERT INTO configuraciones (IsLocal, IsWeb, IsPremiun, IsGenerico, IsJoyeria) 
+                VALUES (0, 0, 0, 1, 0)
+            """)
+            print("Configuración por defecto creada")
+    except sqlite3.Error as e:
+        print(f"Error al crear configuración por defecto: {e}")
+
     # Migración: Agregar campo cliente a VentaMaster si no existe
     try:
         # Verificar si la columna cliente ya existe
@@ -57,6 +82,7 @@ def crear_conexion_y_tablas(db_path="config/sales_system.db"):
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventamaster_folio ON VentaMaster(folio)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventaitems_venta_master ON ventas_items(venta_master_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventaitems_fecha ON ventas_items(fecha_venta)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_configuraciones_id ON configuraciones(id)")
         
         # Configuraciones de rendimiento para SQLite
         cursor.execute("PRAGMA journal_mode=WAL")  # Write-Ahead Logging para mejor concurrencia
@@ -72,7 +98,7 @@ def crear_conexion_y_tablas(db_path="config/sales_system.db"):
     conn.commit()
     conn.close()
 
-def obtener_conexion(db_path="config/sales_system.db"):
+def obtener_conexion(db_path="sales_system.db"):
     """
     Obtener conexión a la base de datos SQLite
     
@@ -103,7 +129,7 @@ def obtener_conexion(db_path="config/sales_system.db"):
         print(f"Error conectando a la base de datos: {e}")
         return None
 
-def obtener_cursor(db_path="config/sales_system.db"):
+def obtener_cursor(db_path="sales_system.db"):
     """
     Obtener cursor de la base de datos
     

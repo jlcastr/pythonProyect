@@ -136,18 +136,49 @@
         // Funciones para abrir cada configuración
         function abrirConfiguracionEmail() {
             console.log('Abriendo configuración de Email...');
-            mostrarModalEnDesarrollo(
-                'Configuración de Email',
-                'Permitirá configurar servidores SMTP, cuentas de correo y plantillas de envío para reportes y facturas.'
-            );
+            try {
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.navegar_a) {
+                    window.pywebview.api.navegar_a('email.html');
+                } else {
+                    window.location.href = 'email.html';
+                }
+            } catch (error) {
+                console.error('Error navegando a configuración de email:', error);
+                window.location.href = 'email.html';
+            }
         }
 
         function abrirConfiguracionLogo() {
-            console.log('Abriendo configuración de Logo...');
-            mostrarModalEnDesarrollo(
-                'Configuración de Logo',
-                'Permitirá cambiar el logo de la empresa que aparece en reportes, facturas y la interfaz del sistema.'
-            );
+            console.log('🖼️ Abriendo configuración de Logo...');
+            
+            try {
+                // Navegación directa al archivo logo.html
+                window.location.href = './logo.html';
+            } catch (error) {
+                console.error('Error navegando a configuración de logo:', error);
+                
+                // Fallback usando PyWebView API si está disponible
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.navegar_a) {
+                    window.pywebview.api.navegar_a('logo.html')
+                        .then(result => {
+                            console.log('✅ Navegación exitosa a logo.html');
+                        })
+                        .catch(nav_error => {
+                            console.error('❌ Error en navegación PyWebView:', nav_error);
+                            // Último recurso: mostrar modal de desarrollo
+                            mostrarModalEnDesarrollo(
+                                'Configuración de Logo',
+                                'Permitirá cambiar el logo de la empresa que aparece en reportes, facturas y la interfaz del sistema.'
+                            );
+                        });
+                } else {
+                    // Si no hay PyWebView, mostrar modal de desarrollo
+                    mostrarModalEnDesarrollo(
+                        'Configuración de Logo',
+                        'Permitirá cambiar el logo de la empresa que aparece en reportes, facturas y la interfaz del sistema.'
+                    );
+                }
+            }
         }
 
         function abrirConfiguracionApariencia() {
