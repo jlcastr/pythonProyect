@@ -541,3 +541,265 @@ def resetear_tabla_titles():
         except Exception as e:
             print(f"❌ Error al resetear tabla titles: {e}")
             return False
+
+
+# ==================== FUNCIONES PARA TIPO DE MERCANCÍA ====================
+
+def crear_tabla_tipo_mercancia():
+    """Crear tabla TipoMercancia si no existe"""
+    with db_optimizer.get_connection() as (conn, cursor):
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS TipoMercancia (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tipo_mercancia TEXT NOT NULL,
+                descripcion TEXT,
+                categoria_general TEXT NOT NULL,
+                activo BOOLEAN DEFAULT 1,
+                fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+                fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+
+def agregar_tipo_mercancia(tipo_mercancia, descripcion="", categoria_general=""):
+    """
+    Agregar nuevo tipo de mercancía
+    
+    Args:
+        tipo_mercancia: Tipo/nombre de la mercancía
+        descripcion: Descripción detallada (opcional)
+        categoria_general: Categoría general a la que pertenece
+    
+    Returns:
+        dict: Resultado de la operación con status y mensaje
+    """
+    if not tipo_mercancia.strip():
+        return {"status": "error", "message": "El tipo de mercancía es obligatorio"}
+    
+    if not categoria_general.strip():
+        return {"status": "error", "message": "La categoría general es obligatoria"}
+    
+    with db_optimizer.get_connection() as (conn, cursor):
+        try:
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Verificar si ya existe
+            cursor.execute("""
+                SELECT id FROM TipoMercancia 
+                WHERE LOWER(tipo_mercancia) = LOWER(?) AND LOWER(categoria_general) = LOWER(?) AND activo = 1
+            """, (tipo_mercancia.strip(), categoria_general.strip()))
+            
+            if cursor.fetchone():
+                return {"status": "error", "message": "Este tipo de mercancía ya existe en la misma categoría"}
+            
+            # Insertar nuevo registro
+            cursor.execute("""
+                INSERT INTO TipoMercancia (tipo_mercancia, descripcion, categoria_general, fecha_creacion) 
+                VALUES (?, ?, ?, ?)
+            """, (tipo_mercancia.strip(), descripcion.strip(), categoria_general.strip(), now))
+            
+            tipo_id = cursor.lastrowid
+            conn.commit()
+            
+            print(f"✅ Tipo de mercancía agregado: '{tipo_mercancia}' - ID: {tipo_id}")
+            return {"status": "success", "id": tipo_id, "message": "Tipo de mercancía agregado exitosamente"}
+            
+        except sqlite3.Error as e:
+            print(f"❌ Error al agregar tipo de mercancía: {e}")
+            return {"status": "error", "message": f"Error de base de datos: {e}"}
+
+def obtener_tipos_mercancia(categoria=None, activos_solo=True):
+    """
+    Obtener lista de tipos de mercancía
+    
+    Args:
+        categoria: Filtrar por categoría específica (opcional)
+        activos_solo: Si True, solo devuelve registros activos
+    
+    Returns:
+        list: Lista de tipos de mercancía
+    """
+    with db_optimizer.get_connection() as (conn, cursor):
+        try:
+            query = """
+                SELECT id, tipo_mercancia, descripcion, categoria_general, 
+                       fecha_creacion, fecha_actualizacion
+                FROM TipoMercancia 
+                WHERE 1=1
+            """
+            params = []
+            
+            if activos_solo:
+                query += " AND activo = 1"
+            
+            if categoria:
+                query += " AND LOWER(categoria_general) = LOWER(?)"
+                params.append(categoria.strip())
+            
+            query += " ORDER BY categoria_general, tipo_mercancia"
+            
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            
+            return [{
+                'id': row[0],
+                'tipo_mercancia': row[1],
+                'descripcion': row[2],
+                'categoria_general': row[3],
+                'fecha_creacion': row[4],
+                'fecha_actualizacion': row[5]
+            } for row in rows]
+            
+        except sqlite3.Error as e:
+            print(f"❌ Error al obtener tipos de mercancía: {e}")
+            return []
+
+def obtener_categorias_mercancia():
+    """
+    Obtener lista única de categorías de mercancía
+    
+    Returns:
+        list: Lista de categorías distintas
+    """
+    with db_optimizer.get_connection() as (conn, cursor):
+        try:
+            cursor.execute("""
+                SELECT DISTINCT categoria_general 
+                FROM TipoMercancia 
+                WHERE activo = 1 
+                ORDER BY categoria_general
+            """)
+            rows = cursor.fetchall()
+            return [row[0] for row in rows]
+            
+        except sqlite3.Error as e:
+            print(f"❌ Error al obtener categorías: {e}")
+            return []
+
+def actualizar_tipo_mercancia(tipo_id, tipo_mercancia=None, descripcion=None, categoria_general=None):
+    """
+    Actualizar tipo de mercancía existente
+    
+    Args:
+        tipo_id: ID del tipo de mercancía a actualizar
+        tipo_mercancia: Nuevo nombre (opcional)
+        descripcion: Nueva descripción (opcional)  
+        categoria_general: Nueva categoría (opcional)
+    
+    Returns:
+        dict: Resultado de la operación
+    """
+    with db_optimizer.get_connection() as (conn, cursor):
+        try:
+            # Verificar que el registro existe
+            cursor.execute("SELECT id FROM TipoMercancia WHERE id = ? AND activo = 1", (tipo_id,))
+            if not cursor.fetchone():
+                return {"status": "error", "message": "Tipo de mercancía no encontrado"}
+            
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            updates = []
+            params = []
+            
+            if tipo_mercancia:
+                updates.append("tipo_mercancia = ?")
+                params.append(tipo_mercancia.strip())
+            
+            if descripcion is not None:  # Permitir vacío
+                updates.append("descripcion = ?")
+                params.append(descripcion.strip())
+                
+            if categoria_general:
+                updates.append("categoria_general = ?")
+                params.append(categoria_general.strip())
+            
+            if updates:
+                updates.append("fecha_actualizacion = ?")
+                params.append(now)
+                params.append(tipo_id)
+                
+                query = f"UPDATE TipoMercancia SET {', '.join(updates)} WHERE id = ?"
+                cursor.execute(query, params)
+                conn.commit()
+                
+                print(f"✅ Tipo de mercancía actualizado: ID {tipo_id}")
+                return {"status": "success", "message": "Tipo de mercancía actualizado exitosamente"}
+            else:
+                return {"status": "error", "message": "No se proporcionaron datos para actualizar"}
+                
+        except sqlite3.Error as e:
+            print(f"❌ Error al actualizar tipo de mercancía: {e}")
+            return {"status": "error", "message": f"Error de base de datos: {e}"}
+
+def eliminar_tipo_mercancia(tipo_id, eliminar_permanente=False):
+    """
+    Eliminar tipo de mercancía (soft delete por defecto)
+    
+    Args:
+        tipo_id: ID del tipo a eliminar
+        eliminar_permanente: Si True, eliminación física; si False, marca como inactivo
+    
+    Returns:
+        dict: Resultado de la operación
+    """
+    with db_optimizer.get_connection() as (conn, cursor):
+        try:
+            if eliminar_permanente:
+                cursor.execute("DELETE FROM TipoMercancia WHERE id = ?", (tipo_id,))
+                accion = "eliminado permanentemente"
+            else:
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                cursor.execute("""
+                    UPDATE TipoMercancia 
+                    SET activo = 0, fecha_actualizacion = ? 
+                    WHERE id = ?
+                """, (now, tipo_id))
+                accion = "marcado como inactivo"
+            
+            if cursor.rowcount == 0:
+                return {"status": "error", "message": "Tipo de mercancía no encontrado"}
+            
+            conn.commit()
+            print(f"✅ Tipo de mercancía {accion}: ID {tipo_id}")
+            return {"status": "success", "message": f"Tipo de mercancía {accion} exitosamente"}
+            
+        except sqlite3.Error as e:
+            print(f"❌ Error al eliminar tipo de mercancía: {e}")
+            return {"status": "error", "message": f"Error de base de datos: {e}"}
+
+def buscar_tipos_mercancia(termino_busqueda):
+    """
+    Buscar tipos de mercancía por término
+    
+    Args:
+        termino_busqueda: Término a buscar en nombre, descripción o categoría
+    
+    Returns:
+        list: Lista de tipos que coinciden con la búsqueda
+    """
+    with db_optimizer.get_connection() as (conn, cursor):
+        try:
+            termino = f"%{termino_busqueda.strip()}%"
+            cursor.execute("""
+                SELECT id, tipo_mercancia, descripcion, categoria_general, 
+                       fecha_creacion, fecha_actualizacion
+                FROM TipoMercancia 
+                WHERE (LOWER(tipo_mercancia) LIKE LOWER(?) 
+                       OR LOWER(descripcion) LIKE LOWER(?) 
+                       OR LOWER(categoria_general) LIKE LOWER(?))
+                       AND activo = 1
+                ORDER BY categoria_general, tipo_mercancia
+            """, (termino, termino, termino))
+            
+            rows = cursor.fetchall()
+            return [{
+                'id': row[0],
+                'tipo_mercancia': row[1],
+                'descripcion': row[2],
+                'categoria_general': row[3],
+                'fecha_creacion': row[4],
+                'fecha_actualizacion': row[5]
+            } for row in rows]
+            
+        except sqlite3.Error as e:
+            print(f"❌ Error en búsqueda: {e}")
+            return []

@@ -32,12 +32,20 @@
                 <div class="menu-frame">
                     <h2 class="menu-title">Menú de Inventario</h2>
                     <div class="menu-grid">
-                        <div class="menu-item" onclick="abrirInventario()">
+                        <div class="menu-item" onclick="agregarProducto()">
                             <div class="menu-button">
                                 <div class="button-icon">
-                                    <i class="fas fa-boxes"></i>
+                                    <i class="fas fa-plus-circle"></i>
                                 </div>
-                                <div class="button-text">INVENTARIO</div>
+                                <div class="button-text">AGREGAR<br>PRODUCTO</div>
+                            </div>
+                        </div>
+                        <div class="menu-item" onclick="consultarInventario()">
+                            <div class="menu-button">
+                                <div class="button-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="button-text">CONSULTAR<br>INVENTARIO</div>
                             </div>
                         </div>
                         <div class="menu-item" onclick="abrirTipoMercancia()">
@@ -60,14 +68,26 @@
     </div>
 
     <script>
-        function abrirInventario() {
+        function agregarProducto() {
             try {
-                // Navegación o acción para Inventario
+                // Navegación al formulario de agregar producto
                 window.location.href = 'inventory.html';
             } catch (error) {
-                mostrarPopupNoDesarrollado('Inventario');
+                mostrarPopupNoDesarrollado('Agregar Producto');
             }
         }
+        
+        function consultarInventario() {
+            try {
+                // Navegación a la consulta de inventario
+                // Por ahora redirige al mismo formulario, se puede cambiar después
+                alert('Módulo de consulta en desarrollo. Redirigiendo al formulario de productos.');
+                window.location.href = 'inventory.html';
+            } catch (error) {
+                mostrarPopupNoDesarrollado('Consultar Inventario');
+            }
+        }
+        
         function abrirTipoMercancia() {
             try {
                 // Navegación o acción para Tipo de mercancía

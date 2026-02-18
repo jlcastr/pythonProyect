@@ -25,38 +25,82 @@
             </div>
         </header>
         <main class="main-content">
-            <div class="form-container" style="max-width: 500px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-                <form id="tipo-mercancia-form">
-                    <h2 style="margin-bottom: 1.5rem;">Registrar tipo de mercancía</h2>
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label for="tipoMercancia">Tipo de mercancía</label>
-                        <input type="text" id="tipoMercancia" name="tipoMercancia" class="form-input" placeholder="Ejemplo: Cadena de oro" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1200px; margin: 2rem auto;">
+                
+                <!-- Formulario de registro -->
+                <div class="form-container" style="background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <form id="tipo-mercancia-form">
+                        <h2 style="margin-bottom: 1.5rem;">Registrar tipo de mercancía</h2>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label for="tipoMercancia">Tipo de mercancía</label>
+                            <input type="text" id="tipoMercancia" name="tipoMercancia" class="form-input" placeholder="Ejemplo: Cadena de oro" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label for="descripcion">Descripción</label>
+                            <input type="text" id="descripcion" name="descripcion" class="form-input" placeholder="Descripción detallada" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label for="categoriaGeneral">Categoría general</label>
+                            <select id="categoriaGeneral" name="categoriaGeneral" class="form-input" required>
+                                <option value="">Seleccione una categoría</option>
+                                <option value="Cadenas">Cadenas</option>
+                                <option value="Dijes">Dijes</option>
+                                <option value="Anillos">Anillos</option>
+                                <option value="Pulseras">Pulseras</option>
+                                <option value="Aretes">Aretes</option>
+                                <option value="Collares/Gargantillas">Collares/Gargantillas</option>
+                                <option value="Tobilleras">Tobilleras</option>
+                                <option value="Set de joyería">Set de joyería</option>
+                                <option value="Broqueles/Piercings">Broqueles/Piercings</option>
+                                <option value="Relojes">Relojes</option>
+                            </select>
+                        </div>
+                        <div class="action-buttons" style="display: flex; gap: 1rem; flex-direction: column;">
+                            <button type="submit" class="btn-sales btn-success" style="width: 100%;">
+                                <i class="fas fa-save"></i> Registrar
+                            </button>
+                            <button type="button" onclick="volverAMenu()" class="btn-sales" style="width: 100%;">
+                                <i class="fas fa-arrow-left"></i> Volver al menú
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Lista de tipos de mercancía -->
+                <div class="form-container" style="background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <h2 style="margin-bottom: 1.5rem;">
+                        <i class="fas fa-list"></i> Tipos de mercancía registrados
+                        <button onclick="actualizarLista()" class="btn-sales" style="float: right; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            <i class="fas fa-list"></i> Mostrar todos
+                        </button>
+                    </h2>
+                    
+                    <div id="lista-tipos-container">
+                        <div class="empty-state" style="text-align: center; padding: 2rem; color: #7f8c8d;">
+                            <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p style="margin: 0; font-size: 1.1rem;">Cargando tipos de mercancía...</p>
+                        </div>
                     </div>
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label for="descripcion">Descripción</label>
-                        <input type="text" id="descripcion" name="descripcion" class="form-input" placeholder="Descripción detallada" required>
+                    
+                    <div id="lista-tipos-tabla" style="display: none;">
+                        <table class="products-table" style="width: 100%; margin-top: 1rem;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%;">Tipo</th>
+                                    <th style="width: 45%;">Descripción</th>
+                                    <th style="width: 25%;">Categoría</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-tipos-tbody">
+                            </tbody>
+                        </table>
+                        
+                        <div style="margin-top: 1rem; text-align: center; color: #7f8c8d; font-size: 0.9rem;">
+                            <span id="total-tipos">0 tipos registrados</span>
+                        </div>
                     </div>
-                    <div class="form-group" style="margin-bottom: 1.5rem;">
-                        <label for="categoriaGeneral">Categoría general</label>
-                        <select id="categoriaGeneral" name="categoriaGeneral" class="form-input" required>
-                            <option value="">Seleccione una categoría</option>
-                            <option value="Cadenas">Cadenas</option>
-                            <option value="Dijes">Dijes</option>
-                            <option value="Anillos">Anillos</option>
-                            <option value="Pulseras">Pulseras</option>
-                            <option value="Aretes">Aretes</option>
-                            <option value="Collares/Gargantillas">Collares/Gargantillas</option>
-                            <option value="Tobilleras">Tobilleras</option>
-                            <option value="Set de joyería">Set de joyería</option>
-                            <option value="Broqueles/Piercings">Broqueles/Piercings</option>
-                            <option value="Relojes">Relojes</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="main-btn" style="width: 100%; margin-bottom: 1rem;">Registrar</button>
-                    <button type="button" onclick="volverAMenu()" class="main-btn secondary" style="width: 100%;">
-                        <i class="fas fa-arrow-left"></i> Volver al menú
-                    </button>
-                </form>
+                </div>
+                
             </div>
         </main>
         <footer class="app-footer">
@@ -68,6 +112,173 @@
             window.location.href = 'menu_inventory.html';
         }
         
+        // Función para mostrar notificaciones estilo sales.html
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            // Eliminar notificaciones existentes
+            const notificacionesExistentes = document.querySelectorAll('.notification');
+            notificacionesExistentes.forEach(n => n.remove());
+            
+            // Configurar iconos según el tipo
+            const iconos = {
+                'success': 'check-circle',
+                'error': 'exclamation-circle',
+                'warning': 'exclamation-triangle',
+                'info': 'info-circle'
+            };
+            
+            // Crear nueva notificación
+            const notificacion = document.createElement('div');
+            notificacion.className = `notification ${tipo}`;
+            notificacion.innerHTML = `
+                <i class="fas fa-${iconos[tipo] || 'info-circle'}"></i>
+                <span class="notification-message">${mensaje}</span>
+            `;
+            
+            document.body.appendChild(notificacion);
+            
+            // Mostrar con animación
+            setTimeout(() => {
+                notificacion.classList.add('show');
+            }, 100);
+            
+            // Duración según tipo (errores y advertencias se muestran más tiempo)
+            const duracion = (tipo === 'error' || tipo === 'warning') ? 5000 : 3000;
+            
+            // Ocultar después del tiempo especificado
+            setTimeout(() => {
+                notificacion.classList.remove('show');
+                setTimeout(() => {
+                    if (notificacion.parentNode) {
+                        notificacion.parentNode.removeChild(notificacion);
+                    }
+                }, 300);
+            }, duracion);
+        }
+        
+        // Función para cargar y mostrar tipos de mercancía
+        function cargarTiposMercancia() {
+            const container = document.getElementById('lista-tipos-container');
+            const tabla = document.getElementById('lista-tipos-tabla');
+            const tbody = document.getElementById('lista-tipos-tbody');
+            const totalSpan = document.getElementById('total-tipos');
+            
+            // Mostrar estado de carga
+            container.style.display = 'block';
+            tabla.style.display = 'none';
+            container.innerHTML = `
+                <div class="empty-state" style="text-align: center; padding: 2rem; color: #7f8c8d;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; color: #3498db;"></i>
+                    <p style="margin: 0; font-size: 1.1rem;">Cargando tipos de mercancía...</p>
+                </div>
+            `;
+            
+            if (typeof pywebview !== 'undefined' && pywebview.api) {
+                // Usar API de PyWebView
+                pywebview.api.obtener_tipos_mercancia()
+                    .then(response => {
+                        console.log('[INVENTORY] Tipos obtenidos:', response);
+                        
+                        if (response.status === 'success' && response.data) {
+                            mostrarTiposEnTabla(response.data);
+                        } else {
+                            mostrarSinDatos('No se encontraron tipos de mercancía registrados');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('[INVENTORY] Error obteniendo tipos:', error);
+                        mostrarSinDatos('Error al cargar tipos de mercancía');
+                    });
+            } else {
+                // Modo simulación - datos demo
+                setTimeout(() => {
+                    const datosDemo = [
+                        {
+                            id: 1,
+                            tipo_mercancia: "Cadena de oro 18k",
+                            descripcion: "Cadena elegante para uso diario",
+                            categoria_general: "Cadenas"
+                        },
+                        {
+                            id: 2,
+                            tipo_mercancia: "Anillo de compromiso",
+                            descripcion: "Anillo con diamante solitario",
+                            categoria_general: "Anillos"
+                        },
+                        {
+                            id: 3,
+                            tipo_mercancia: "Aretes de perla",
+                            descripcion: "Aretes clásicos con perlas cultivadas",
+                            categoria_general: "Aretes"
+                        }
+                    ];
+                    
+                    mostrarTiposEnTabla(datosDemo);
+                }, 1000);
+            }
+        }
+        
+        function mostrarTiposEnTabla(tipos) {
+            const container = document.getElementById('lista-tipos-container');
+            const tabla = document.getElementById('lista-tipos-tabla');
+            const tbody = document.getElementById('lista-tipos-tbody');
+            const totalSpan = document.getElementById('total-tipos');
+            
+            if (tipos.length === 0) {
+                mostrarSinDatos('No hay tipos de mercancía registrados');
+                return;
+            }
+            
+            // Limpiar tabla
+            tbody.innerHTML = '';
+            
+            // Llenar tabla
+            tipos.forEach(tipo => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td style="font-weight: bold; color: var(--primary-color);">
+                        ${tipo.tipo_mercancia}
+                    </td>
+                    <td style="color: #666; font-size: 0.9rem;">
+                        ${tipo.descripcion || 'Sin descripción'}
+                    </td>
+                    <td>
+                        <span class="category-badge" style="background: var(--primary-color); color: white; padding: 0.25rem 0.5rem; border-radius: 15px; font-size: 0.8rem;">
+                            ${tipo.categoria_general}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(fila);
+            });
+            
+            // Mostrar tabla y ocultar container
+            container.style.display = 'none';
+            tabla.style.display = 'block';
+            totalSpan.textContent = `${tipos.length} tipo${tipos.length !== 1 ? 's' : ''} registrado${tipos.length !== 1 ? 's' : ''}`;
+        }
+        
+        function mostrarSinDatos(mensaje) {
+            const container = document.getElementById('lista-tipos-container');
+            const tabla = document.getElementById('lista-tipos-tabla');
+            
+            container.innerHTML = `
+                <div class="empty-state" style="text-align: center; padding: 2rem; color: #7f8c8d;">
+                    <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p style="margin: 0; font-size: 1.1rem;">${mensaje}</p>
+                    <button onclick="cargarTiposMercancia()" class="btn-sales" style="margin-top: 1rem;">
+                        <i class="fas fa-list"></i> Mostrar todos
+                    </button>
+                </div>
+            `;
+            
+            container.style.display = 'block';
+            tabla.style.display = 'none';
+        }
+        
+        function actualizarLista() {
+            mostrarNotificacion('� Cargando todos los tipos...', 'info');
+            cargarTiposMercancia();
+        }
+        
         // Manejar el envío del formulario
         document.getElementById('tipo-mercancia-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -77,11 +288,91 @@
             const descripcion = document.getElementById('descripcion').value;
             const categoria = document.getElementById('categoriaGeneral').value;
             
-            // Mostrar mensaje de confirmación (simulación)
-            alert(`Tipo de mercancía registrado:\n\nTipo: ${tipoMercancia}\nDescripción: ${descripcion}\nCategoría: ${categoria}\n\nNota: Esta es una simulación. La funcionalidad completa será implementada próximamente.`);
+            // Validar que los campos requeridos estén llenos
+            if (!tipoMercancia.trim()) {
+                mostrarNotificacion('El tipo de mercancía es obligatorio', 'error');
+                return;
+            }
             
-            // Limpiar formulario
-            this.reset();
+            if (!categoria.trim()) {
+                mostrarNotificacion('La categoría general es obligatoria', 'error');
+                return;
+            }
+            
+            // Verificar conexión antes de enviar
+            console.log('[INVENTORY] Enviando datos...');
+            
+            // Deshabilitar el botón mientras se procesa
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            
+            // Verificar si pywebview está disponible (interfaz web integrada)
+            if (typeof pywebview !== 'undefined' && pywebview.api) {
+                console.log('[INVENTORY] Enviando datos a PyWebView API...');
+                console.log('[INVENTORY] Datos:', { tipoMercancia, descripcion, categoria });
+                
+                // Usar API de PyWebView
+                pywebview.api.guardar_tipo_mercancia(tipoMercancia, descripcion, categoria)
+                    .then(response => {
+                        console.log('[INVENTORY] Respuesta del servidor:', response);
+                        
+                        if (response.status === 'success') {
+                            mostrarNotificacion(`🎉 Tipo de mercancía "${tipoMercancia}" registrado exitosamente`, 'success');
+                            
+                            // Limpiar formulario
+                            this.reset();
+                            
+                            // Actualizar la lista
+                            setTimeout(() => {
+                                cargarTiposMercancia();
+                            }, 500);
+                            
+                            console.log('[INVENTORY] ✅ Guardado exitoso con ID:', response.id);
+                        } else {
+                            console.log('[INVENTORY] ❌ Error en respuesta:', response.message);
+                            mostrarNotificacion(`Error: ${response.message}`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('[INVENTORY] ❌ Error de comunicación:', error);
+                        mostrarNotificacion(`Error de conexión: ${error.message || error}`, 'error');
+                    })
+                    .finally(() => {
+                        // Restaurar botón
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    });
+            } else {
+                // Fallback para navegador web normal (sin PyWebView)
+                console.log('[INVENTORY] PyWebView no disponible, usando modo simulación');
+                
+                // Simular delay de red
+                setTimeout(() => {
+                    mostrarNotificacion(`✨ Tipo "${tipoMercancia}" simulado correctamente en categoría "${categoria}"`, 'success');
+                    
+                    // Limpiar formulario
+                    this.reset();
+                    
+                    // Actualizar la lista en modo demo
+                    setTimeout(() => {
+                        cargarTiposMercancia();
+                    }, 500);
+                    
+                    // Restaurar botón
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }, 1000);
+            }
+        });
+        
+        // Inicialización al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[INVENTORY] Página cargada, inicializando...');
+            
+            // Cargar tipos de mercancía existentes
+            cargarTiposMercancia();
         });
     </script>
     <script src="../js/sidebar-new.js"></script>

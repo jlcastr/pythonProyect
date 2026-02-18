@@ -49,6 +49,19 @@ def crear_conexion_y_tablas(db_path="sales_system.db"):
         )
     """)
 
+    # Crear tabla TipoMercancia
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS TipoMercancia (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo_mercancia TEXT NOT NULL,
+            descripcion TEXT,
+            categoria_general TEXT NOT NULL,
+            activo BOOLEAN DEFAULT 1,
+            fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+            fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     # Insertar configuración por defecto si la tabla está vacía
     try:
         cursor.execute("SELECT COUNT(*) FROM configuraciones")
@@ -83,6 +96,8 @@ def crear_conexion_y_tablas(db_path="sales_system.db"):
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventaitems_venta_master ON ventas_items(venta_master_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_ventaitems_fecha ON ventas_items(fecha_venta)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_configuraciones_id ON configuraciones(id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_tipomercancia_categoria ON TipoMercancia(categoria_general)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_tipomercancia_activo ON TipoMercancia(activo)")
         
         # Configuraciones de rendimiento para SQLite
         cursor.execute("PRAGMA journal_mode=WAL")  # Write-Ahead Logging para mejor concurrencia

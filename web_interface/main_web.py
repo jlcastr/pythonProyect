@@ -948,6 +948,131 @@ class SalesSystemAPI:
                 "message": f"Error al guardar títulos: {str(e)}"
             }
     
+    def guardar_tipo_mercancia(self, tipo_mercancia, descripcion, categoria_general):
+        """API: Guardar tipo de mercancía en la base de datos"""
+        try:
+            print(f"[INVENTORY] Guardando tipo de mercancía: '{tipo_mercancia}' - Categoría: '{categoria_general}'")
+            
+            # Validaciones
+            if not tipo_mercancia or not tipo_mercancia.strip():
+                return {
+                    "status": "error",
+                    "message": "El tipo de mercancía es obligatorio"
+                }
+            
+            if not categoria_general or not categoria_general.strip():
+                return {
+                    "status": "error",
+                    "message": "La categoría general es obligatoria"
+                }
+            
+            if not DEMO_MODE:
+                try:
+                    from Controller.SQL.db_operations import agregar_tipo_mercancia
+                    
+                    # Guardar en la base de datos
+                    resultado = agregar_tipo_mercancia(
+                        tipo_mercancia.strip(),
+                        descripcion.strip() if descripcion else "",
+                        categoria_general.strip()
+                    )
+                    
+                    if resultado["status"] == "success":
+                        print(f"[INVENTORY] Tipo de mercancía guardado exitosamente con ID: {resultado['id']}")
+                        return {
+                            "status": "success",
+                            "message": "Tipo de mercancía registrado correctamente",
+                            "id": resultado["id"]
+                        }
+                    else:
+                        print(f"[INVENTORY] Error al guardar: {resultado['message']}")
+                        return {
+                            "status": "error",
+                            "message": resultado["message"]
+                        }
+                        
+                except ImportError as e:
+                    print(f"[INVENTORY] Error importando módulo: {e}")
+                    return {
+                        "status": "error",
+                        "message": "Módulo de base de datos no disponible"
+                    }
+            else:
+                # Modo demostración
+                print(f"[INVENTORY] Modo demo - tipo de mercancía simulado: {tipo_mercancia}")
+                return {
+                    "status": "success",
+                    "message": "Tipo de mercancía registrado correctamente (modo demostración)",
+                    "id": 999
+                }
+                
+        except Exception as e:
+            print(f"[INVENTORY] Error guardando tipo de mercancía: {e}")
+            import traceback
+            traceback.print_exc()
+            return {
+                "status": "error",
+                "message": f"Error al registrar tipo de mercancía: {str(e)}"
+            }
+    
+    def obtener_tipos_mercancia(self, categoria=None):
+        """API: Obtener lista de tipos de mercancía"""
+        try:
+            print(f"[INVENTORY] Obteniendo tipos de mercancía - Categoría: {categoria}")
+            
+            if not DEMO_MODE:
+                try:
+                    from Controller.SQL.db_operations import obtener_tipos_mercancia as get_tipos
+                    
+                    # Obtener de la base de datos
+                    tipos = get_tipos(categoria=categoria, activos_solo=True)
+                    
+                    print(f"[INVENTORY] Se encontraron {len(tipos)} tipos de mercancía")
+                    return {
+                        "status": "success",
+                        "data": tipos,
+                        "count": len(tipos)
+                    }
+                        
+                except ImportError as e:
+                    print(f"[INVENTORY] Error importando módulo: {e}")
+                    return {
+                        "status": "error",
+                        "message": "Módulo de base de datos no disponible"
+                    }
+            else:
+                # Modo demostración
+                tipos_demo = [
+                    {
+                        "id": 1,
+                        "tipo_mercancia": "Cadena de oro 18k",
+                        "descripcion": "Cadena elegante para uso diario",
+                        "categoria_general": "Cadenas"
+                    },
+                    {
+                        "id": 2,
+                        "tipo_mercancia": "Anillo de compromiso",
+                        "descripcion": "Anillo con diamante solitario",
+                        "categoria_general": "Anillos"
+                    }
+                ]
+                
+                if categoria:
+                    tipos_demo = [t for t in tipos_demo if t["categoria_general"] == categoria]
+                
+                return {
+                    "status": "success",
+                    "data": tipos_demo,
+                    "count": len(tipos_demo)
+                }
+                
+        except Exception as e:
+            print(f"[INVENTORY] Error obteniendo tipos de mercancía: {e}")
+            return {
+                "status": "error",
+                "message": f"Error al obtener tipos de mercancía: {str(e)}"
+            }
+    
     def obtener_logo_info(self, seccion):
         """API: Obtener información de logo de una sección"""
         try:

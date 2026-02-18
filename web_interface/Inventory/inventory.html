@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/sidebar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Librerías para códigos de barras y QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -26,32 +29,233 @@
         </header>
         
         <main class="main-content">
-            <div class="content-container" style="max-width: 800px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-                <div class="info-message" style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.5rem; border-radius: 5px; margin-bottom: 2rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div style="color: #2196f3; font-size: 1.5rem;">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div>
-                            <h3 style="margin: 0; color: #1976d2;">Módulo en desarrollo</h3>
-                            <p style="margin: 0.5rem 0 0 0; color: #424242;">
-                                La funcionalidad completa del inventario está siendo desarrollada. 
-                                Por ahora puede gestionar los tipos de mercancía desde el menú principal.
-                            </p>
+            <div class="content-container" style="max-width: 1200px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                
+                <!-- Formulario de Inventario -->
+                <form id="inventarioForm" style="display: grid; gap: 1.5rem;">
+                    
+                    <!-- Identificación y Descripción -->
+                    <div class="form-section" style="background: #f8f9fa; padding: 1.2rem; border-radius: 8px; border-left: 4px solid #007bff;">
+                        <h3 style="margin: 0 0 0.8rem 0; color: #007bff; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-id-card"></i>
+                            Identificación y Descripción
+                        </h3>
+                        <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap: 1rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Código *</label>
+                                <input type="text" id="codigo_producto" name="codigo_producto" required style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Nombre *</label>
+                                <input type="text" id="nombre" name="nombre" required style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Categoría</label>
+                                <input type="text" id="categoria" name="categoria" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Marca</label>
+                                <input type="text" id="marca" name="marca" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column; grid-column: 1 / -1;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Descripción</label>
+                                <textarea id="descripcion" name="descripcion" rows="2" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem; resize: vertical;"></textarea>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="action-buttons" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <button onclick="navegarATipoMercancia()" class="main-btn" style="display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-tags"></i>
-                        Gestionar tipos de mercancía
-                    </button>
-                    <button onclick="navegarAMenuInventario()" class="main-btn secondary" style="display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-arrow-left"></i>
-                        Volver al menú
-                    </button>
-                </div>
+
+                    <!-- Precios y Costos -->
+                    <div class="form-section" style="background: #f1f8e9; padding: 1.2rem; border-radius: 8px; border-left: 4px solid #4caf50;">
+                        <h3 style="margin: 0 0 0.8rem 0; color: #4caf50; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-dollar-sign"></i>
+                            Precios y Costos
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Peso Metal (g)</label>
+                                <input type="number" id="peso_metal" name="peso_metal" step="0.001" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Precio del Gramo</label>
+                                <input type="number" id="precio_gramo" name="precio_gramo" step="0.01" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Precio Sugerido</label>
+                                <input type="number" id="precio_sugerido" name="precio_sugerido" step="0.01" readonly style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem; background: #f8f9fa; color: #28a745; font-weight: 600;">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Precio Compra</label>
+                                <input type="number" id="precio_compra" name="precio_compra" step="0.01" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Precio Venta *</label>
+                                <input type="number" id="precio_venta" name="precio_venta" step="0.01" required style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Precio Mayoreo</label>
+                                <input type="number" id="precio_mayoreo" name="precio_mayoreo" step="0.01" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Margen (%)</label>
+                                <input type="number" id="margen_ganancia" name="margen_ganancia" step="0.01" readonly style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem; background: #f8f9fa;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventario y Medidas -->
+                    <div class="form-section" style="background: #fff3e0; padding: 1.2rem; border-radius: 8px; border-left: 4px solid #ff9800;">
+                        <h3 style="margin: 0 0 0.8rem 0; color: #ff9800; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-boxes"></i>
+                            Inventario y Medidas
+                        </h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 2fr 2fr; gap: 1rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Stock *</label>
+                                <input type="number" id="stock_actual" name="stock_actual" value="0" required style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Unidad</label>
+                                <select id="unidad_medida" name="unidad_medida" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                                    <option value="PZA" selected>PZA</option>
+                                    <option value="GR">Gramos</option>
+                                    <option value="KG">Kilogramos</option>
+                                    <option value="PAR">Par</option>
+                                    <option value="SET">Set</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Imagen del Producto</label>
+                                <input type="file" id="imagen_principal" name="imagen_principal" accept="image/*" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem; background: #f8f9fa;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Dimensiones</label>
+                                <input type="text" id="dimensiones" name="dimensiones" placeholder="Largo x Ancho x Alto" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos de Joyería -->
+                    <div class="form-section" style="background: #f3e5f5; padding: 1.2rem; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                        <h3 style="margin: 0 0 0.8rem 0; color: #9c27b0; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-gem"></i>
+                            Datos de Joyería
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Tipo de Metal</label>
+                                <select id="tipo_metal" name="tipo_metal" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Oro">Oro</option>
+                                    <option value="Plata">Plata</option>
+                                    <option value="Platino">Platino</option>
+                                    <option value="Acero">Acero Inoxidable</option>
+                                    <option value="Cobre">Cobre</option>
+                                    <option value="Aleación">Aleación</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Pureza</label>
+                                <input type="text" id="pureza_metal" name="pureza_metal" placeholder="925, 14K, 18K" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">¿Tiene Piedras?</label>
+                                <select id="tiene_piedras" name="tiene_piedras" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                                    <option value="0" selected>No</option>
+                                    <option value="1">Sí</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Peso Piedras (ct)</label>
+                                <input type="number" id="peso_piedras" name="peso_piedras" step="0.001" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                        </div>
+                        
+                        <div id="piedrasSection" style="margin-top: 1rem; display: none; background: #fafafa; padding: 1rem; border-radius: 5px;">
+                            <h4 style="color: #9c27b0; margin-bottom: 0.8rem; font-size: 1rem;">Detalles de Piedra Principal</h4>
+                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.85rem;">Tipo</label>
+                                    <input type="text" id="tipo_piedra_principal" name="tipo_piedra_principal" style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.9rem;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.85rem;">Quilates</label>
+                                    <input type="number" id="quilates_principal" name="quilates_principal" step="0.01" style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.9rem;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.85rem;">Calidad</label>
+                                    <input type="text" id="calidad_piedra" name="calidad_piedra" style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.9rem;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.85rem;">Color</label>
+                                    <input type="text" id="color_piedra" name="color_piedra" style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.9rem;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.85rem;">Corte</label>
+                                    <input type="text" id="corte_piedra" name="corte_piedra" style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.9rem;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clasificación -->
+                    <div class="form-section" style="background: #e8f5e8; padding: 1.2rem; border-radius: 8px; border-left: 4px solid #2e7d32;">
+                        <h3 style="margin: 0 0 0.8rem 0; color: #2e7d32; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-tags"></i>
+                            Clasificación
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Talla</label>
+                                <input type="text" id="talla" name="talla" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Género</label>
+                                <select id="genero" name="genero" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Unisex">Unisex</option>
+                                    <option value="Hombre">Hombre</option>
+                                    <option value="Mujer">Mujer</option>
+                                    <option value="Niño">Niño</option>
+                                    <option value="Niña">Niña</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Estilo</label>
+                                <input type="text" id="estilo" name="estilo" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Tipo de Mercancía</label>
+                                <select id="tipo_mercancia_id" name="tipo_mercancia_id" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                                    <option value="">Cargar tipos...</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.3rem; font-weight: 600; color: #495057; font-size: 0.9rem;">Acabado</label>
+                                <input type="text" id="acabado" name="acabado" placeholder="Diamantado" style="padding: 0.6rem; border: 2px solid #e9ecef; border-radius: 5px; font-size: 0.95rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="action-buttons" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
+                        <button type="submit" class="btn-sales btn-success" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
+                            <i class="fas fa-save"></i>
+                            Guardar Producto
+                        </button>
+                        <button type="reset" class="btn-sales" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
+                            <i class="fas fa-eraser"></i>
+                            Limpiar
+                        </button>
+                        <button type="button" onclick="navegarAMenuInventario()" class="btn-sales" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
+                            <i class="fas fa-arrow-left"></i>
+                            Volver
+                        </button>
+                    </div>
+                </form>
             </div>
         </main>
         
@@ -60,7 +264,237 @@
         </footer>
     </div>
     
+    <!-- Modal de Confirmación -->
+    <div id="confirmModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 10000;">
+        <div class="modal-content" style="background: white; padding: 2rem; border-radius: 15px; max-width: 400px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; margin: 1rem;">
+            <div class="modal-header" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-check-circle" style="font-size: 4rem; color: #28a745; margin-bottom: 1rem;"></i>
+                <h3 style="color: #28a745; margin: 0; font-size: 1.3rem;">¡Producto Guardado!</h3>
+            </div>
+            
+            <div class="modal-body">
+                <p id="modal-mensaje" style="color: #6c757d; margin-bottom: 2rem; font-size: 1rem; line-height: 1.4;">
+                    El producto se ha guardado exitosamente en el inventario.
+                </p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-sales btn-success" onclick="cerrarModalConfirm()" style="padding: 0.75rem 2rem; border-radius: 8px;">
+                    <i class="fas fa-check"></i> Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Error -->
+    <div id="errorModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 10000;">
+        <div class="modal-content" style="background: white; padding: 2rem; border-radius: 15px; max-width: 400px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; margin: 1rem;">
+            <div class="modal-header" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                <h3 style="color: #dc3545; margin: 0; font-size: 1.3rem;">Error</h3>
+            </div>
+            
+            <div class="modal-body">
+                <p id="modal-error-mensaje" style="color: #6c757d; margin-bottom: 2rem; font-size: 1rem; line-height: 1.4;">
+                    Ha ocurrido un error inesperado.
+                </p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-sales" onclick="cerrarModalError()" style="padding: 0.75rem 2rem; border-radius: 8px; background: #dc3545; border-color: #dc3545;">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para Imprimir Códigos -->
+    <div id="codigosModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 10000;">
+        <div class="modal-content" style="background: white; padding: 2rem; border-radius: 15px; max-width: 600px; width: 90%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; margin: 1rem; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-header" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-qrcode" style="font-size: 3rem; color: #007bff; margin-bottom: 1rem;"></i>
+                <h3 style="color: #007bff; margin: 0; font-size: 1.3rem;">¿Deseas imprimir códigos?</h3>
+                <p style="color: #6c757d; margin: 0.5rem 0 0 0; font-size: 0.9rem;">Código de producto: <span id="producto-codigo"></span></p>
+            </div>
+            
+            <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <!-- Código de Barras -->
+                <div style="text-align: center; padding: 1rem; border: 2px dashed #e9ecef; border-radius: 10px;">
+                    <h4 style="color: #495057; margin-bottom: 1rem; font-size: 1rem;">Código de Barras</h4>
+                    <div style="background: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; min-height: 80px;">
+                        <svg id="codigo-barras"></svg>
+                    </div>
+                    <button type="button" class="btn-sales btn-success" onclick="imprimirCodigoBarras()" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-print"></i> Imprimir Código de Barras
+                    </button>
+                </div>
+                
+                <!-- Código QR -->
+                <div style="text-align: center; padding: 1rem; border: 2px dashed #e9ecef; border-radius: 10px;">
+                    <h4 style="color: #495057; margin-bottom: 1rem; font-size: 1rem;">Código QR</h4>
+                    <div style="background: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; min-height: 80px;">
+                        <div id="codigo-qr"></div>
+                    </div>
+                    <button type="button" class="btn-sales btn-success" onclick="imprimirCodigoQR()" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-print"></i> Imprimir Código QR
+                    </button>
+                </div>
+            </div>
+            
+            <div class="modal-actions" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button type="button" class="btn-sales" onclick="imprimirAmbos()" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: #28a745; border-color: #28a745;">
+                    <i class="fas fa-print"></i> Imprimir Ambos
+                </button>
+                <button type="button" class="btn-sales" onclick="cerrarModalCodigos()" style="padding: 0.75rem 1.5rem; border-radius: 8px;">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    
     <script>
+        // Protección contra impresión automática
+        let pageLoaded = false;
+        const originalPrint = window.print;
+        
+        window.print = function() {
+            if (!pageLoaded) {
+                console.log('🚫 Impresión bloqueada durante la carga de la página');
+                return;
+            }
+            originalPrint.call(window);
+        };
+        
+        // Permitir impresión después de que la página esté completamente cargada
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                pageLoaded = true;
+                console.log('✅ Página cargada, impresión habilitada');
+            }, 1000);
+        });
+        
+        // Mostrar/Ocultar sección de piedras según selección
+        document.getElementById('tiene_piedras').addEventListener('change', function() {
+            const piedrasSection = document.getElementById('piedrasSection');
+            if (this.value === '1') {
+                piedrasSection.style.display = 'block';
+            } else {
+                piedrasSection.style.display = 'none';
+                // Limpiar campos de piedras cuando se oculta
+                document.getElementById('tipo_piedra_principal').value = '';
+                document.getElementById('quilates_principal').value = '';
+                document.getElementById('calidad_piedra').value = '';
+                document.getElementById('color_piedra').value = '';
+                document.getElementById('corte_piedra').value = '';
+            }
+        });
+
+        // Cargar tipos de mercancía desde la base de datos
+        async function cargarTiposMercancia() {
+            try {
+                const tipoMercanciaSelect = document.getElementById('tipo_mercancia_id');
+                tipoMercanciaSelect.innerHTML = '<option value="">Cargando...</option>';
+                
+                // Datos reales de la tabla TipoMercancia
+                const tiposReales = [
+                    {id: 2, tipo_mercancia: 'Anillo de compromiso', categoria_general: 'Anillos'},
+                    {id: 3, tipo_mercancia: 'Aretes de perla', categoria_general: 'Aretes'},
+                    {id: 7, tipo_mercancia: 'Cadena Oro', categoria_general: 'Cadenas'},
+                    {id: 1, tipo_mercancia: 'Cadena de oro 18k', categoria_general: 'Cadenas'},
+                    {id: 8, tipo_mercancia: 'Cadena de plata', categoria_general: 'Cadenas'},
+                    {id: 5, tipo_mercancia: 'Collar de diamantes', categoria_general: 'Collares/Gargantillas'},
+                    {id: 6, tipo_mercancia: 'Collar de perlas (PRUEBA)', categoria_general: 'Collares/Gargantillas'},
+                    {id: 9, tipo_mercancia: 'Dijes', categoria_general: 'Dijes'},
+                    {id: 10, tipo_mercancia: 'Dijes cartoneados', categoria_general: 'Dijes'}
+                ];
+                
+                // Limpiar select
+                tipoMercanciaSelect.innerHTML = '<option value="">Seleccionar tipo...</option>';
+                
+                // Agrupar por categoría
+                const categorias = {};
+                tiposReales.forEach(tipo => {
+                    if (!categorias[tipo.categoria_general]) {
+                        categorias[tipo.categoria_general] = [];
+                    }
+                    categorias[tipo.categoria_general].push(tipo);
+                });
+                
+                // Crear opciones agrupadas por categoría
+                Object.keys(categorias).sort().forEach(categoria => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = categoria;
+                    
+                    categorias[categoria].forEach(tipo => {
+                        const option = document.createElement('option');
+                        option.value = tipo.id;
+                        option.textContent = tipo.tipo_mercancia;
+                        optgroup.appendChild(option);
+                    });
+                    
+                    tipoMercanciaSelect.appendChild(optgroup);
+                });
+                
+            } catch (error) {
+                console.error('Error al cargar tipos de mercancía:', error);
+                const tipoMercanciaSelect = document.getElementById('tipo_mercancia_id');
+                tipoMercanciaSelect.innerHTML = '<option value="">Error al cargar</option>';
+            }
+        }
+
+        // Calcular margen de ganancia automáticamente
+        function calcularMargen() {
+            const precioCompra = parseFloat(document.getElementById('precio_compra').value) || 0;
+            const precioVenta = parseFloat(document.getElementById('precio_venta').value) || 0;
+            
+            if (precioCompra > 0 && precioVenta > 0) {
+                const margen = ((precioVenta - precioCompra) / precioCompra) * 100;
+                document.getElementById('margen_ganancia').value = margen.toFixed(2);
+            }
+        }
+
+        // Event listeners para cálculo automático de margen
+        document.getElementById('precio_compra').addEventListener('input', calcularMargen);
+        document.getElementById('precio_venta').addEventListener('input', calcularMargen);
+
+        // Manejar envío del formulario
+        document.getElementById('inventarioForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Recopilar datos del formulario
+            const formData = new FormData(this);
+            const datos = Object.fromEntries(formData);
+            
+            // Agregar fecha de creación
+            datos.fecha_creacion = new Date().toISOString();
+            datos.usuario_creacion = 'Sistema'; // Cambiar por usuario actual
+            
+            try {
+                // Aquí se enviarían los datos al backend
+                console.log('Datos a guardar:', datos);
+                
+                // Simulación de guardado exitoso
+                mostrarConfirmacionExito('El producto se ha guardado exitosamente en el inventario.');
+                
+                // Generar códigos después del guardado exitoso
+                const codigoProducto = datos.codigo_producto;
+                generarCodigos(codigoProducto, datos);
+                
+                this.reset();
+                
+                // Ocultar sección de piedras después de reset
+                document.getElementById('piedrasSection').style.display = 'none';
+                
+                // Recargar tipos de mercancía
+                cargarTiposMercancia();
+                
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                mostrarModalError('Error al guardar el producto. Inténtelo nuevamente.');
+            }
+        });
+
         function navegarATipoMercancia() {
             window.location.href = 'typeofmerchandise.html';
         }
@@ -68,6 +502,364 @@
         function navegarAMenuInventario() {
             window.location.href = 'menu_inventory.html';
         }
+        
+        // Función para mostrar modal de confirmación de éxito
+        function mostrarConfirmacionExito(mensaje) {
+            const modal = document.getElementById('confirmModal');
+            const mensajeElem = document.getElementById('modal-mensaje');
+            
+            if (mensajeElem) {
+                mensajeElem.textContent = mensaje;
+            }
+            
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+        
+        // Función para mostrar modal de error
+        function mostrarModalError(mensaje) {
+            const modal = document.getElementById('errorModal');
+            const mensajeElem = document.getElementById('modal-error-mensaje');
+            
+            if (mensajeElem) {
+                mensajeElem.textContent = mensaje;
+            }
+            
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+        
+        // Función para cerrar modal de confirmación
+        function cerrarModalConfirm() {
+            const modal = document.getElementById('confirmModal');
+            if (modal) {
+                modal.style.display = 'none';
+                // Mostrar modal de códigos después de cerrar el de confirmación
+                setTimeout(() => {
+                    const codigosModal = document.getElementById('codigosModal');
+                    if (codigosModal && codigosModal.dataset.mostrar === 'true') {
+                        codigosModal.style.display = 'flex';
+                        codigosModal.dataset.mostrar = 'false';
+                    }
+                }, 300);
+            }
+        }
+        
+        // Función para generar códigos de barras y QR
+        function generarCodigos(codigoProducto, datosProducto) {
+            try {
+                // Generar código de barras usando JsBarcode
+                const svgBarras = document.getElementById('codigo-barras');
+                JsBarcode(svgBarras, codigoProducto, {
+                    format: "CODE128",
+                    width: 2,
+                    height: 60,
+                    displayValue: true,
+                    fontSize: 12,
+                    margin: 5
+                });
+                
+                // Generar código QR
+                const qrContainer = document.getElementById('codigo-qr');
+                qrContainer.innerHTML = ''; // Limpiar contenido anterior
+                
+                // Crear datos para QR (información del producto)
+                const qrData = JSON.stringify({
+                    codigo: codigoProducto,
+                    nombre: datosProducto.nombre,
+                    precio: datosProducto.precio_venta,
+                    fecha: new Date().toISOString().split('T')[0]
+                });
+                
+                // Crear canvas para QR
+                const qrCanvas = document.createElement('canvas');
+                qrCanvas.width = 120;
+                qrCanvas.height = 120;
+                qrContainer.appendChild(qrCanvas);
+                
+                // Generar QR usando QRious
+                try {
+                    const qr = new QRious({
+                        element: qrCanvas,
+                        value: qrData,
+                        size: 120,
+                        level: 'M'
+                    });
+                } catch (error) {
+                    console.error('Error generando QR:', error);
+                    qrContainer.innerHTML = `<div style="width: 120px; height: 120px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; text-align: center;">${codigoProducto}</div>`;
+                }
+                
+                // Preparar el modal para mostrarse
+                document.getElementById('producto-codigo').textContent = codigoProducto;
+                document.getElementById('codigosModal').dataset.mostrar = 'true';
+                
+            } catch (error) {
+                console.error('Error al generar códigos:', error);
+            }
+        }
+        
+        // Funciones de impresión
+        function imprimirCodigoBarras() {
+            const svgElement = document.getElementById('codigo-barras');
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            canvas.width = 300;
+            canvas.height = 100;
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Código de Barras</title>
+                            <style>
+                                body { 
+                                    text-align: center; 
+                                    padding: 20px; 
+                                    font-family: Arial, sans-serif;
+                                }
+                                .btn {
+                                    background-color: #007bff;
+                                    color: white;
+                                    padding: 10px 20px;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    margin: 10px;
+                                    font-size: 16px;
+                                }
+                                .btn:hover {
+                                    background-color: #0056b3;
+                                }
+                                .btn-close {
+                                    background-color: #6c757d;
+                                }
+                                .btn-close:hover {
+                                    background-color: #545b62;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <h3>Código de Barras</h3>
+                            <img src="${canvas.toDataURL()}" style="max-width: 100%; margin: 20px 0;">
+                            <br>
+                            <button class="btn" onclick="window.print()">Imprimir</button>
+                            <button class="btn btn-close" onclick="window.close()">Cerrar</button>
+                        </body>
+                    </html>
+                `);
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        }
+        
+        function imprimirCodigoQR() {
+            const qrCanvas = document.getElementById('codigo-qr').querySelector('canvas');
+            if (qrCanvas) {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Código QR</title>
+                            <style>
+                                body { 
+                                    text-align: center; 
+                                    padding: 20px; 
+                                    font-family: Arial, sans-serif;
+                                }
+                                .btn {
+                                    background-color: #007bff;
+                                    color: white;
+                                    padding: 10px 20px;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    margin: 10px;
+                                    font-size: 16px;
+                                }
+                                .btn:hover {
+                                    background-color: #0056b3;
+                                }
+                                .btn-close {
+                                    background-color: #6c757d;
+                                }
+                                .btn-close:hover {
+                                    background-color: #545b62;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <h3>Código QR</h3>
+                            <img src="${qrCanvas.toDataURL()}" style="max-width: 100%; margin: 20px 0;">
+                            <br>
+                            <button class="btn" onclick="window.print()">Imprimir</button>
+                            <button class="btn btn-close" onclick="window.close()">Cerrar</button>
+                        </body>
+                    </html>
+                `);
+            }
+        }
+        
+        function imprimirAmbos() {
+            const qrCanvas = document.getElementById('codigo-qr').querySelector('canvas');
+            const svgElement = document.getElementById('codigo-barras');
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            canvas.width = 300;
+            canvas.height = 100;
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const barcodeDataURL = canvas.toDataURL();
+                
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Código de Barras y QR</title>
+                            <style>
+                                body { 
+                                    text-align: center; 
+                                    padding: 20px; 
+                                    font-family: Arial, sans-serif;
+                                }
+                                .btn {
+                                    background-color: #007bff;
+                                    color: white;
+                                    padding: 10px 20px;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    margin: 10px;
+                                    font-size: 16px;
+                                }
+                                .btn:hover {
+                                    background-color: #0056b3;
+                                }
+                                .btn-close {
+                                    background-color: #6c757d;
+                                }
+                                .btn-close:hover {
+                                    background-color: #545b62;
+                                }
+                                .codigo-section {
+                                    margin: 30px 0;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="codigo-section">
+                                <h3>Código de Barras</h3>
+                                <img src="${barcodeDataURL}" style="max-width: 100%;">
+                            </div>
+                            <div class="codigo-section">
+                                <h3>Código QR</h3>
+                                <img src="${qrCanvas ? qrCanvas.toDataURL() : ''}" style="max-width: 100%;">
+                            </div>
+                            <br>
+                            <button class="btn" onclick="window.print()">Imprimir</button>
+                            <button class="btn btn-close" onclick="window.close()">Cerrar</button>
+                        </body>
+                    </html>
+                `);
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        }
+        
+        function cerrarModalCodigos() {
+            const modal = document.getElementById('codigosModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Función para cerrar modal de error
+        function cerrarModalError() {
+            const modal = document.getElementById('errorModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Cerrar modal al hacer clic fuera de él
+        document.addEventListener('click', function(e) {
+            const confirmModal = document.getElementById('confirmModal');
+            const errorModal = document.getElementById('errorModal');
+            const codigosModal = document.getElementById('codigosModal');
+            
+            if (confirmModal && e.target === confirmModal) {
+                cerrarModalConfirm();
+            }
+            
+            if (errorModal && e.target === errorModal) {
+                cerrarModalError();
+            }
+            
+            if (codigosModal && e.target === codigosModal) {
+                cerrarModalCodigos();
+            }
+        });
+
+        // Función para calcular el precio sugerido
+        function calcularPrecioSugerido() {
+            const pesoMetal = parseFloat(document.getElementById('peso_metal').value) || 0;
+            const precioGramo = parseFloat(document.getElementById('precio_gramo').value) || 0;
+            const precioSugerido = pesoMetal * precioGramo;
+            
+            document.getElementById('precio_sugerido').value = precioSugerido.toFixed(2);
+        }
+
+        // Función para calcular el margen de ganancia
+        function calcularMargen() {
+            const precioCompra = parseFloat(document.getElementById('precio_compra').value) || 0;
+            const precioVenta = parseFloat(document.getElementById('precio_venta').value) || 0;
+            
+            if (precioCompra > 0 && precioVenta > 0) {
+                const margen = ((precioVenta - precioCompra) / precioCompra * 100);
+                document.getElementById('margen_ganancia').value = margen.toFixed(2);
+            } else {
+                document.getElementById('margen_ganancia').value = '';
+            }
+        }
+
+        // Inicializar cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarTiposMercancia();
+            
+            // Establecer fecha actual como placeholder
+            const fechaActual = new Date().toLocaleDateString();
+            
+            // Agregar event listeners para cálculos automáticos
+            document.getElementById('peso_metal').addEventListener('input', calcularPrecioSugerido);
+            document.getElementById('precio_gramo').addEventListener('input', calcularPrecioSugerido);
+            document.getElementById('precio_compra').addEventListener('input', calcularMargen);
+            document.getElementById('precio_venta').addEventListener('input', calcularMargen);
+            
+            // Validaciones en tiempo real
+            document.getElementById('codigo_producto').addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+            
+            // Validar números positivos
+            const numerosPositivos = ['precio_compra', 'precio_venta', 'precio_mayoreo', 'stock_actual', 'peso_metal', 'peso_piedras', 'quilates_principal', 'precio_gramo'];
+            numerosPositivos.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        if (this.value < 0) this.value = 0;
+                    });
+                }
+            });
+        });
     </script>
     <script src="../js/sidebar-new.js"></script>
 </body>
