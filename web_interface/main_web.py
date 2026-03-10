@@ -249,12 +249,9 @@ class SalesSystemAPI:
             import sqlite3
             from datetime import datetime
             
-            # Conectar a la base de datos
-            db_path = Path(__file__).parent.parent / "config" / "sales_system.db"
-            
-            if not db_path.exists():
-                print(f"[ERROR] Base de datos no encontrada en: {db_path}")
-                return []
+            # La base de datos debe ser configurada externamente
+            print("[ERROR] Función de reportes requiere configuración de base de datos")
+            return []
             
             conn = sqlite3.connect(str(db_path))
             cursor = conn.cursor()
@@ -320,12 +317,9 @@ class SalesSystemAPI:
             import sqlite3
             from datetime import datetime
             
-            # Conectar a la base de datos
-            db_path = Path(__file__).parent.parent / "config" / "sales_system.db"
-            
-            if not db_path.exists():
-                print(f"[ERROR] Base de datos no encontrada en: {db_path}")
-                return {"status": "error", "message": "Base de datos no encontrada"}
+            # La base de datos debe ser configurada externamente
+            print("[ERROR] Función de historial requiere configuración de base de datos")
+            return {"status": "error", "message": "Base de datos no configurada"}
             
             conn = sqlite3.connect(str(db_path))
             cursor = conn.cursor()
@@ -388,12 +382,9 @@ class SalesSystemAPI:
             
             import sqlite3
             
-            # Conectar a la base de datos
-            db_path = Path(__file__).parent.parent / "config" / "sales_system.db"
-            
-            if not db_path.exists():
-                print(f"[ERROR] Base de datos no encontrada en: {db_path}")
-                return {"status": "error", "message": "Base de datos no encontrada"}
+            # La base de datos debe ser configurada externamente
+            print("[ERROR] Función de items requiere configuración de base de datos")
+            return {"status": "error", "message": "Base de datos no configurada"}
             
             conn = sqlite3.connect(str(db_path))
             cursor = conn.cursor()
@@ -1455,9 +1446,10 @@ class SalesSystemWebApp:
                 print("[DB] Verificando base de datos...")
                 conn = obtener_conexion()
                 if not conn:
-                    print("[DB] Creando base de datos...")
-                    crear_conexion_y_tablas()
-                    conn = obtener_conexion()
+                    print("[DB] Base de datos no configurada - se requiere configuración externa")
+                    # crear_conexion_y_tablas()  # Comentado para evitar crear BD automáticamente
+                    # conn = obtener_conexion()
+                    conn = None
                 
                 if conn:
                     cursor = conn.cursor()

@@ -9,7 +9,9 @@ from typing import Generator, Tuple, List, Any
 class SQLiteOptimizer:
     """Clase para manejo optimizado de conexiones SQLite"""
     
-    def __init__(self, db_path: str = "config/sales_system.db"):
+    def __init__(self, db_path: str = None):
+        if not db_path:
+            raise ValueError("Se requiere especificar la ruta de la base de datos")
         self.db_path = db_path
     
     @contextmanager
@@ -215,8 +217,8 @@ def aplicar_optimizaciones_iniciales():
     print("="*50)
     
     try:
-        print("1. Creando índices y configurando base de datos...")
-        crear_conexion_y_tablas()
+        print("1. Verificando configuración de base de datos...")
+        # crear_conexion_y_tablas()  # Comentado para evitar crear BD automáticamente
         
         print("\n2. Verificando configuración actual...")
         verificar_rendimiento_db()

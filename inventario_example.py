@@ -9,7 +9,9 @@ from datetime import datetime
 class InventarioManager:
     """Manejador de inventarios con adaptación según configuración"""
     
-    def __init__(self, db_path="config/sales_system.db"):
+    def __init__(self, db_path=None):
+        if not db_path:
+            raise ValueError("Se requiere especificar la ruta de la base de datos")
         self.db_path = db_path
         self.config = self._get_configuration()
     

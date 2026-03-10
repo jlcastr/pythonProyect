@@ -1,7 +1,33 @@
 import sqlite3
+import os
+from pathlib import Path
 
-def crear_conexion_y_tablas(db_path="sales_system.db"):
-
+def crear_conexion_y_tablas(db_path=None):
+    """
+    SOLO conecta a la base de datos existente y verifica tablas
+    NO crea archivos nuevos de base de datos
+    """
+    if not db_path:
+        print("[ERROR] Se requiere especificar la ruta de la base de datos")
+        return None
+    # Convertir a ruta absoluta si es necesario
+    if not os.path.isabs(db_path):
+        # Buscar la base de datos en la raíz del proyecto
+        project_root = Path(__file__).parent.parent
+        full_path = project_root / db_path
+        if full_path.exists():
+            db_path = str(full_path)
+        else:
+            print(f"[ERROR] Base de datos no encontrada en: {full_path}")
+            return None
+    
+    # Verificar que el archivo existe antes de conectar
+    if not os.path.exists(db_path):
+        print(f"[ERROR] Base de datos no existe en: {db_path}")
+        print("No se creará una nueva base de datos automáticamente.")
+        return None
+    
+    print(f"[OK] Conectando a base de datos existente: {db_path}")
     conn = sqlite3.connect(db_path, check_same_thread=False)
     cursor = conn.cursor()
     # Crear tabla Emails
@@ -113,9 +139,9 @@ def crear_conexion_y_tablas(db_path="sales_system.db"):
     conn.commit()
     conn.close()
 
-def obtener_conexion(db_path="sales_system.db"):
+def obtener_conexion(db_path=None):
     """
-    Obtener conexión a la base de datos SQLite
+    Obtener conexión a la base de datos SQLite EXISTENTE
     
     Args:
         db_path (str): Ruta a la base de datos
@@ -123,9 +149,25 @@ def obtener_conexion(db_path="sales_system.db"):
     Returns:
         sqlite3.Connection: Conexión a la base de datos
     """
+    if not db_path:
+        print("[ERROR] Se requiere especificar la ruta de la base de datos")
+        return None
     try:
-        # Crear las tablas si no existen
-        crear_conexion_y_tablas(db_path)
+        # Convertir a ruta absoluta y verificar que existe
+        if not os.path.isabs(db_path):
+            project_root = Path(__file__).parent.parent
+            full_path = project_root / db_path
+            if full_path.exists():
+                db_path = str(full_path)
+            else:
+                print(f"[ERROR] Base de datos no encontrada en: {full_path}")
+                return None
+        
+        if not os.path.exists(db_path):
+            print(f"[ERROR] Base de datos no existe: {db_path}")
+            return None
+            
+        print(f"[OK] Conectando a: {db_path}")
         
         # Establecer conexión con check_same_thread=False para permitir uso en múltiples threads
         conn = sqlite3.connect(db_path, check_same_thread=False)
@@ -154,6 +196,9 @@ def obtener_cursor(db_path="sales_system.db"):
     Returns:
         sqlite3.Cursor: Cursor de la base de datos
     """
+    if not db_path:
+        print("[ERROR] Se requiere especificar la ruta de la base de datos")
+        return None
     try:
         conn = obtener_conexion(db_path)
         if conn:
@@ -163,5 +208,6 @@ def obtener_cursor(db_path="sales_system.db"):
         print(f"Error obteniendo cursor: {e}")
         return None
 
-if __name__ == "__main__":
-    crear_conexion_y_tablas()
+# Comentado para evitar crear bases de datos automáticamente
+# if __name__ == "__main__":
+#     crear_conexion_y_tablas()

@@ -1,5 +1,8 @@
 # Consultar solo el correo almacenado
-def consultar_email_config(db_path="config/sales_system.db"):
+def consultar_email_config(db_path=None):
+    if not db_path:
+        print("[ERROR] Se requiere especificar la ruta de la base de datos")
+        return None
     with db_optimizer.get_connection() as (conn, cursor):
         cursor.execute("SELECT email FROM Emails LIMIT 1")
         row = cursor.fetchone()
@@ -7,7 +10,10 @@ def consultar_email_config(db_path="config/sales_system.db"):
             return row[0]
         return None
 # Función para obtener email y contraseña desencriptada
-def obtener_email_config(db_path="config/sales_system.db"):
+def obtener_email_config(db_path=None):
+    if not db_path:
+        print("[ERROR] Se requiere especificar la ruta de la base de datos")
+        return None, None
     with db_optimizer.get_connection() as (conn, cursor):
         cursor.execute("SELECT email, pass FROM Emails LIMIT 1")
         row = cursor.fetchone()
@@ -30,7 +36,10 @@ from .sqlite_utils import db_optimizer
 FERNET_KEY = b'Ky9D34yPsE_LUzk-nBKX76doGj2IH8Jq7rjDdBGqRSs='
 fernet = Fernet(FERNET_KEY)
 
-def guardar_email_config(email, password, db_path="config/sales_system.db"):
+def guardar_email_config(email, password, db_path=None):
+    if not db_path:
+        print("[ERROR] Se requiere especificar la ruta de la base de datos")
+        return False
     with db_optimizer.get_connection() as (conn, cursor):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # Encriptar la contraseña antes de guardar

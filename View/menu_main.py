@@ -7,7 +7,7 @@ import os
 # Agregar el directorio padre al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config.db_setup import crear_conexion_y_tablas
+from config.db_setup import crear_conexion_y_tablas, obtener_conexion
 from Controller.styles import configurar_estilos_aplicacion, Colores, Fuentes
 from Controller.styles_mac import configurar_estilos_macos, crear_boton_macos, es_macos
 
@@ -169,7 +169,10 @@ def crear_menu_principal():
     def abrir_ventas():
         """Abrir el módulo de ventas con transición suave"""
         # Crear el frame de ventas ANTES de ocultar el menú
-        conn = sqlite3.connect("config/sales_system.db")
+        conn = obtener_conexion()
+        if not conn:
+            print("[ERROR] No se puede conectar a la base de datos")
+            return
         cursor = conn.cursor()
         
         frame_ventas = tk.Frame(root, bg='#ecf0f1')
@@ -505,5 +508,5 @@ def crear_menu_principal():
     root.mainloop()
 
 if __name__ == '__main__':
-    crear_conexion_y_tablas('config/sales_system.db')
+    # crear_conexion_y_tablas('sales_system.db')  # Comentado para evitar crear BD automáticamente
     crear_menu_principal()

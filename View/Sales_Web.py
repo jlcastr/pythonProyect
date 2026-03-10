@@ -319,8 +319,8 @@ class SalesWebInterface:
             import sqlite3
             import os
             
-            db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config', 'sales_system.db')
-            print(f"[DEBUG] Conectando a la base de datos: {db_path}")
+            print("[ERROR] Configuración de base de datos requerida")
+            return
             
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()

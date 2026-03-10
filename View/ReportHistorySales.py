@@ -4,11 +4,15 @@ import sqlite3
 from tkcalendar import DateEntry
 from datetime import datetime
 from Controller.SQL.sqlite_utils import db_optimizer, consulta_ventas_optimizada
+from config.db_setup import obtener_conexion
 
 def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
     """Mostrar historial de ventas dentro de un frame existente"""
     # Conexión optimizada pero manteniendo estructura existente
-    conn = sqlite3.connect("config/sales_system.db")
+    conn = obtener_conexion()
+    if not conn:
+        print("[ERROR] No se puede conectar a la base de datos")
+        return
     cursor = conn.cursor()
     
     # Aplicar optimizaciones de rendimiento
@@ -246,7 +250,10 @@ def mostrar_historial_ventas_en_frame(parent_frame, callback_volver):
 
 def mostrar_historial_ventas(parent=None):
     """Función original para mostrar en ventana separada (mantener compatibilidad)"""
-    conn = sqlite3.connect("config/sales_system.db")
+    conn = obtener_conexion()
+    if not conn:
+        print("[ERROR] No se puede conectar a la base de datos")
+        return
     cursor = conn.cursor()
     
     # Aplicar optimizaciones de rendimiento

@@ -3,10 +3,14 @@ from tkinter import ttk
 import sqlite3
 from datetime import datetime
 from tkcalendar import DateEntry
+from config.db_setup import obtener_conexion
 
 def mostrar_reporte_ventas_en_frame(parent_frame, callback_volver):
     """Mostrar reporte de ventas dentro de un frame existente"""
-    conn = sqlite3.connect("config/sales_system.db")
+    conn = obtener_conexion()
+    if not conn:
+        print("[ERROR] No se puede conectar a la base de datos")
+        return
     cursor = conn.cursor()
     
     # Limpiar el frame padre
@@ -133,7 +137,10 @@ def mostrar_reporte_ventas_en_frame(parent_frame, callback_volver):
 
 def mostrar_reporte_ventas(parent=None):
     """Función original para mostrar en ventana separada (mantener compatibilidad)"""
-    conn = sqlite3.connect("config/sales_system.db")
+    conn = obtener_conexion()
+    if not conn:
+        print("[ERROR] No se puede conectar a la base de datos")
+        return
     cursor = conn.cursor()
 
     root = tk.Toplevel(parent) if parent else tk.Toplevel()
