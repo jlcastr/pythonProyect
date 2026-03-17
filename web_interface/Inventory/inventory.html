@@ -466,16 +466,36 @@
             const formData = new FormData(this);
             const datos = Object.fromEntries(formData);
             
-            // Agregar fecha de creación
+            // Validar campos requeridos
+            if (!datos.codigo_producto || !datos.nombre) {
+                mostrarModalError('Por favor, complete al menos el código y nombre del producto.');
+                return;
+            }
+            
+            // Agregar metadatos
             datos.fecha_creacion = new Date().toISOString();
-            datos.usuario_creacion = 'Sistema'; // Cambiar por usuario actual
+            datos.usuario_creacion = 'Sistema';
+            datos.id = 'PROD_' + Date.now(); // ID único para el producto
             
             try {
-                // Aquí se enviarían los datos al backend
-                console.log('Datos a guardar:', datos);
+                // Guardar en localStorage
+                const productosExistentes = JSON.parse(localStorage.getItem('inventario_productos') || '[]');
                 
-                // Simulación de guardado exitoso
-                mostrarConfirmacionExito('El producto se ha guardado exitosamente en el inventario.');
+                // Verificar si el código ya existe
+                const codigoExiste = productosExistentes.some(p => p.codigo_producto === datos.codigo_producto);
+                if (codigoExiste) {
+                    mostrarModalError('Ya existe un producto con este código. Use un código diferente.');
+                    return;
+                }
+                
+                // Agregar el nuevo producto
+                productosExistentes.push(datos);
+                localStorage.setItem('inventario_productos', JSON.stringify(productosExistentes));
+                
+                console.log('✅ Producto guardado exitosamente:', datos);
+                
+                // Mostrar confirmación
+                mostrarConfirmacionExito(`El producto "${datos.nombre}" se ha guardado exitosamente en el inventario.`);
                 
                 // Generar códigos después del guardado exitoso
                 const codigoProducto = datos.codigo_producto;

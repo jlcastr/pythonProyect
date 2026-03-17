@@ -4,12 +4,13 @@ from pathlib import Path
 
 def crear_conexion_y_tablas(db_path=None):
     """
-    SOLO conecta a la base de datos existente y verifica tablas
-    NO crea archivos nuevos de base de datos
+    Conecta a la base de datos existente o crea una nueva si no existe
     """
     if not db_path:
-        print("[ERROR] Se requiere especificar la ruta de la base de datos")
-        return None
+        # Usar ruta por defecto - base de datos original en config/
+        project_root = Path(__file__).parent
+        db_path = str(project_root / "sqliteDB.db")
+        print(f"[INFO] Usando ruta de base de datos por defecto: {db_path}")
     # Convertir a ruta absoluta si es necesario
     if not os.path.isabs(db_path):
         # Buscar la base de datos en la raíz del proyecto
@@ -21,11 +22,10 @@ def crear_conexion_y_tablas(db_path=None):
             print(f"[ERROR] Base de datos no encontrada en: {full_path}")
             return None
     
-    # Verificar que el archivo existe antes de conectar
+    # Crear la base de datos si no existe
     if not os.path.exists(db_path):
-        print(f"[ERROR] Base de datos no existe en: {db_path}")
-        print("No se creará una nueva base de datos automáticamente.")
-        return None
+        print(f"[INFO] Base de datos no existe, creando nueva en: {db_path}")
+        # SQLite la creará automáticamente al conectar
     
     print(f"[OK] Conectando a base de datos existente: {db_path}")
     conn = sqlite3.connect(db_path, check_same_thread=False)
@@ -150,8 +150,10 @@ def obtener_conexion(db_path=None):
         sqlite3.Connection: Conexión a la base de datos
     """
     if not db_path:
-        print("[ERROR] Se requiere especificar la ruta de la base de datos")
-        return None
+        # Usar ruta por defecto - base de datos original en config/
+        project_root = Path(__file__).parent
+        db_path = str(project_root / "sqliteDB.db")
+        print(f"[INFO] Usando ruta de base de datos por defecto: {db_path}")
     try:
         # Convertir a ruta absoluta y verificar que existe
         if not os.path.isabs(db_path):
@@ -186,19 +188,21 @@ def obtener_conexion(db_path=None):
         print(f"Error conectando a la base de datos: {e}")
         return None
 
-def obtener_cursor(db_path="sales_system.db"):
+def obtener_cursor(db_path=None):
     """
     Obtener cursor de la base de datos
     
     Args:
-        db_path (str): Ruta a la base de datos
+        db_path (str): Ruta a la base de datos (opcional, usa por defecto sales_system.db)
         
     Returns:
         sqlite3.Cursor: Cursor de la base de datos
     """
     if not db_path:
-        print("[ERROR] Se requiere especificar la ruta de la base de datos")
-        return None
+        # Usar ruta por defecto - base de datos original en config/
+        project_root = Path(__file__).parent
+        db_path = str(project_root / "sqliteDB.db")
+    
     try:
         conn = obtener_conexion(db_path)
         if conn:

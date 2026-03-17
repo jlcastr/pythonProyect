@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Inventario - S&M</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Ajustes para sidebar */
+        .with-sidebar {
+            margin-left: 70px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .sidebar:hover + .app-container.with-sidebar {
+            margin-left: 250px;
+        }
+        
+        /* Estilos para filtros superiores */
+        .top-filters-container {
+            background: white;
+            border-radius: 0 0 10px 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--primary-color);
+        }
+        
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .filters-title {
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .filters-toggle {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filters-toggle:hover {
+            background: var(--primary-hover);
+        }
+        
+        .filters-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .filters-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        
+        .filters-content.expanded {
+            max-height: 1000px;
+            opacity: 1;
+            padding-top: 1rem;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s;
+        }
+        
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-filter {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-filter:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        
+        .btn-clear {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-clear:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+                
+                .btn-show-all {
+                    background: #2c3e50;
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 2rem;
+                    border-radius: 25px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+                
+                .btn-show-all:hover {
+                    background: #1a252f;
+                    transform: translateY(-2px);
+                }
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .results-table th,
+        .results-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: var(--text-color);
+            position: sticky;
+            top: 0;
+        }
+        
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .results-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .results-count {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .btn-export {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-export:hover {
+            background: #229954;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .with-sidebar {
+                margin-left: 70px;
+            }
+            
+            .sidebar:hover + .app-container.with-sidebar {
+                margin-left: 70px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .with-sidebar {
+                margin-left: 0;
+                padding-left: 70px;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .results-table {
+                font-size: 0.9rem;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 0.5rem;
+            }
+            
+            .filters-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container with-sidebar">
+        <!-- Header -->
+        <header class="app-header" style="padding: 0.75rem 1rem; min-height: auto;">
+            <div class="header-content" style="padding: 0;">
+                <div class="logo-section" style="align-items: center; gap: 1rem;">
+                    <div class="logo-circle" style="width: 50px; height: 50px; font-size: 0.85rem;">
+                        <span class="logo-text" style="font-size: 0.9rem; font-weight: bold;">S&M</span>
+                        <div class="logo-subtitle" style="font-size: 0.6rem; margin-top: 2px;">REPORTE</div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="main-title" style="font-size: 1.25rem; margin: 0; line-height: 1.2;">Reporte de Inventario</h1>
+                        <p class="subtitle" style="font-size: 0.9rem; margin: 0;">Consulta y Filtrado de Mercancía</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Filtros superiores -->
+        <div class="top-filters-container">
+            <div class="filters-header">
+                <h2 class="filters-title">
+                    <i class="fas fa-filter"></i> Filtros de Búsqueda
+                </h2>
+                <button class="filters-toggle" onclick="toggleFilters()">
+                    <i class="fas fa-chevron-up" id="toggle-icon"></i>
+                    <span id="toggle-text">Ocultar</span>
+                </button>
+            </div>
+            
+            <div class="filters-content expanded" id="filters-content">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="filtro-codigo">Código:</label>
+                        <input type="text" id="filtro-codigo" placeholder="Ingrese código del producto...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filtro-tipo-mercancia">Tipo de Mercancía:</label>
+                        <select id="filtro-tipo-mercancia">
+                            <option value="">-- Seleccione --</option>
+                            <option value="anillo">Anillo</option>
+                            <option value="collar">Collar</option>
+                            <option value="pulsera">Pulsera</option>
+                            <option value="aretes">Aretes</option>
+                            <option value="cadena">Cadena</option>
+                            <option value="reloj">Reloj</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filtro-marca">Marca:</label>
+                        <input type="text" id="filtro-marca" placeholder="Ingrese marca...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filtro-tipo-metal">Tipo de Metal:</label>
+                        <select id="filtro-tipo-metal">
+                            <option value="">-- Seleccione --</option>
+                            <option value="oro">Oro</option>
+                            <option value="plata">Plata</option>
+                            <option value="platino">Platino</option>
+                            <option value="acero">Acero Inoxidable</option>
+                            <option value="titanio">Titanio</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filtro-pureza">Pureza:</label>
+                        <select id="filtro-pureza">
+                            <option value="">-- Seleccione --</option>
+                            <option value="10k">10K</option>
+                            <option value="14k">14K</option>
+                            <option value="18k">18K</option>
+                            <option value="22k">22K</option>
+                            <option value="24k">24K</option>
+                            <option value="925">925 (Plata)</option>
+                            <option value="950">950 (Platino)</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filtro-genero">Género:</label>
+                        <select id="filtro-genero">
+                            <option value="">-- Seleccione --</option>
+                            <option value="hombre">Hombre</option>
+                            <option value="mujer">Mujer</option>
+                            <option value="unisex">Unisex</option>
+                            <option value="niño">Niño</option>
+                            <option value="niña">Niña</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filtro-acabado">Acabado:</label>
+                        <select id="filtro-acabado">
+                            <option value="">-- Seleccione --</option>
+                            <option value="brillante">Brillante</option>
+                            <option value="mate">Mate</option>
+                            <option value="satinado">Satinado</option>
+                            <option value="pulido">Pulido</option>
+                            <option value="texturizado">Texturizado</option>
+                            <option value="combinado">Combinado</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="btn-filter" onclick="aplicarFiltros()">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                    <button class="btn-clear" onclick="limpiarFiltros()">
+                        <i class="fas fa-eraser"></i> Limpiar Filtros
+                    </button>
+                    <button class="btn-show-all" onclick="mostrarTodosLosProductos()" style="background: #2c3e50; color: white; border: none; padding: 0.75rem 2rem; border-radius: 25px; font-size: 1rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-list"></i> Ver Todo el Inventario
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Resultados -->
+            <div class="results-container">
+                <div class="results-summary" id="results-summary" style="display: none;">
+                    <span class="results-count" id="results-count">0 productos encontrados</span>
+                    <button class="btn-export" onclick="exportarResultados()">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                </div>
+                
+                <div class="no-results" id="no-results">
+                    <i class="fas fa-search"></i>
+                    <h3>Utilice los filtros para realizar una búsqueda</h3>
+                    <p>Seleccione uno o varios filtros en la parte superior y presione "Buscar" para consultar el inventario.</p>
+                </div>
+                
+                <div id="results-table-container" style="display: none;">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Tipo de Mercancía</th>
+                                <th>Marca</th>
+                                <th>Tipo de Metal</th>
+                                <th>Pureza</th>
+                                <th>Género</th>
+                                <th>Acabado</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <!-- Los resultados se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© 2026 Sistema de Gestión Empresarial | Reporte de Inventario</p>
+        </footer>
+    </div>
+
+    <script>
+        // Inicializar sidebar al cargar la página
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Inicializando página de reporte de inventario...');
+            
+            // Cargar productos del inventario
+            inventarioProductos = cargarProductosInventario();
+            console.log(`📦 Productos cargados: ${inventarioProductos.length}`);
+            
+            // Mostrar mensaje inicial basado en si hay productos
+            if (inventarioProductos.length === 0) {
+                document.getElementById('no-results').innerHTML = `
+                    <i class="fas fa-box-open"></i>
+                    <h3>No hay productos en el inventario</h3>
+                    <p>Vaya al módulo de <a href="../Inventory/inventory.html" style="color: var(--primary-color); text-decoration: underline;">Creación de Inventario</a> para agregar productos.</p>
+                `;
+                document.getElementById('no-results').style.display = 'block';
+            } else {
+                // Si hay productos, mostrarlos automáticamente
+                console.log('✅ Mostrando todos los productos automáticamente...');
+                mostrarResultados(inventarioProductos);
+            }
+            
+            // Crear sidebar si no existe
+            if (!document.querySelector('.sidebar')) {
+                console.log('📋 Creando sidebar...');
+                crearSidebar();
+                agregarEventListeners();
+                
+                // Marcar "Inventario" como activo en el sidebar  
+                setTimeout(() => {
+                    const inventarioLink = document.querySelector('.sidebar .menu-link[data-nav="inventario"]');
+                    if (inventarioLink) {
+                        inventarioLink.closest('.menu-item').classList.add('active');
+                    }
+                }, 100);
+            }
+        });
+        
+        // Función para toggle de filtros
+        function toggleFilters() {
+            const filtersContent = document.getElementById('filters-content');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const toggleText = document.getElementById('toggle-text');
+            
+            if (filtersContent.classList.contains('expanded')) {
+                filtersContent.classList.remove('expanded');
+                filtersContent.classList.add('collapsed');
+                toggleIcon.className = 'fas fa-chevron-down';
+                toggleText.textContent = 'Mostrar';
+            } else {
+                filtersContent.classList.remove('collapsed');
+                filtersContent.classList.add('expanded');
+                toggleIcon.className = 'fas fa-chevron-up';
+                toggleText.textContent = 'Ocultar';
+            }
+        }
+        
+        // Función para cargar productos reales del inventario
+        function cargarProductosInventario() {
+            try {
+                const productosGuardados = JSON.parse(localStorage.getItem('inventario_productos') || '[]');
+                
+                // Convertir formato de datos del formulario al formato esperado por el reporte
+                return productosGuardados.map(producto => {
+                    // Obtener nombre del tipo de mercancía por ID
+                    const tipoMercancia = obtenerNombreTipoMercancia(producto.tipo_mercancia_id);
+                    
+                    return {
+                        id: producto.id,
+                        codigo: producto.codigo_producto || 'N/A',
+                        nombre: producto.nombre || 'Sin nombre',
+                        tipo_mercancia: tipoMercancia.toLowerCase(),
+                        tipo_mercancia_display: tipoMercancia,
+                        marca: producto.marca || 'Sin marca',
+                        modelo: producto.modelo || '',
+                        tipo_metal: producto.tipo_metal || 'no especificado',
+                        pureza: producto.pureza || 'N/A',
+                        genero: producto.genero || 'unisex',
+                        acabado: producto.acabado || 'no especificado',
+                        precio: parseFloat(producto.precio_venta) || 0,
+                        precio_compra: parseFloat(producto.precio_compra) || 0,
+                        precio_mayoreo: parseFloat(producto.precio_mayoreo) || 0,
+                        stock: parseInt(producto.stock_actual) || 0,
+                        peso_metal: parseFloat(producto.peso_metal) || 0,
+                        peso_piedras: parseFloat(producto.peso_piedras) || 0,
+                        fecha_creacion: producto.fecha_creacion,
+                        usuario_creacion: producto.usuario_creacion
+                    };
+                });
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+                return [];
+            }
+        }
+        
+        // Función auxiliar para obtener nombre del tipo de mercancía
+        function obtenerNombreTipoMercancia(tipoId) {
+            const tipos = {
+                '1': 'Cadena',
+                '2': 'Anillo',
+                '3': 'Aretes',
+                '5': 'Collar',
+                '6': 'Collar',
+                '7': 'Cadena',
+                '8': 'Cadena',
+                '9': 'Dije',
+                '10': 'Dije'
+            };
+            return tipos[tipoId] || 'Otro';
+        }
+        
+        // Variable global para almacenar productos cargados
+        let inventarioProductos = [];
+        
+        function aplicarFiltros() {
+            // Recargar productos del localStorage por si hay cambios
+            inventarioProductos = cargarProductosInventario();
+            
+            // Obtener valores de los filtros
+            const filtros = {
+                codigo: document.getElementById('filtro-codigo').value.toLowerCase().trim(),
+                tipo_mercancia: document.getElementById('filtro-tipo-mercancia').value,
+                marca: document.getElementById('filtro-marca').value.toLowerCase().trim(),
+                tipo_metal: document.getElementById('filtro-tipo-metal').value,
+                pureza: document.getElementById('filtro-pureza').value,
+                genero: document.getElementById('filtro-genero').value,
+                acabado: document.getElementById('filtro-acabado').value
+            };
+            
+            // Si no hay filtros, mostrar todos los productos
+            const hayFiltros = Object.values(filtros).some(valor => valor !== '');
+            
+            let resultados;
+            if (!hayFiltros) {
+                // Mostrar todos los productos si no hay filtros específicos
+                resultados = inventarioProductos;
+            } else {
+                // Aplicar filtros
+                resultados = inventarioProductos.filter(producto => {
+                    return (
+                        (!filtros.codigo || producto.codigo.toLowerCase().includes(filtros.codigo)) &&
+                        (!filtros.tipo_mercancia || producto.tipo_mercancia === filtros.tipo_mercancia) &&
+                        (!filtros.marca || producto.marca.toLowerCase().includes(filtros.marca)) &&
+                        (!filtros.tipo_metal || producto.tipo_metal === filtros.tipo_metal) &&
+                        (!filtros.pureza || producto.pureza === filtros.pureza) &&
+                        (!filtros.genero || producto.genero === filtros.genero) &&
+                        (!filtros.acabado || producto.acabado === filtros.acabado)
+                    );
+                });
+            }
+            
+            mostrarResultados(resultados);
+        }
+        
+        function mostrarResultados(resultados) {
+            const noResultsDiv = document.getElementById('no-results');
+            const summaryDiv = document.getElementById('results-summary');
+            const tableContainer = document.getElementById('results-table-container');
+            const tableBody = document.getElementById('results-table-body');
+            const resultsCount = document.getElementById('results-count');
+            
+            if (resultados.length === 0) {
+                noResultsDiv.innerHTML = `
+                    <i class="fas fa-search-minus"></i>
+                    <h3>No se encontraron productos</h3>
+                    <p>No hay productos que coincidan con los filtros seleccionados. Intente modificar los criterios de búsqueda.</p>
+                `;
+                noResultsDiv.style.display = 'block';
+                summaryDiv.style.display = 'none';
+                tableContainer.style.display = 'none';
+                return;
+            }
+            
+            // Ocultar mensaje de no resultados y mostrar tabla
+            noResultsDiv.style.display = 'none';
+            summaryDiv.style.display = 'flex';
+            tableContainer.style.display = 'block';
+            
+            // Actualizar contador
+            resultsCount.textContent = `${resultados.length} producto${resultados.length !== 1 ? 's' : ''} encontrado${resultados.length !== 1 ? 's' : ''}`;
+            
+            // Limpiar tabla y agregar resultados
+            tableBody.innerHTML = '';
+            resultados.forEach(producto => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${producto.codigo}</strong></td>
+                    <td>
+                        <i class="fas ${getTipoMercanciaIcon(producto.tipo_mercancia)}"></i>
+                        ${producto.tipo_mercancia_display || capitalizeFirst(producto.tipo_mercancia)}
+                        ${producto.nombre ? `<br><small style="color: #666;">${producto.nombre}</small>` : ''}
+                    </td>
+                    <td>${producto.marca}</td>
+                    <td>${capitalizeFirst(producto.tipo_metal)}</td>
+                    <td>${producto.pureza}</td>
+                    <td>
+                        <i class="fas ${getGeneroIcon(producto.genero)}"></i>
+                        ${capitalizeFirst(producto.genero)}
+                    </td>
+                    <td>${capitalizeFirst(producto.acabado)}</td>
+                    <td><strong>$${producto.precio.toFixed(2)}</strong></td>
+                    <td>
+                        <span class="${producto.stock <= 2 ? 'text-danger' : 'text-success'}">
+                            ${producto.stock} unidades
+                        </span>
+                    </td>
+                    <td>
+                        <button onclick="verDetalle('${producto.codigo}')" class="btn-sm btn-info" title="Ver detalle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="editarProducto('${producto.codigo}')" class="btn-sm btn-warning" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="eliminarProducto('${producto.codigo}')" class="btn-sm btn-danger" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function limpiarFiltros() {
+            // Limpiar todos los campos
+            document.getElementById('filtro-codigo').value = '';
+            document.getElementById('filtro-tipo-mercancia').value = '';
+            document.getElementById('filtro-marca').value = '';
+            document.getElementById('filtro-tipo-metal').value = '';
+            document.getElementById('filtro-pureza').value = '';
+            document.getElementById('filtro-genero').value = '';
+            document.getElementById('filtro-acabado').value = '';
+            
+            // Recargar productos y mostrar todos
+            inventarioProductos = cargarProductosInventario();
+            
+            if (inventarioProductos.length === 0) {
+                document.getElementById('no-results').innerHTML = `
+                    <i class="fas fa-box-open"></i>
+                    <h3>No hay productos en el inventario</h3>
+                    <p>Vaya al módulo de <a href="../Inventory/inventory.html" style="color: var(--primary-color); text-decoration: underline;">Creación de Inventario</a> para agregar productos.</p>
+                `;
+                document.getElementById('no-results').style.display = 'block';
+                document.getElementById('results-summary').style.display = 'none';
+                document.getElementById('results-table-container').style.display = 'none';
+            } else {
+                // Mostrar todos los productos después de limpiar filtros
+                mostrarResultados(inventarioProductos);
+            }
+        }
+        
+        // Nueva función para mostrar todos los productos
+        function mostrarTodosLosProductos() {
+            console.log('📋 Mostrando todos los productos del inventario...');
+            
+            // Limpiar filtros primero
+            document.getElementById('filtro-codigo').value = '';
+            document.getElementById('filtro-tipo-mercancia').value = '';
+            document.getElementById('filtro-marca').value = '';
+            document.getElementById('filtro-tipo-metal').value = '';
+            document.getElementById('filtro-pureza').value = '';
+            document.getElementById('filtro-genero').value = '';
+            document.getElementById('filtro-acabado').value = '';
+            
+            // Recargar productos del localStorage por si hay cambios recientes
+            inventarioProductos = cargarProductosInventario();
+            
+            if (inventarioProductos.length === 0) {
+                document.getElementById('no-results').innerHTML = `
+                    <i class="fas fa-box-open"></i>
+                    <h3>No hay productos en el inventario</h3>
+                    <p>Vaya al módulo de <a href="../Inventory/inventory.html" style="color: var(--primary-color); text-decoration: underline;">Creación de Inventario</a> para agregar productos.</p>
+                `;
+                document.getElementById('no-results').style.display = 'block';
+                document.getElementById('results-summary').style.display = 'none';
+                document.getElementById('results-table-container').style.display = 'none';
+            } else {
+                // Mostrar todos los productos
+                mostrarResultados(inventarioProductos);
+            }
+        }
+        
+        function exportarResultados() {
+            // Verificar si hay productos que exportar
+            if (inventarioProductos.length === 0) {
+                alert('No hay productos para exportar.');
+                return;
+            }
+            
+            // Obtener productos actualmente mostrados en la tabla
+            const tablaVisible = document.getElementById('results-table-container').style.display !== 'none';
+            if (!tablaVisible) {
+                alert('No hay resultados visibles para exportar. Realice una búsqueda primero.');
+                return;
+            }
+            
+            // En una implementación real, esto exportaría a Excel/CSV
+            const totalProductos = document.querySelectorAll('#results-table-body tr').length;
+            alert(`Funcionalidad de exportación en desarrollo.\n\nSe exportarían ${totalProductos} productos.\n\nPróximamente se implementará la exportación a Excel/CSV.`);
+        }
+        
+        function verDetalle(codigo) {
+            const producto = inventarioProductos.find(p => p.codigo === codigo);
+            if (producto) {
+                const fecha = new Date(producto.fecha_creacion).toLocaleDateString('es-ES');
+                alert(`DETALLE DEL PRODUCTO\n\n` +
+                    `Código: ${producto.codigo}\n` +
+                    `Nombre: ${producto.nombre}\n` +
+                    `Marca: ${producto.marca}\n` +
+                    `Modelo: ${producto.modelo || 'N/A'}\n` +
+                    `Tipo: ${producto.tipo_mercancia_display}\n` +
+                    `Metal: ${producto.tipo_metal} (${producto.pureza})\n` +
+                    `Género: ${capitalizeFirst(producto.genero)}\n` +
+                    `Acabado: ${capitalizeFirst(producto.acabado)}\n` +
+                    `\nPRECIOS:\n` +
+                    `Compra: $${producto.precio_compra.toFixed(2)}\n` +
+                    `Venta: $${producto.precio.toFixed(2)}\n` +
+                    `Mayoreo: $${producto.precio_mayoreo.toFixed(2)}\n` +
+                    `\nINVENTARIO:\n` +
+                    `Stock: ${producto.stock} unidades\n` +
+                    `Peso metal: ${producto.peso_metal}g\n` +
+                    `Peso piedras: ${producto.peso_piedras}g\n` +
+                    `\nCREADO: ${fecha} por ${producto.usuario_creacion}`);
+            } else {
+                alert('Producto no encontrado.');
+            }
+        }
+        
+        function editarProducto(codigo) {
+            if (confirm(`¿Desea editar el producto ${codigo}?\n\nSe redirigirá al formulario de inventario.`)) {
+                // En una implementación completa, se cargarían los datos en el formulario
+                window.location.href = `../Inventory/inventory.html?edit=${codigo}`;
+            }
+        }
+        
+        function eliminarProducto(codigo) {
+            const producto = inventarioProductos.find(p => p.codigo === codigo);
+            if (!producto) {
+                alert('Producto no encontrado.');
+                return;
+            }
+            
+            if (confirm(`¿Está seguro de eliminar el producto?\n\n` +
+                       `Código: ${producto.codigo}\n` +
+                       `Nombre: ${producto.nombre}\n\n` +
+                       `Esta acción no se puede deshacer.`)) {
+                try {
+                    // Eliminar del localStorage
+                    const productos = JSON.parse(localStorage.getItem('inventario_productos') || '[]');
+                    const productosActualizados = productos.filter(p => p.codigo_producto !== codigo);
+                    localStorage.setItem('inventario_productos', JSON.stringify(productosActualizados));
+                    
+                    // Actualizar lista local y refrescar vista
+                    inventarioProductos = cargarProductosInventario();
+                    aplicarFiltros();
+                    
+                    alert(`Producto "${producto.nombre}" eliminado exitosamente.`);
+                } catch (error) {
+                    console.error('Error al eliminar producto:', error);
+                    alert('Error al eliminar el producto. Inténtelo nuevamente.');
+                }
+            }
+        }
+        
+        // Funciones auxiliares
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        
+        function getTipoMercanciaIcon(tipo) {
+            const icons = {
+                'anillo': 'fa-ring',
+                'collar': 'fa-gem',
+                'pulsera': 'fa-bracelet',
+                'aretes': 'fa-earrings',
+                'cadena': 'fa-link',
+                'reloj': 'fa-clock'
+            };
+            return icons[tipo] || 'fa-jewelry';
+        }
+        
+        function getGeneroIcon(genero) {
+            const icons = {
+                'hombre': 'fa-mars',
+                'mujer': 'fa-venus',
+                'unisex': 'fa-venus-mars',
+                'niño': 'fa-child',
+                'niña': 'fa-child'
+            };
+            return icons[genero] || 'fa-user';
+        }
+        
+        // Agregar estilos adicionales para botones pequeños
+        const additionalStyles = `
+            <style>
+                .btn-sm {
+                    padding: 0.25rem 0.5rem;
+                    font-size: 0.8rem;
+                    border-radius: 3px;
+                    border: none;
+                    cursor: pointer;
+                    margin-right: 0.25rem;
+                    transition: all 0.3s;
+                }
+                
+                .btn-info {
+                    background: #17a2b8;
+                    color: white;
+                }
+                
+                .btn-info:hover {
+                    background: #138496;
+                }
+                
+                .btn-warning {
+                    background: #ffc107;
+                    color: #212529;
+                }
+                
+                .btn-warning:hover {
+                    background: #e0a800;
+                }
+                
+                .btn-danger {
+                    background: #dc3545;
+                    color: white;
+                }
+                
+                .btn-danger:hover {
+                    background: #c82333;
+                }
+                
+                .text-danger {
+                    color: #dc3545 !important;
+                }
+                
+                .text-success {
+                    color: #28a745 !important;
+                }
+                
+                .btn-back {
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+                
+                .btn-back:hover {
+                    background: var(--primary-hover);
+                    transform: translateY(-2px);
+                }
+            </style>
+        `;
+        
+        // Agregar estilos adicionales al head
+        document.head.insertAdjacentHTML('beforeend', additionalStyles);
+    </script>
+    <script src="../js/sidebar-new.js"></script>
+</body>
+</html>

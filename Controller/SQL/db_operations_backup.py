@@ -1,8 +1,23 @@
+import sqlite3
+import os
+from datetime import datetime
+from pathlib import Path
+from cryptography.fernet import Fernet
+from .sqlite_utils import db_optimizer
+
+# Clave fija para ejemplo, en producción debe estar en variable de entorno o archivo seguro
+FERNET_KEY = b'Ky9D34yPsE_LUzk-nBKX76doGj2IH8Jq7rjDdBGqRSs='
+fernet = Fernet(FERNET_KEY)
+
+def _get_default_db_path():
+    """Obtener ruta por defecto de la base de datos"""
+    project_root = Path(__file__).parent.parent.parent
+    return str(project_root / "sales_system.db")
+
 # Consultar solo el correo almacenado
 def consultar_email_config(db_path=None):
     if not db_path:
-        print("[ERROR] Se requiere especificar la ruta de la base de datos")
-        return None
+        db_path = _get_default_db_path()
     with db_optimizer.get_connection() as (conn, cursor):
         cursor.execute("SELECT email FROM Emails LIMIT 1")
         row = cursor.fetchone()
@@ -12,8 +27,7 @@ def consultar_email_config(db_path=None):
 # Función para obtener email y contraseña desencriptada
 def obtener_email_config(db_path=None):
     if not db_path:
-        print("[ERROR] Se requiere especificar la ruta de la base de datos")
-        return None, None
+        db_path = _get_default_db_path()
     with db_optimizer.get_connection() as (conn, cursor):
         cursor.execute("SELECT email, pass FROM Emails LIMIT 1")
         row = cursor.fetchone()
@@ -38,8 +52,7 @@ fernet = Fernet(FERNET_KEY)
 
 def guardar_email_config(email, password, db_path=None):
     if not db_path:
-        print("[ERROR] Se requiere especificar la ruta de la base de datos")
-        return False
+        db_path = _get_default_db_path()
     with db_optimizer.get_connection() as (conn, cursor):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # Encriptar la contraseña antes de guardar

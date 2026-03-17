@@ -3,7 +3,9 @@ Utilidades para optimización de SQLite3
 Funciones centralizadas para manejo eficiente de conexiones y consultas
 """
 import sqlite3
+import os
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Generator, Tuple, List, Any
 
 class SQLiteOptimizer:
@@ -11,7 +13,9 @@ class SQLiteOptimizer:
     
     def __init__(self, db_path: str = None):
         if not db_path:
-            raise ValueError("Se requiere especificar la ruta de la base de datos")
+            # Usar ruta por defecto - base de datos original en config/
+            project_root = Path(__file__).parent.parent.parent / "config"
+            db_path = str(project_root / "sqliteDB.db")
         self.db_path = db_path
     
     @contextmanager

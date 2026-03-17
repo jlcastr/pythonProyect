@@ -5,13 +5,16 @@ integrada con el sistema de configuraciones existente
 
 import sqlite3
 from datetime import datetime
+from pathlib import Path
 
 class InventarioManager:
     """Manejador de inventarios con adaptación según configuración"""
     
     def __init__(self, db_path=None):
         if not db_path:
-            raise ValueError("Se requiere especificar la ruta de la base de datos")
+            # Usar ruta por defecto
+            project_root = Path(__file__).parent
+            db_path = str(project_root / "sales_system.db")
         self.db_path = db_path
         self.config = self._get_configuration()
     

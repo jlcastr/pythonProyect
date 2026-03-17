@@ -1444,11 +1444,9 @@ class SalesSystemWebApp:
             # Verificar base de datos si está disponible
             try:
                 print("[DB] Verificando base de datos...")
-                conn = obtener_conexion()
+                conn = crear_conexion_y_tablas()  # Esto creará la BD si no existe
                 if not conn:
-                    print("[DB] Base de datos no configurada - se requiere configuración externa")
-                    # crear_conexion_y_tablas()  # Comentado para evitar crear BD automáticamente
-                    # conn = obtener_conexion()
+                    print("[DB] Error configurando base de datos")
                     conn = None
                 
                 if conn:
